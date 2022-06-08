@@ -452,6 +452,7 @@
     <Content Include="Content\DataTables\css\common.scss" />
     <Content Include="Content\toastr.scss" />
     <Content Include="Content\toastr.less" />
+    <Content Include=".gitignore" />
     <None Include="packages.config" />
     <None Include="Properties\PublishProfiles\HostKing.pubxml" />
     <Content Include="scripts\angular-local-storage.js" />
@@ -578,8 +579,8 @@
     <Content Include="scripts\popper.js" />
     <Content Include="scripts\popper.min.js" />
     <Content Include="scripts\sb-admin-2.js" />
-    <Content Include="Web.config" />
     <Content Include="Web.sample.config" />
+    <Content Include="Web.config" />
     <TypeScriptCompile Include="scripts\index.d.ts" />
     <TypeScriptCompile Include="scripts\typings\angularjs\angular-animate.d.ts" />
     <TypeScriptCompile Include="scripts\typings\angularjs\angular-component-router.d.ts" />
