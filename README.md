@@ -20,24 +20,24 @@ You can immediately generate (and deploy) the code from this initial setup. The 
 ![image](https://user-images.githubusercontent.com/642609/172638876-e80e57be-ce36-4fcd-9221-a7a229cc3a40.png)
 
 In the above screenshot, you can see the tabs for each of the different files that Code Generator 3 will produce, including:
-- Model: creates the class which EFCore will use to generate a table in the database
-- TypeScriptModel: creates the TypeScript model to work with in your front-end Angular app
-- Enums: if you need to use Enums as fields
-- DTO: The REST API converts your Model classes to DTOs before returning them to the webpage, allowing better control
-- SettingsDTO: a generic settings DTO
-- DbContext: creates part of the DBContext class for EF Core
-- Controller: creates a WEB API controller for the RESTful API
-- BundleConfig: legacy naming, but this creates the `generated.module.ts` and `shared.module.ts` files
-- AppRouter: creates the `generated.routes.ts` file for Angular routing
-- ApiResource: creates a typescript service file for each entity, e.g. `user.service.ts`
-- ListHtml: creates the HTML for searching/listing each entity
-- ListTypeScript: creates the TypeScript for searching/listing each entity
-- EditHtml: creates the HTML for adding/editing/deleting each entity
-- EditTypeScript: creates the TypeScript for adding/editing/deleting each entity
-- AppSelectHtml: creates the selector directive for selecting entities from lists (think of it as an advanced TypeAhead)
-- AppSelectTypeScript: creates the selector directive for selecting entities from lists (think of it as an advanced TypeAhead)
-- SelectModalHtml: creates the modal directive for selecting entities from lists (think of it as an advanced TypeAhead)
-- SelectModalTypeScript: creates the modal directive for selecting entities from lists (think of it as an advanced TypeAhead)
+- `Model`: creates the class which EFCore will use to generate a table in the database
+- `TypeScriptModel`: creates the TypeScript model to work with in your front-end Angular app
+- `Enums`: if you need to use Enums as fields
+- `DTO`: The REST API converts your Model classes to DTOs before returning them to the webpage, allowing better control
+- `SettingsDTO`: a generic settings DTO
+- `DbContext`: creates part of the DBContext class for EF Core
+- `Controller`: creates a WEB API controller for the RESTful API
+- `BundleConfig`: legacy naming, but this creates the `generated.module.ts` and `shared.module.ts` files
+- `AppRouter`: creates the `generated.routes.ts` file for Angular routing
+- `ApiResource`: creates a typescript service file for each entity, e.g. `user.service.ts`
+- `ListHtml`: creates the HTML for searching/listing each entity
+- `ListTypeScript`: creates the TypeScript for searching/listing each entity
+- `EditHtml`: creates the HTML for adding/editing/deleting each entity
+- `EditTypeScript`: creates the TypeScript for adding/editing/deleting each entity
+- `AppSelectHtml`: creates the selector directive for selecting entities from lists (think of it as an advanced TypeAhead)
+- `AppSelectTypeScript`: creates the selector directive for selecting entities from lists (think of it as an advanced TypeAhead)
+- `SelectModalHtml`: creates the modal directive for selecting entities from lists (think of it as an advanced TypeAhead)
+- `SelectModalTypeScript`: creates the modal directive for selecting entities from lists (think of it as an advanced TypeAhead)
 
 These outputs can be deployed directly into your target project if you have set up the `RootPath` value in your **web.config**, as well as the `WebPath` & `ModelsPath` values in the Project screen.
 
@@ -59,6 +59,6 @@ Of course, there is more, such as adding relationships between entities, having 
 
 ![image](https://user-images.githubusercontent.com/642609/172646245-97cf2e4f-52b8-44d9-939b-c1532ed70f8b.png)
 
-Feel free to get in touch for more assistance: twitter.com/capesean
+Feel free to get in touch for more assistance: [twitter.com/capesean](https://twitter.com/capesean)
 
 
