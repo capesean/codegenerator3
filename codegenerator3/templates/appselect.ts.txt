@@ -1,0 +1,78 @@
+﻿import { Component, OnInit, forwardRef, ViewChild, Input, EventEmitter, Output } from '@angular/core';
+import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
+import { NAMEModalComponent } from './NAME_TOLOWER.modal.component';
+import { NAME } from '../common/models/NAME_TOLOWER.model';
+import { Enum/*ENUMS*/ } from '../common/models/enums.model';
+/*IMPORTS*/
+@Component({
+    selector: 'HYPHENATEDNAME-select',
+    templateUrl: './NAME_TOLOWER.select.component.html',
+    providers: [{
+        provide: NG_VALUE_ACCESSOR,
+        useExisting: forwardRef(() => NAMESelectComponent),
+        multi: true
+    }],
+    host: { 'class': 'app-select' }
+})
+export class NAMESelectComponent implements OnInit, ControlValueAccessor {
+
+    @Input() CAMELCASENAME: NAME;
+    @Input() PLURALNAME_TOCAMELCASE: NAME[];
+    @Output() CAMELCASENAMEChange = new EventEmitter<NAME>();
+    @Output() PLURALNAME_TOCAMELCASEChange = new EventEmitter<NAME[]>();
+    @Input() canRemoveFilters = false;
+    @Input() multiple = false;
+    @Input() showAddNew = false;
+/*INPUTS*/
+    disabled = false;
+    placeholder = this.multiple ? "Select PLURALFRIENDLYNAME_TOLOWER" : "Select aSTARTSWITHVOWEL FRIENDLYNAME_LOWER";
+
+    @ViewChild('modal') modal: NAMEModalComponent;
+
+    constructor(
+    ) {
+    }
+
+    ngOnInit(): void {
+    }
+
+    propagateChange = (_: any) => { };
+
+    writeValue(KEYFIELD: KEYFIELDTYPE | KEYFIELDTYPE[]): void {
+        if (KEYFIELD !== undefined) {
+            this.propagateChange(KEYFIELD);
+        }
+    }
+
+    registerOnChange(fn: any): void {
+        this.propagateChange = fn;
+    }
+
+    registerOnTouched(): void {
+    }
+
+    setDisabledState?(isDisabled: boolean): void {
+        this.disabled = isDisabled;
+    }
+
+    changed(CAMELCASENAME: NAME | NAME[]) {
+        if (this.disabled) return;
+        if (this.multiple) {
+            this.writeValue(CAMELCASENAME ? (CAMELCASENAME as NAME[]).map(o => o.KEYFIELD) : null);
+            this.PLURALNAME_TOCAMELCASE = (CAMELCASENAME as NAME[]);
+            this.PLURALNAME_TOCAMELCASEChange.emit((CAMELCASENAME as NAME[]));
+        } else {
+            this.writeValue(CAMELCASENAME ? (CAMELCASENAME as NAME).KEYFIELD : null);
+            this.CAMELCASENAME = (CAMELCASENAME as NAME);
+            this.CAMELCASENAMEChange.emit((CAMELCASENAME as NAME));
+        }
+    }
+
+    getLabel() {
+        return this.multiple ? this.PLURALNAME_TOCAMELCASE.map(CAMELCASENAME => LABEL_OUTPUT_MULTI).join(", ") : LABEL_OUTPUT_SINGLE ?? "";
+    }
+
+    openModal() {
+        if (!this.disabled) this.modal.open();
+    }
+}

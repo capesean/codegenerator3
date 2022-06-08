@@ -1,0 +1,55 @@
+<div>
+
+    <form ng-submit="vm.runSearch(0)" novalidate>
+
+        <div class="row">
+
+            <div class="col-sm-6 col-md-4 col-lg-3">
+                <div class="form-group">
+                    <input type="search" id="q" ng-model="vm.search.q" max="100" class="form-control" placeholder="Search fields" />
+                </div>
+            </div>
+
+        </div>
+
+        <fieldset ng-disabled="vm.loading">
+
+            <button type="submit" class="btn btn-success">Search<i class="fa fa-search"></i></button>
+
+        </fieldset>
+
+    </form>
+
+    <hr />
+
+    <table class="table table-striped table-hover table-bordered row-navigation" ng-class="{ 'disabled': vm.loading }">
+        <thead>
+            <tr>
+                <th scope="col">Entity</th>
+                <th scope="col">Name</th>
+                <th scope="col">Key Field</th>
+                <th scope="col">Show In Search Results</th>
+                <th scope="col">Search Type</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr ng-repeat="field in vm.fields" ng-click="vm.goToField(field.entity.project.projectId, field.entity.entityId, field.fieldId)">
+                <td>{{ field.entity.name }}</td>
+                <td>{{ field.name }}</td>
+                <td>{{ field.keyField ? "Yes" : "No" }}</td>
+                <td>{{ field.showInSearchResults ? "Yes" : "No" }}</td>
+                <td>{{ vm.appSettings.find(vm.appSettings.searchType, field.searchType).label }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="row" ng-class="{ 'disabled': vm.loading }">
+        <div class="col-sm-7">
+            <app-pager headers="vm.headers" callback="vm.runSearch"></app-pager>
+        </div>
+        <div class="col-sm-5 text-right resultsInfo">
+            <app-pager-info headers="vm.headers"></app-pager-info>
+        </div>
+    </div>
+
+</div>

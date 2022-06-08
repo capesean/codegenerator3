@@ -1,0 +1,333 @@
+<div>
+
+    <form name="mainForm" ng-submit="vm.save()" novalidate>
+
+        <fieldset class="group" ng-disabled="vm.loading">
+
+            <legend>Project</legend>
+
+            <div class="row">
+
+                <div class="col-sm-12">
+
+                    <div class="col-sm-6 col-md-4">
+                        <div class="form-group" ng-class="{ 'has-error':  mainForm.$submitted && mainForm.name.$invalid }">
+                            <label for="name" class="control-label">
+                                Name:
+                            </label>
+                            <input type="text" id="name" name="name" ng-model="vm.project.name" maxlength="50" class="form-control" ng-required="true" />
+                        </div>
+                    </div>
+
+                    <div ng-class="{ 'hide':  !vm.isNew && !vm.showMore}">
+
+                    <div class="col-sm-6 col-md-4">
+                        <div class="form-group" ng-class="{ 'has-error':  mainForm.$submitted && mainForm.namespace.$invalid }">
+                            <label for="namespace" class="control-label">
+                                Namespace:
+                            </label>
+                            <input type="text" id="namespace" name="namespace" ng-model="vm.project.namespace" maxlength="20" class="form-control" ng-required="true" />
+                        </div>
+                    </div>
+
+                    <div class="col-sm-6 col-md-4 col-lg-3">
+                        <div class="form-group" ng-class="{ 'has-error':  mainForm.$submitted && mainForm.angularModuleName.$invalid }">
+                            <label for="angularModuleName" class="control-label">
+                                Angular Module Name:
+                            </label>
+                            <input type="text" id="angularModuleName" name="angularModuleName" ng-model="vm.project.angularModuleName" maxlength="20" class="form-control" ng-required="true" />
+                        </div>
+                    </div>
+
+                    <div class="col-sm-6 col-md-4 col-lg-3">
+                        <div class="form-group" ng-class="{ 'has-error':  mainForm.$submitted && mainForm.angularDirectivePrefix.$invalid }">
+                            <label for="angularDirectivePrefix" class="control-label">
+                                Angular Directive Prefix:
+                            </label>
+                            <input type="text" id="angularDirectivePrefix" name="angularDirectivePrefix" ng-model="vm.project.angularDirectivePrefix" maxlength="20" class="form-control" ng-required="true" />
+                        </div>
+                    </div>
+
+                    <div class="col-sm-6 col-md-4 col-lg-3">
+                        <div class="form-group" ng-class="{ 'has-error':  mainForm.$submitted && mainForm.dbContextVariable.$invalid }">
+                            <label for="dbContextVariable" class="control-label">
+                                DbContext Variable:
+                            </label>
+                            <input type="text" id="dbContextVariable" name="dbContextVariable" ng-model="vm.project.dbContextVariable" maxlength="20" class="form-control" />
+                        </div>
+                    </div>
+
+                    <div class="col-sm-6 col-md-4" uib-popover-html="'This is the <strong>relative</strong> path from the <code>RootPath</code> defined in <code>Web.config</code> to the root of your Web project. Example: If your web project is on path <code>c:\\source\\mywebsite</code>, your <code>RootPath</code> should be <code>c:\\source\\</code> and your <code>Web Path</code> should be <code>mywebsite</code>. (This allows you to have Web and Models in different projects, or they could be the same value if it's a single project.')'" popover-trigger="'mouseenter'" popover-append-to-body="true" popover-title="Web Path">
+                        <div class="form-group" ng-class="{ 'has-error':  mainForm.$submitted && mainForm.webPath.$invalid }">
+                            <label for="webPath" class="control-label">
+                                Web Path:
+                            </label>
+                            <input type="text" id="webPath" name="webPath" ng-model="vm.project.webPath" maxlength="250" class="form-control" ng-required="true" />
+                        </div>
+                    </div>
+
+                    <div class="col-sm-6 col-md-4 col-lg-3" uib-popover-html="'This is the <strong>relative</strong> path from the <code>RootPath</code> defined in <code>Web.config</code> to the root of your Models project. Example: If your models project is on path <code>c:\\source\\mymodels</code>, your <code>RootPath</code> should be <code>c:\\source\\</code> and your <code>Models Path</code> should be <code>mymodels</code>. (This allows you to have Web and Models in different projects, or they could be the same value if it's a single project.)'" popover-trigger="'mouseenter'" popover-append-to-body="true" popover-title="Models Path">
+                        <div class="form-group" ng-class="{ 'has-error':  mainForm.$submitted && mainForm.modelsPath.$invalid }">
+                            <label for="modelsPath" class="control-label">
+                                Models Path:
+                            </label>
+                            <input type="text" id="modelsPath" name="modelsPath" ng-model="vm.project.modelsPath" maxlength="50" class="form-control" ng-required="true" />
+                        </div>
+                    </div>
+
+                    <div class="col-sm-6 col-md-4 col-lg-3">
+                        <div class="form-group" ng-class="{ 'has-error':  mainForm.$submitted && mainForm.userFilterFieldName.$invalid }">
+                            <label for="userFilterFieldName" class="control-label">
+                                User Filter Field Name:
+                            </label>
+                            <input type="text" id="userFilterFieldName" name="userFilterFieldName" ng-model="vm.project.userFilterFieldName" maxlength="50" class="form-control" />
+                        </div>
+                    </div>
+
+                    <div class="col-sm-12">
+                        <div class="form-group" ng-class="{ 'has-error':  mainForm.$submitted && mainForm.notes.$invalid }">
+                            <label for="notes" class="control-label">
+                                Notes:
+                            </label>
+                            <textarea id="notes" name="notes" ng-model="vm.project.notes" class="form-control" rows="6"></textarea>
+                        </div>
+                    </div>
+
+                    </div>
+
+                </div>
+            </div>
+
+        </fieldset>
+
+        <div class="form-group error-messages has-error alert alert-danger" ng-if="mainForm.$submitted && mainForm.$invalid">
+
+            <span class="help-block has-error">
+                <span>
+                    Please correct the following errors:
+                </span>
+            </span>
+
+            <ul>
+
+                <li class="help-block has-error"
+                    ng-messages="mainForm.name.$error">
+                    <span ng-message="required">
+                        Name is required.
+                    </span>
+                </li>
+
+                <li class="help-block has-error"
+                    ng-if="mainForm.$submitted"
+                    ng-messages="mainForm.webPath.$error">
+                    <span ng-message="required">
+                        Web Path is required. Mouse over the Web Path field for more information.
+                    </span>
+                </li>
+
+                <li class="help-block has-error"
+                    ng-if="mainForm.$submitted"
+                    ng-messages="mainForm.modelsPath.$error">
+                    <span ng-message="required">
+                        Models Path is required. Mouse over the Models Path field for more information.
+                    </span>
+                </li>
+
+                <li class="help-block has-error"
+                    ng-if="mainForm.$submitted"
+                    ng-messages="mainForm.namespace.$error">
+                    <span ng-message="required">
+                        Namespace is required.
+                    </span>
+                </li>
+
+                <li class="help-block has-error"
+                    ng-if="mainForm.$submitted"
+                    ng-messages="mainForm.angularModuleName.$error">
+                    <span ng-message="required">
+                        Angular Module Name is required.
+                    </span>
+                </li>
+
+                <li class="help-block has-error"
+                    ng-if="mainForm.$submitted"
+                    ng-messages="mainForm.angularDirectivePrefix.$error">
+                    <span ng-message="required">
+                        Angular Directive Prefix is required.
+                    </span>
+                </li>
+
+                <li class="help-block has-error"
+                    ng-if="mainForm.$submitted"
+                    ng-messages="mainForm.dbContextVariable.$error">
+                    <span ng-message="required">
+                        DbContext Variable is required.
+                    </span>
+                </li>
+
+            </ul>
+
+        </div>
+
+        <fieldset ng-disabled="vm.loading">
+            <button type="submit" class="btn btn-success">Save<i class="fa fa-check"></i></button>
+            <button type="button" ng-if="!vm.isNew" class="btn btn-danger btn-delete" ng-click="vm.delete()">Delete<i class="fa fa-times"></i></button>
+            <button type="button" ng-if="!vm.isNew" class="btn btn-default" ng-click="vm.showMore = !vm.showMore"><span ng-if="!vm.showMore">More<i class="fa fa-chevron-right"></i></span><span ng-if="vm.showMore">Less<i class="fa fa-chevron-left"></i></span></button>
+        </fieldset>
+
+    </form>
+
+    <div ng-show="!vm.isNew">
+
+        <hr />
+
+        <h2>Entities</h2>
+
+        <fieldset ng-disabled="vm.loading">
+            <a class="btn btn-primary" href="projects/{{vm.project.projectId}}/entities/{{vm.appSettings.newGuid}}">Add Entity<i class="fa fa-plus-circle"></i></a>
+            <button type="button" class="btn btn-primary" ng-click="vm.runMultiDeploy()">Multi-Deploy<i class="fa fa-refresh"></i></button>
+            <button type="button" class="btn btn-default" ng-click="vm.selectAll()">Select All</button>
+        </fieldset>
+
+        <br />
+
+        <table class="table table-striped table-hover table-bordered row-navigation ">
+            <thead class="rotated">
+                <tr>
+                    <th scope="col">Name</th>
+                    <th class="text-center rotate-90" scope="col"><div ng-click="vm.setCheckBoxes('model')" class="clickable">Model</div></th>
+                    <th class="text-center rotate-90" scope="col"><div ng-click="vm.setCheckBoxes('typeScriptModel')" class="clickable">TypeScriptModel</div></th>
+                    <th class="text-center rotate-90" scope="col"><div ng-click="vm.setCheckBoxes('enums')" class="clickable">Enums</div></th>
+                    <th class="text-center rotate-90" scope="col"><div ng-click="vm.setCheckBoxes('dto')" class="clickable">DTO</div></th>
+                    <th class="text-center rotate-90" scope="col"><div ng-click="vm.setCheckBoxes('settingsDTO')" class="clickable">SettingsDTO</div></th>
+                    <th class="text-center rotate-90" scope="col"><div ng-click="vm.setCheckBoxes('dbContext')" class="clickable">DBContext</div></th>
+                    <th class="text-center rotate-90" scope="col"><div ng-click="vm.setCheckBoxes('controller')" class="clickable">Controller</div></th>
+                    <th class="text-center rotate-90" scope="col"><div ng-click="vm.setCheckBoxes('bundleConfig')" class="clickable">BundleConfig</div></th>
+                    <th class="text-center rotate-90" scope="col"><div ng-click="vm.setCheckBoxes('appRouter')" class="clickable">AppRouter</div></th>
+                    <th class="text-center rotate-90" scope="col"><div ng-click="vm.setCheckBoxes('apiResource')" class="clickable">ApiResource</div></th>
+                    <th class="text-center rotate-90" scope="col"><div ng-click="vm.setCheckBoxes('listHtml')" class="clickable">ListHtml</div></th>
+                    <th class="text-center rotate-90" scope="col"><div ng-click="vm.setCheckBoxes('listTypeScript')" class="clickable">ListTypeScript</div></th>
+                    <th class="text-center rotate-90" scope="col"><div ng-click="vm.setCheckBoxes('editHtml')" class="clickable">EditHtml</div></th>
+                    <th class="text-center rotate-90" scope="col"><div ng-click="vm.setCheckBoxes('editTypeScript')" class="clickable">EditTypeScript</div></th>
+                    <th class="text-center rotate-90" scope="col"><div ng-click="vm.setCheckBoxes('appSelectHtml')" class="clickable">AppSelectHtml</div></th>
+                    <th class="text-center rotate-90" scope="col"><div ng-click="vm.setCheckBoxes('appSelectTypeScript')" class="clickable">AppSelectTS</div></th>
+                    <th class="text-center rotate-90" scope="col"><div ng-click="vm.setCheckBoxes('selectModalHtml')" class="clickable">SelectModalHtml</div></th>
+                    <th class="text-center rotate-90" scope="col"><div ng-click="vm.setCheckBoxes('selectModalTypeScript')" class="clickable">SelectModalTs</div></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="entity in vm.entities" ng-click="vm.goToEntity(entity.project.projectId, entity.entityId)">
+                    <td ng-click="$event.stopPropagation();vm.setCheckBoxesByRow(entity);"><a ng-click="$event.stopPropagation();$event.preventDefault();vm.goToEntity(entity.project.projectId, entity.entityId);" href="/projects/{{vm.project.projectId}}/entities/{{entity.entityId}}">{{ entity.name }}</a></td>
+                    <td class="text-center" ng-click="$event.stopPropagation()" uib-tooltip="{{entity.preventModelDeployment}}"><input type="checkbox" ng-disabled="!!entity.preventModelDeployment" ng-model="vm.multideploy[entity.entityId].model" /></td>
+                    <td class="text-center" ng-click="$event.stopPropagation()" uib-tooltip="{{entity.preventTypeScriptModelDeployment}}"><input type="checkbox" ng-disabled="!!entity.preventTypeScriptModelDeployment" ng-model="vm.multideploy[entity.entityId].typeScriptModel" /></td>
+                    <td class="text-center" ng-click="$event.stopPropagation()"><input type="checkbox" ng-model="vm.multideploy[entity.entityId].enums" /></td>
+                    <td class="text-center" ng-click="$event.stopPropagation()" uib-tooltip="{{entity.preventDTODeployment}}"><input type="checkbox" ng-disabled="!!entity.preventDTODeployment" ng-model="vm.multideploy[entity.entityId].dto" /></td>
+                    <td class="text-center" ng-click="$event.stopPropagation()"><input type="checkbox" ng-model="vm.multideploy[entity.entityId].settingsDTO" /></td>
+                    <td class="text-center" ng-click="$event.stopPropagation()" uib-tooltip="{{entity.preventDbContextDeployment}}"><input type="checkbox" ng-disabled="!!entity.preventDbContextDeployment" ng-model="vm.multideploy[entity.entityId].dbContext" /></td>
+                    <td class="text-center" ng-click="$event.stopPropagation()" uib-tooltip="{{entity.preventControllerDeployment}}"><input type="checkbox" ng-disabled="!!entity.preventControllerDeployment" ng-model="vm.multideploy[entity.entityId].controller" /></td>
+                    <td class="text-center" ng-click="$event.stopPropagation()" uib-tooltip="{{entity.preventBundleConfigDeployment}}"><input type="checkbox" ng-disabled="!!entity.preventBundleConfigDeployment" ng-model="vm.multideploy[entity.entityId].bundleConfig" /></td>
+                    <td class="text-center" ng-click="$event.stopPropagation()" uib-tooltip="{{entity.preventAppRouterDeployment}}"><input type="checkbox" ng-disabled="!!entity.preventAppRouterDeployment" ng-model="vm.multideploy[entity.entityId].appRouter" /></td>
+                    <td class="text-center" ng-click="$event.stopPropagation()" uib-tooltip="{{entity.preventApiResourceDeployment}}"><input type="checkbox" ng-disabled="!!entity.preventApiResourceDeployment" ng-model="vm.multideploy[entity.entityId].apiResource" /></td>
+                    <td class="text-center" ng-click="$event.stopPropagation()" uib-tooltip="{{entity.preventListHtmlDeployment}}"><input type="checkbox" ng-disabled="!!entity.preventListHtmlDeployment" ng-model="vm.multideploy[entity.entityId].listHtml" /></td>
+                    <td class="text-center" ng-click="$event.stopPropagation()" uib-tooltip="{{entity.preventListTypeScriptDeployment}}"><input type="checkbox" ng-disabled="!!entity.preventListTypeScriptDeployment" ng-model="vm.multideploy[entity.entityId].listTypeScript" /></td>
+                    <td class="text-center" ng-click="$event.stopPropagation()" uib-tooltip="{{entity.preventEditHtmlDeployment}}"><input type="checkbox" ng-disabled="!!entity.preventEditHtmlDeployment" ng-model="vm.multideploy[entity.entityId].editHtml" /></td>
+                    <td class="text-center" ng-click="$event.stopPropagation()" uib-tooltip="{{entity.preventEditTypeScriptDeployment}}"><input type="checkbox" ng-disabled="!!entity.preventEditTypeScriptDeployment" ng-model="vm.multideploy[entity.entityId].editTypeScript" /></td>
+                    <td class="text-center" ng-click="$event.stopPropagation()" uib-tooltip="{{entity.preventAppSelectHtmlDeployment}}"><input type="checkbox" ng-disabled="!!entity.preventAppSelectHtmlDeployment" ng-model="vm.multideploy[entity.entityId].appSelectHtml" /></td>
+                    <td class="text-center" ng-click="$event.stopPropagation()" uib-tooltip="{{entity.preventAppSelectTypeScriptDeployment}}"><input type="checkbox" ng-disabled="!!entity.preventAppSelectHtmlDeployment" ng-model="vm.multideploy[entity.entityId].appSelectTypeScript" /></td>
+                    <td class="text-center" ng-click="$event.stopPropagation()" uib-tooltip="{{entity.preventSelectModalHtmlDeployment}}"><input type="checkbox" ng-disabled="!!entity.preventSelectModalHtmlDeployment" ng-model="vm.multideploy[entity.entityId].selectModalHtml" /></td>
+                    <td class="text-center" ng-click="$event.stopPropagation()" uib-tooltip="{{entity.preventSelectModalTypeScriptDeployment}}"><input type="checkbox" ng-disabled="!!entity.preventSelectModalHtmlDeployment" ng-model="vm.multideploy[entity.entityId].selectModalTypeScript" /></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="alert alert-info" ng-if="vm.entities.length">
+            Click on an entity name (hyperlink) above to navigate to that entity; click on the cell/row to select all checkboxes in the row.
+        </div>
+
+        <div ng-if="vm.deploymentResults">
+
+            <h2>Deployment Results</h2>
+
+            <table class="table table-striped table-hover table-bordered">
+                <thead>
+                    <tr>
+                        <th scope="col">Entity</th>
+                        <th scope="col">Code Type</th>
+                        <th scope="col">Error Message</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="result in vm.deploymentResults" ng-class="{ 'danger':  result.isError }">
+                        <td>{{result.entityName}}</td>
+                        <td>{{result.codeType}}</td>
+                        <td>{{result.errorMessage}}</td>
+                    </tr>
+                </tbody>
+            </table>
+
+
+        </div>
+
+        <hr />
+
+        <h2>Lookups</h2>
+
+        <fieldset ng-disabled="vm.loading">
+            <a class="btn btn-primary" href="projects/{{vm.project.projectId}}/lookups/{{vm.appSettings.newGuid}}">Add Lookup<i class="fa fa-plus-circle"></i></a><br />
+            <br />
+        </fieldset>
+
+        <table class="table table-striped table-hover table-bordered row-navigation ">
+            <thead>
+                <tr>
+                    <th scope="col">Name</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="lookup in vm.lookups" ng-click="vm.goToLookup(lookup.project.projectId, lookup.lookupId)">
+                    <td>{{ lookup.name }}</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="row" ng-if="!vm.loading">
+            <div class="col-sm-7">
+                <app-pager headers="vm.lookupsHeaders" callback="vm.loadLookups"></app-pager>
+            </div>
+            <div class="col-sm-5 text-right resultsInfo">
+                <app-pager-info headers="vm.lookupsHeaders"></app-pager-info>
+            </div>
+        </div>
+
+    </div>
+
+    <style>
+        thead.rotated th {
+            height: 120px;
+            -webkit-user-select: none; /* Chrome/Safari */
+            -moz-user-select: none; /* Firefox */
+            -ms-user-select: none; /* IE10+ */
+            /* Rules below not implemented in browsers yet */
+            -o-user-select: none;
+            user-select: none;
+        }
+
+        .rotate-90 {
+            width: 50px;
+        }
+
+            .rotate-90 div {
+                padding-top: 12px;
+                -webkit-transform: rotate(270deg); /* Saf3.1+, Chrome */
+                -moz-transform: rotate(270deg); /* FF3.5+ */
+                -ms-transform: rotate(270deg); /* IE9 */
+                -o-transform: rotate(270deg); /* Opera 10.5 */
+                transform: rotate(270deg);
+                zoom: 1;
+                max-width: 15px;
+                padding-left: 0px;
+                text-align: center;
+            }
+    </style>
+
+</div>

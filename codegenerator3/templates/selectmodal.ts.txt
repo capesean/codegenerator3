@@ -1,0 +1,152 @@
+﻿import { Component, OnInit, ViewChild, Output, EventEmitter, TemplateRef, Input } from '@angular/core';
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { Observable } from 'rxjs';
+import { NAMESearchOptions, NAMESearchResponse, NAME } from '../common/models/NAME_TOLOWER.model';
+import { NAMEService } from '../common/services/NAME_TOLOWER.service';
+import { PagingOptions } from '../common/models/http.model';
+import { ErrorService } from '../common/services/error.service';
+/*IMPORTS*/
+@Component({
+    selector: 'HYPHENATEDNAME-modal',
+    templateUrl: './NAME_TOLOWER.modal.component.html'
+})
+export class NAMEModalComponent implements OnInit {
+
+    modal: NgbModalRef;
+    CAMELCASENAME: NAME | NAME[];
+    selectedItems: NAME[] = [];
+    headers: PagingOptions = new PagingOptions();
+    searchOptions: NAMESearchOptions = new NAMESearchOptions();
+    PLURALNAME_TOCAMELCASE: NAME[];
+    allSelected = false;
+/*PROPERTIES*/
+    @ViewChild('content') content: TemplateRef<unknown>;
+    @Output() change: EventEmitter<NAME> = new EventEmitter<NAME>();
+    @Output() changes: EventEmitter<NAME[]> = new EventEmitter<NAME[]>();
+    @Input() canRemoveFilters = false;
+    @Input() multiple = false;
+    @Input() showAddNew = false;
+    @Input() title = this.multiple ? "Select PLURALFRIENDLYNAME" : "Select a FRIENDLYNAME_LOWER";
+/*INPUTS*/
+    constructor(
+        private modalService: NgbModal,
+        private CAMELCASENAMEService: NAMEService,
+        private errorService: ErrorService
+    ) {
+    }
+
+    ngOnInit(): void {
+        this.searchOptions.includeEntities = true;
+    }
+
+    open(): NgbModalRef {
+        //this.selectedItems = []; <-- allow multiple selects to re-open with selection in tact
+/*SEARCHOPTIONS*/        this.modal = this.modalService.open(this.content, { size: 'xl', centered: true, scrollable: true });
+        this.runSearch();
+        this.modal.result.then((CAMELCASENAME: NAME | NAME[]) => {
+            this.CAMELCASENAME = CAMELCASENAME;
+            if (this.multiple) this.changes.emit(CAMELCASENAME as NAME[]);
+            else this.change.emit(CAMELCASENAME as NAME);
+        }, () => {
+            // dismissed
+        });
+        return this.modal;
+    }
+
+    public runSearch(pageIndex = 0): Observable<NAMESearchResponse> {
+
+        this.searchOptions.pageIndex = pageIndex;
+
+        const observable = this.CAMELCASENAMEService
+            .search(this.searchOptions);
+
+        observable.subscribe(
+            response => {
+                this.PLURALNAME_TOCAMELCASE = response.PLURALNAME_TOCAMELCASE;
+                this.headers = response.headers;
+            },
+            err => {
+
+                this.errorService.handleError(err, "PLURALFRIENDLYNAME", "Load");
+
+            }
+        );
+
+        return observable;
+
+    }
+
+    close() {
+        if (this.multiple) this.modal.close(this.selectedItems);
+        else this.modal.dismiss();
+    }
+
+    clear() {
+        if (this.multiple) { this.selectedItems = []; this.modal.close([]); }
+        else this.modal.close(undefined);
+    }
+
+    select(CAMELCASENAME: NAME) {
+        if (this.multiple) {
+            if (this.isSelected(CAMELCASENAME)) {
+                for (let i = 0; i < this.selectedItems.length; i++) {
+                    if (this.selectedItems[i].KEYFIELD === CAMELCASENAME.KEYFIELD) {
+                        this.selectedItems.splice(i, 1);
+                        break;
+                    }
+                }
+            } else {
+                this.selectedItems.push(CAMELCASENAME);
+            }
+        } else {
+            this.modal.close(CAMELCASENAME);
+        }
+    }
+
+    isSelected(CAMELCASENAME: NAME) {
+        if (!this.multiple) return false;
+        return this.selectedItems.filter(item => item.KEYFIELD === CAMELCASENAME.KEYFIELD).length > 0;
+    }
+
+    toggleAll() {
+        this.allSelected = !this.allSelected;
+        this.PLURALNAME_TOCAMELCASE.forEach(CAMELCASENAME => {
+            const isSelected = this.isSelected(CAMELCASENAME);
+			if (isSelected && !this.allSelected) {
+                for (let i = 0; i < this.selectedItems.length; i++) {
+                    if (this.selectedItems[i].KEYFIELD === CAMELCASENAME.KEYFIELD) {
+                        this.selectedItems.splice(i, 1);
+                        break;
+                    }
+                }
+            } else if (!isSelected && this.allSelected) {
+                this.selectedItems.push(CAMELCASENAME);
+            }
+        });
+    }
+
+    selectAll() {
+
+        const oldPageSize = this.searchOptions.pageSize;
+        this.searchOptions.pageSize = 0;
+        this.searchOptions.pageIndex = 0;
+
+        this.CAMELCASENAMEService.search(this.searchOptions)
+
+            .subscribe(
+                response => {
+                    this.modal.close(response.PLURALNAME_TOCAMELCASE);
+                    this.PLURALNAME_TOCAMELCASE = response.PLURALNAME_TOCAMELCASE;
+                    this.searchOptions.pageSize = oldPageSize;
+                },
+                err => {
+                    this.errorService.handleError(err, "PLURALFRIENDLYNAME", "Load");
+                }
+            );
+
+    }
+
+    addNew() {
+        window.open("ADDNEWURL", "_blank");
+    }
+}
