@@ -8,7 +8,7 @@ To get started, just rename the `Web.Sample.config` and configure it to your env
 - Set the localhost url that the website will run on
 - Run the app and add your first Project!
 
-You will need **Website 3**, which you can find in my repositories, as the project into which your generated code will be placed.
+You will need **Website 3**, which you can find [here](https://github.com/capesean/Website3), as the project into which your generated code will be placed.
 
 Creating a project automatically adds a `User` entity with fields for Id, Email, First Name, Last Name, Full Name and Disabled. (The Full Name is a database-calculated field.) 
 
