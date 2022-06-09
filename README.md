@@ -10,7 +10,7 @@ To get started, just rename the `Web.Sample.config` and configure it to your env
 
 You will need **Website 3**, which you can find [here](https://github.com/capesean/Website3), as the project into which your generated code will be placed.
 
-Creating a project automatically adds a `User` entity with fields for `Id`, `Email`, `First Name`, `Last Name`, `Full Nam`e and `Disabled`. (The `Full Nam`e is a database-calculated field.) 
+Creating a project automatically adds a `User` entity with fields for `Id`, `Email`, `First Name`, `Last Name`, `Full Name` and `Disabled`. (The `Full Nam`e is a database-calculated field.) 
 
 ![image](https://user-images.githubusercontent.com/642609/172637620-94836445-f8ab-4a94-bf27-3e23f8f77087.png)
 
