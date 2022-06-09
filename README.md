@@ -1,5 +1,5 @@
 # Code Generator 3
-Generate code for an ASP.NET Core + Entity Framework Core website, using WebApi for a RESTFUL API service, and an Angular 14 font-end using TypeScript & Bootstrap 5.
+Generate code for an ASP.NET Core 6 + Entity Framework Core website, using WebApi for a RESTFUL API service, and an Angular 14 font-end using TypeScript & Bootstrap 5.
 
 *CodeGenerator runs on (old) ASP.NET v4, but the outputs are for modern (2022) targets, so don't be put off!*
 
