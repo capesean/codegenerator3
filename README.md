@@ -1,7 +1,7 @@
 # Code Generator 3
 Generate code for an ASP.NET Core 6 + Entity Framework Core website, using WebApi for a RESTFUL API service, and an Angular 14 font-end using TypeScript & Bootstrap 5.
 
-To get started, just rename the `Web.Sample.config` and configure it to your environment. *CodeGenerator runs on (old) ASP.NET v4, but the outputs are for modern (2022) targets, so don't be put off!*
+To get started, just rename the `Web.Sample.config` and configure it to your environment. (*CodeGenerator runs on (old) ASP.NET v4, but the outputs are for modern (2022) targets, so don't be put off!*)
 
 - Set the connection string
 - Set your name, email and password so you can log in on first run
