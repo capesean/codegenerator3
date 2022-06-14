@@ -654,7 +654,7 @@ namespace WEB.Models
                         if (rel == null) throw new Exception($"Field has IsUniqueOnHierarchy but no hierarchy: {entity.Name}.{field.Name}");
                         s.Add($"            modelBuilder.Entity<{entity.Name}>()");
                         s.Add($"                .HasIndex(o => new {{ o.{rel.RelationshipFields.First().ChildField.Name}, o.{field.Name} }})");
-                        s.Add($"                .HasName(\"IX_{entity.Name}_{field.Name}\")");
+                        s.Add($"                .HasDatabaseName(\"IX_{entity.Name}_{field.Name}\")");
                         s.Add($"                .IsUnique();");
                         needsBreak = true;
                     }
@@ -662,7 +662,7 @@ namespace WEB.Models
                     {
                         s.Add($"            modelBuilder.Entity<{entity.Name}>()");
                         s.Add($"                .HasIndex(o => o.{field.Name})");
-                        s.Add($"                .HasName(\"IX_{entity.Name}_{field.Name}\")");
+                        s.Add($"                .HasDatabaseName(\"IX_{entity.Name}_{field.Name}\")");
                         s.Add($"                .IsUnique();");
                         needsBreak = true;
                     }
@@ -1674,7 +1674,7 @@ namespace WEB.Models
             s.Add(t + $"    <thead>");
             s.Add(t + $"        <tr>");
             if (useSortColumn)
-                s.Add(t + $"            <th class=\"text-center fa-col-width\"><i class=\"fas fa-sort\"></i></th>");
+                s.Add(t + $"            <th class=\"text-center fa-col-width\" *ngIf=\"{CurrentEntity.PluralName.ToCamelCase()}.length > 1\"><i class=\"fas fa-sort\"></i></th>");
             foreach (var field in CurrentEntity.Fields.Where(f => f.ShowInSearchResults).OrderBy(f => f.FieldOrder))
                 s.Add(t + $"            <th>{field.Label}</th>");
             s.Add(t + $"        </tr>");
@@ -1682,7 +1682,7 @@ namespace WEB.Models
             s.Add(t + $"    <tbody{(useSortColumn ? " cdkDropList (cdkDropListDropped)=\"sort($event)\"" : "")}>");
             s.Add(t + $"        <tr *ngFor=\"let {CurrentEntity.CamelCaseName} of {CurrentEntity.PluralName.ToCamelCase()}\" (click)=\"goTo{CurrentEntity.Name}({CurrentEntity.CamelCaseName})\"{(useSortColumn ? " cdkDrag" : "")}>");
             if (useSortColumn)
-                s.Add(t + $"            <td class=\"text-center fa-col-width\" cdkDragHandle (click)=\"$event.stopPropagation();\"><span *cdkDragPreview></span><i class=\"fas fa-sort\"></i></td>");
+                s.Add(t + $"            <td class=\"text-center fa-col-width\" cdkDragHandle (click)=\"$event.stopPropagation();\" *ngIf=\"{CurrentEntity.PluralName.ToCamelCase()}.length > 1\"><span *cdkDragPreview></span><i class=\"fas fa-sort\"></i></td>");
             foreach (var field in CurrentEntity.Fields.Where(f => f.ShowInSearchResults).OrderBy(f => f.FieldOrder))
             {
                 s.Add(t + $"            <td>{field.ListFieldHtml}</td>");
@@ -3194,7 +3194,7 @@ namespace WEB.Models
                 var findCode = replacement.FindCode.Replace("\\", @"\\").Replace("(", "\\(").Replace(")", "\\)").Replace("[", "\\[").Replace("]", "\\]").Replace("?", "\\?").Replace("*", "\\*").Replace("$", "\\$").Replace("+", "\\+").Replace("{", "\\{").Replace("}", "\\}").Replace("|", "\\|").Replace("^", "\\^").Replace("\n", "\r\n").Replace("\r\r", "\r");
                 var re = new Regex(findCode);
                 if (replacement.CodeType != CodeType.Global && !re.IsMatch(code))
-                    throw new Exception($"{CurrentEntity.Name} failed to replace {replacement.Purpose} in {replacement.Entity.Name}.{type.ToString()}");
+                    throw new Exception($"Code Replacement failed on {replacement.Entity.Name}.{type}: {replacement.Purpose}");
                 code = re.Replace(code, replacement.ReplacementCode ?? string.Empty).Replace("\n", "\r\n").Replace("\r\r", "\r");
             }
             return code;

@@ -26,7 +26,7 @@ export class NAMEModalComponent implements OnInit {
     @Input() canRemoveFilters = false;
     @Input() multiple = false;
     @Input() showAddNew = false;
-    @Input() title = this.multiple ? "Select PLURALFRIENDLYNAME" : "Select a FRIENDLYNAME_LOWER";
+    @Input() title = this.multiple ? "Select PLURALFRIENDLYNAME_TOLOWER" : "Select aSTARTSWITHVOWEL FRIENDLYNAME_LOWER";
 /*INPUTS*/
     constructor(
         private modalService: NgbModal,
@@ -40,7 +40,6 @@ export class NAMEModalComponent implements OnInit {
     }
 
     open(): NgbModalRef {
-        //this.selectedItems = []; <-- allow multiple selects to re-open with selection in tact
 /*SEARCHOPTIONS*/        this.modal = this.modalService.open(this.content, { size: 'xl', centered: true, scrollable: true });
         this.runSearch();
         this.modal.result.then((CAMELCASENAME: NAME | NAME[]) => {

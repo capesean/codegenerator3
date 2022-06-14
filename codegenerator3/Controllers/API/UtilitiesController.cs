@@ -17,9 +17,6 @@ namespace WEB.Controllers
             if (!System.Web.HttpContext.Current.Request.IsLocal)
                 return BadRequest("Deployment is only allowed when hosted on a local machine");
 
-            var badEntity = await DbContext.Entities.FirstOrDefaultAsync(o => !o.Exclude && o.PrimaryFieldId == null);
-            if (badEntity != null) return BadRequest(badEntity.Name + " doesn't have a Primary Field");
-
             var results = new List<DeploymentResult>();
 
             bool enumsHasRun = false;
@@ -64,6 +61,10 @@ namespace WEB.Controllers
                     if (entity == null) return BadRequest("Invalid Entity Id");
 
                     if (entity.Exclude) continue;
+
+                    // todo: should only apply if at least one option is checked?
+                    var badEntity = await DbContext.Entities.FirstOrDefaultAsync(o => o.PrimaryFieldId == null && o.PrimaryFieldId == null);
+                    if (badEntity != null) return BadRequest(badEntity.Name + " doesn't have a Primary Field");
 
                     if (option.Model) RunDeploy(entity, CodeType.Model, results);
                     if (option.TypeScriptModel) RunDeploy(entity, CodeType.TypeScriptModel, results);

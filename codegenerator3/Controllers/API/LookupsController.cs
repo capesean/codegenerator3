@@ -11,7 +11,7 @@ namespace WEB.Controllers
     public partial class LookupsController : BaseApiController
     {
         [HttpGet, Route("")]
-        public async Task<IHttpActionResult> Search([FromUri]PagingOptions pagingOptions, [FromUri]string q = null, [FromUri]Guid? projectId = null)
+        public async Task<IHttpActionResult> Search([FromUri] PagingOptions pagingOptions, [FromUri] string q = null, [FromUri] Guid? projectId = null)
         {
             IQueryable<Lookup> results = DbContext.Lookups;
             if (pagingOptions.IncludeEntities)
@@ -43,7 +43,7 @@ namespace WEB.Controllers
         }
 
         [HttpPost, Route("")]
-        public async Task<IHttpActionResult> Insert([FromBody]LookupDTO lookupDTO)
+        public async Task<IHttpActionResult> Insert([FromBody] LookupDTO lookupDTO)
         {
             if (lookupDTO.LookupId != Guid.Empty) return BadRequest("Invalid LookupId");
 
@@ -51,7 +51,7 @@ namespace WEB.Controllers
         }
 
         [HttpPost, Route("{lookupId:Guid}")]
-        public async Task<IHttpActionResult> Update(Guid lookupId, [FromBody]LookupDTO lookupDTO)
+        public async Task<IHttpActionResult> Update(Guid lookupId, [FromBody] LookupDTO lookupDTO)
         {
             if (lookupDTO.LookupId != lookupId) return BadRequest("Id mismatch");
 
@@ -92,16 +92,16 @@ namespace WEB.Controllers
         [HttpDelete, Route("{lookupId:Guid}")]
         public async Task<IHttpActionResult> Delete(Guid lookupId)
         {
-            var lookup = await DbContext.Lookups.SingleOrDefaultAsync(o => o.LookupId == lookupId);
+            var lookup = await DbContext.Lookups.Include(o => o.LookupOptions).SingleOrDefaultAsync(o => o.LookupId == lookupId);
 
             if (lookup == null)
                 return NotFound();
 
-            if (DbContext.LookupOptions.Any(o => o.LookupId == lookup.LookupId))
-                return BadRequest("Unable to delete the lookup as it has related lookup options");
-
             if (DbContext.Fields.Any(o => o.LookupId == lookup.LookupId))
                 return BadRequest("Unable to delete the lookup as it has related fields");
+
+            foreach (var option in lookup.LookupOptions.ToList())
+                DbContext.Entry(option).State = EntityState.Deleted;
 
             DbContext.Entry(lookup).State = EntityState.Deleted;
 
