@@ -161,7 +161,10 @@ namespace WEB.Models
         internal Relationship GetParentSearchRelationship(Field field)
         {
             // field must be in a relationship of this entity, where the field is (part of) the key of the related entity
-            var relationship = RelationshipsAsChild.Single(r => r.RelationshipFields.Any(f => f.ChildFieldId == field.FieldId && f.ParentField.KeyField));
+            var relationships = RelationshipsAsChild.Where(r => r.RelationshipFields.Any(f => f.ChildFieldId == field.FieldId && f.ParentField.KeyField)).ToList();
+            if (!relationships.Any()) throw new Exception($"GetParentSearchRelationship for field {field.Entity.Name}.{field.Name} has no fields");
+            if (relationships.Count > 1) throw new Exception($"GetParentSearchRelationship for field {field.Entity.Name}.{field.Name} has has multiple fields");
+            var relationship = relationships.First();
             //if (relationship.RelationshipFields.Count() != 1) throw new Exception("Can't have a search field that is part of a multi-field key");
             return relationship;
         }

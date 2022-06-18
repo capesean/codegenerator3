@@ -4,8 +4,6 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Data.Entity;
-using System.Data;
-using System.Data.Entity.Infrastructure;
 using System.IO;
 
 /*
@@ -545,15 +543,15 @@ namespace WEB.Models
             s.Add($"");
             s.Add($"    public static partial class ModelFactory");
             s.Add($"    {{");
-            s.Add($"        public static {CurrentEntity.DTOName} Create({CurrentEntity.Name} {CurrentEntity.CamelCaseName}{(CurrentEntity.EntityType == EntityType.User ? ", List<AppRole> appRoles = null" : "")})");
+            s.Add($"        public static {CurrentEntity.DTOName} Create({CurrentEntity.Name} {CurrentEntity.CamelCaseName}{(CurrentEntity.EntityType == EntityType.User ? ", List<Role> dbRoles = null" : "")})");
             s.Add($"        {{");
             s.Add($"            if ({CurrentEntity.CamelCaseName} == null) return null;");
             s.Add($"");
             if (CurrentEntity.EntityType == EntityType.User)
             {
-                s.Add($"            var roles = new List<string>();");
-                s.Add($"            if ({CurrentEntity.CamelCaseName}.Roles != null && appRoles != null)");
-                s.Add($"                roles = appRoles.Where(o => user.Roles.Any(r => r.RoleId == o.Id)).Select(o => o.Name).ToList();");
+                s.Add($"            var userRoles = new List<string>();");
+                s.Add($"            if ({CurrentEntity.CamelCaseName}.Roles != null && dbRoles != null)");
+                s.Add($"                userRoles = dbRoles.Where(o => user.Roles.Any(r => r.RoleId == o.Id)).Select(o => o.Name).ToList();");
                 s.Add($"");
             }
             s.Add($"            var {CurrentEntity.DTOName.ToCamelCase()} = new {CurrentEntity.DTOName}();");
@@ -564,7 +562,7 @@ namespace WEB.Models
             }
             if (CurrentEntity.EntityType == EntityType.User)
             {
-                s.Add($"            {CurrentEntity.DTOName.ToCamelCase()}.Roles = roles;");
+                s.Add($"            {CurrentEntity.DTOName.ToCamelCase()}.Roles = userRoles;");
             }
             foreach (var relationship in CurrentEntity.RelationshipsAsChild.OrderBy(o => o.ParentFriendlyName))
             {
@@ -685,7 +683,7 @@ namespace WEB.Models
                 }
             }
 
-            var smallDateTimeFields = DbContext.Fields.Where(f => f.FieldType == FieldType.SmallDateTime && f.Entity.ProjectId == CurrentEntity.ProjectId).OrderBy(f => f.Entity.Name).ThenBy(f => f.FieldOrder).ToList();
+            var smallDateTimeFields = DbContext.Fields.Where(f => f.FieldType == FieldType.SmallDateTime && f.Entity.ProjectId == CurrentEntity.ProjectId && !f.Entity.Exclude).OrderBy(f => f.Entity.Name).ThenBy(f => f.FieldOrder).ToList();
             foreach (var field in smallDateTimeFields.OrderBy(o => o.Entity.Name).ThenBy(o => o.FieldOrder))
             {
                 if (field.EditPageType == EditPageType.CalculatedField) continue;
@@ -721,8 +719,6 @@ namespace WEB.Models
 
         public string GenerateController()
         {
-            //if (CurrentEntity.EntityType == EntityType.User) return string.Empty;
-
             var s = new StringBuilder();
 
             s.Add($"using System;");
@@ -743,10 +739,10 @@ namespace WEB.Models
             s.Add($"    {{");
             if (CurrentEntity.EntityType == EntityType.User)
             {
-                s.Add($"        private RoleManager<AppRole> rm;");
+                s.Add($"        private RoleManager<Role> rm;");
                 s.Add($"        private IOptions<PasswordOptions> opts;");
                 s.Add($"");
-                s.Add($"        public UsersController(ApplicationDbContext db, UserManager<User> um, Settings settings, RoleManager<AppRole> rm, IOptions<PasswordOptions> opts)");
+                s.Add($"        public UsersController(ApplicationDbContext db, UserManager<User> um, Settings settings, RoleManager<Role> rm, IOptions<PasswordOptions> opts)");
                 s.Add($"            : base(db, um, settings) {{ this.rm = rm; this.opts = opts; }}");
             }
             else
@@ -761,7 +757,7 @@ namespace WEB.Models
             var fieldsToSearch = new List<Field>();
             var roleSearch = string.Empty;
             if (CurrentEntity.EntityType == EntityType.User)
-                roleSearch = ", string roleName = null";
+                roleSearch = ", [FromQuery] string roleName = null";
 
             foreach (var relationship in CurrentEntity.RelationshipsAsChild.OrderBy(r => r.RelationshipFields.Min(f => f.ChildField.FieldOrder)))
                 foreach (var relationshipField in relationship.RelationshipFields)
@@ -783,9 +779,6 @@ namespace WEB.Models
                 if (CurrentEntity.HasUserFilterField)
                     s.Add($"            results = results.Where(o => o.{CurrentEntity.UserFilterFieldPath} == CurrentUser.{CurrentEntity.Project.UserFilterFieldName});");
                 s.Add($"            results = results.Include(o => o.Roles);");
-                s.Add($"");
-                // todo: fix...
-                //s.Add($"            if (roleName != null) results = results.Where(o => o.Roles.Any(r => r.Role.Name == roleName));");
                 s.Add($"");
             }
             else
@@ -815,6 +808,16 @@ namespace WEB.Models
             {
                 s.Add($"            if (!string.IsNullOrWhiteSpace(q))");
                 s.Add($"                results = results.Where(o => {(CurrentEntity.EntityType == EntityType.User ? "o.Email.Contains(q) || " : "")}{CurrentEntity.TextSearchFields.Select(o => $"o.{o.Name + (o.CustomType == CustomType.String ? string.Empty : ".ToString()")}.Contains(q)").Aggregate((current, next) => current + " || " + next)});");
+                s.Add($"");
+            }
+
+            if (CurrentEntity.EntityType == EntityType.User)
+            {
+                s.Add($"            if (!string.IsNullOrWhiteSpace(roleName))");
+                s.Add($"            {{");
+                s.Add($"                var role = await rm.Roles.SingleOrDefaultAsync(o => o.Name == roleName);");
+                s.Add($"                results = results.Where(o => o.Roles.Any(r => r.RoleId == role.Id));");
+                s.Add($"            }}");
                 s.Add($"");
             }
 
@@ -1055,8 +1058,6 @@ namespace WEB.Models
                 s.Add($"");
                 s.Add($"            if (!saveResult.Succeeded)");
                 s.Add($"                return GetErrorResult(saveResult);");
-                s.Add($"");
-                s.Add($"            var appRoles = await rm.Roles.ToListAsync();");
                 s.Add($"");
                 s.Add($"            if (!isNew)");
                 s.Add($"            {{");
@@ -1562,7 +1563,7 @@ namespace WEB.Models
                 s.Add($"");
                 t = "    ";
             }
-            if (CurrentEntity.Fields.Any(f => f.SearchType != SearchType.None))
+            if (CurrentEntity.Fields.Any(f => f.SearchType != SearchType.None) || CurrentEntity.EntityType == EntityType.User)
             {
                 s.Add(t + $"<form (submit)=\"runSearch(0)\" novalidate>");
                 s.Add($"");
@@ -1574,6 +1575,19 @@ namespace WEB.Models
                     s.Add(t + $"        <div class=\"col-sm-6 col-md-4 col-lg-3\">");
                     s.Add(t + $"            <div class=\"form-group\">");
                     s.Add(t + $"                <input type=\"search\" name=\"q\" id=\"q\" [(ngModel)]=\"searchOptions.q\" max=\"100\" class=\"form-control\" placeholder=\"Search {CurrentEntity.PluralFriendlyName.ToLower()}\" />");
+                    s.Add(t + $"            </div>");
+                    s.Add(t + $"        </div>");
+                    s.Add($"");
+                }
+
+                if (CurrentEntity.EntityType == EntityType.User)
+                {
+                    s.Add(t + $"        <div class=\"col-sm-6 col-md-4 col-lg-3\">");
+                    s.Add(t + $"            <div class=\"form-group\">");
+                    s.Add(t + $"                <select id=\"roles\" name=\"roles\" class=\"form-select\" [(ngModel)]=\"searchOptions.roleName\">");
+                    s.Add(t + $"                    <option [value]=\"undefined\">All roles</option>");
+                    s.Add(t + $"                    <option *ngFor=\"let role of roles\" [ngValue]=\"role.name\">{{{{role.name}}}}</option>");
+                    s.Add(t + $"                </select>");
                     s.Add(t + $"            </div>");
                     s.Add(t + $"        </div>");
                     s.Add($"");
@@ -1740,6 +1754,8 @@ namespace WEB.Models
                 s.Add($"import {{ Enum, Enums }} from '../common/models/enums.model';");
             if (CurrentEntity.HasASortField)
                 s.Add($"import {{ ToastrService }} from 'ngx-toastr';");
+            if (CurrentEntity.EntityType == EntityType.User)
+                s.Add($"import {{ Roles }} from '../common/models/roles.model';");
             s.Add($"");
             s.Add($"@Component({{");
             s.Add($"    selector: '{CurrentEntity.Name.ToLower()}-list',");
@@ -1754,6 +1770,8 @@ namespace WEB.Models
                 s.Add($"    private routerSubscription: Subscription;");
             foreach (var enumLookup in enumLookups)
                 s.Add($"    public {enumLookup.PluralName.ToCamelCase()}: Enum[] = Enums.{enumLookup.PluralName};");
+            if (CurrentEntity.EntityType == EntityType.User)
+                s.Add($"    public roles = Roles.List;");
 
             s.Add($"");
             s.Add($"    constructor(");
@@ -1981,7 +1999,8 @@ namespace WEB.Models
                     else if (field.CustomType == CustomType.Enum)
                     {
                         tagType = "select";
-                        attributes.Remove("type");
+                        attributes.Remove("class");
+                        attributes.Add("class", "form-select");
                     }
                     else if (field.FieldType == FieldType.Date || field.FieldType == FieldType.SmallDateTime || field.FieldType == FieldType.DateTime)
                     {
@@ -2394,6 +2413,8 @@ namespace WEB.Models
             s.Add($"import {{ HttpErrorResponse }} from '@angular/common/http';");
             s.Add($"import {{ BreadcrumbService }} from 'angular-crumbs';");
             s.Add($"import {{ ErrorService }} from '../common/services/error.service';");
+            s.Add($"import {{ NgbModal }} from '@ng-bootstrap/ng-bootstrap';");
+            s.Add($"import {{ ConfirmModalComponent, ModalOptions }} from '../common/components/confirm.component';");
             if (relationshipsAsParent.Any())
                 s.Add($"import {{ PagingOptions }} from '../common/models/http.model';");
             s.Add($"import {{ {CurrentEntity.Name} }} from '../common/models/{CurrentEntity.Name.ToLower()}.model';");
@@ -2476,6 +2497,7 @@ namespace WEB.Models
             s.Add($"        {(hasChildRoutes ? "public" : "private")} route: ActivatedRoute,");
             s.Add($"        private toastr: ToastrService,");
             s.Add($"        private breadcrumbService: BreadcrumbService,");
+            s.Add($"        private modalService: NgbModal,");
             s.Add($"        private {CurrentEntity.Name.ToCamelCase()}Service: {CurrentEntity.Name}Service,");
             var relChildEntities = relationshipsAsParent.Where(o => o.ChildEntityId != CurrentEntity.EntityId).Select(o => o.ChildEntity).Distinct().OrderBy(o => o.Name);
             foreach (var relChildEntity in relChildEntities)
@@ -2640,20 +2662,23 @@ namespace WEB.Models
 
             s.Add($"    delete(): void {{");
             s.Add($"");
-            // todo: make this a modal?
-            s.Add($"        if (!confirm(\"Confirm delete?\")) return;");
+            s.Add($"        let modalRef = this.modalService.open(ConfirmModalComponent, {{ centered: true }});");
+            s.Add($"        (modalRef.componentInstance as ConfirmModalComponent).options = {{ title: \"Delete {CurrentEntity.FriendlyName}\", text: \"Are you sure you want to delete this {CurrentEntity.FriendlyName.ToLower()}?\" }} as ModalOptions;");
+            s.Add($"        modalRef.result.then(");
+            s.Add($"            () => {{");
             s.Add($"");
-            s.Add($"        this.{CurrentEntity.Name.ToCamelCase()}Service.delete({CurrentEntity.KeyFields.Select(o => $"this.{CurrentEntity.Name.ToCamelCase()}.{o.Name.ToCamelCase()}").Aggregate((current, next) => { return current + ", " + next; })})");
-            s.Add($"            .subscribe(");
-            s.Add($"                () => {{");
-            s.Add($"                    this.toastr.success(\"The {CurrentEntity.FriendlyName.ToLower()} has been deleted\", \"Delete {CurrentEntity.FriendlyName}\");");
-            s.Add($"                    {CurrentEntity.ReturnRoute}");
-            s.Add($"                }},");
-            s.Add($"                err => {{");
-            s.Add($"                    this.errorService.handleError(err, \"{CurrentEntity.FriendlyName}\", \"Delete\");");
-            s.Add($"                }}");
-            s.Add($"            );");
+            s.Add($"                this.{CurrentEntity.Name.ToCamelCase()}Service.delete({CurrentEntity.KeyFields.Select(o => $"this.{CurrentEntity.Name.ToCamelCase()}.{o.Name.ToCamelCase()}").Aggregate((current, next) => { return current + ", " + next; })})");
+            s.Add($"                    .subscribe(");
+            s.Add($"                        () => {{");
+            s.Add($"                            this.toastr.success(\"The {CurrentEntity.FriendlyName.ToLower()} has been deleted\", \"Delete {CurrentEntity.FriendlyName}\");");
+            s.Add($"                            {CurrentEntity.ReturnRoute}");
+            s.Add($"                        }},");
+            s.Add($"                        err => {{");
+            s.Add($"                            this.errorService.handleError(err, \"{CurrentEntity.FriendlyName}\", \"Delete\");");
+            s.Add($"                        }}");
+            s.Add($"                    );");
             s.Add($"");
+            s.Add($"        }}, () => {{ }});");
             s.Add($"    }}");
             s.Add($"");
 
@@ -2764,33 +2789,43 @@ namespace WEB.Models
                 s.Add($"    delete{rel.CollectionName}({rel.ChildEntity.Name.ToCamelCase()}: {rel.ChildEntity.Name}, event: MouseEvent): void {{");
                 s.Add($"        event.stopPropagation();");
                 s.Add($"");
-                s.Add($"        if (!confirm('Are you sure you want to delete this {rel.ChildEntity.FriendlyName.ToLower()}?')) return;");
+                s.Add($"        let modalRef = this.modalService.open(ConfirmModalComponent, {{ centered: true }});");
+                s.Add($"        (modalRef.componentInstance as ConfirmModalComponent).options = {{ title: \"Delete {rel.ChildEntity.FriendlyName}\", text: \"Are you sure you want to delete this {rel.ChildEntity.FriendlyName.ToLower()}?\" }} as ModalOptions;");
+                s.Add($"        modalRef.result.then(");
+                s.Add($"            () => {{");
                 s.Add($"");
-                s.Add($"        this.{rel.ChildEntity.Name.ToCamelCase()}Service.delete({rel.ChildEntity.KeyFields.Select(o => $"{rel.ChildEntity.Name.ToCamelCase()}.{o.Name.ToCamelCase()}").Aggregate((current, next) => { return current + ", " + next; })})");
-                s.Add($"            .subscribe(");
-                s.Add($"                () => {{");
-                s.Add($"                    this.toastr.success(\"The {rel.ChildEntity.FriendlyName.ToLower()} has been deleted\", \"Delete {rel.ChildEntity.FriendlyName}\");");
-                s.Add($"                    this.load{rel.CollectionName}();");
-                s.Add($"                }},");
-                s.Add($"                err => {{");
-                s.Add($"                    this.errorService.handleError(err, \"{rel.ChildEntity.FriendlyName}\", \"Delete\");");
-                s.Add($"                }}");
-                s.Add($"            );");
+                s.Add($"                this.{rel.ChildEntity.Name.ToCamelCase()}Service.delete({rel.ChildEntity.KeyFields.Select(o => $"{rel.ChildEntity.Name.ToCamelCase()}.{o.Name.ToCamelCase()}").Aggregate((current, next) => { return current + ", " + next; })})");
+                s.Add($"                    .subscribe(");
+                s.Add($"                        () => {{");
+                s.Add($"                            this.toastr.success(\"The {rel.ChildEntity.FriendlyName.ToLower()} has been deleted\", \"Delete {rel.ChildEntity.FriendlyName}\");");
+                s.Add($"                            this.load{rel.CollectionName}();");
+                s.Add($"                        }},");
+                s.Add($"                        err => {{");
+                s.Add($"                            this.errorService.handleError(err, \"{rel.ChildEntity.FriendlyName}\", \"Delete\");");
+                s.Add($"                        }}");
+                s.Add($"                    );");
+                s.Add($"");
+                s.Add($"            }}, () => {{ }});");
                 s.Add($"    }}");
                 s.Add($"");
                 s.Add($"    deleteAll{rel.CollectionName}(): void {{");
-                s.Add($"        if (!confirm('Are you sure you want to delete all the {rel.CollectionFriendlyName.ToLower()}?')) return;");
+                s.Add($"        let modalRef = this.modalService.open(ConfirmModalComponent, {{ centered: true }});");
+                s.Add($"        (modalRef.componentInstance as ConfirmModalComponent).options = {{ title: \"Delete {rel.ChildEntity.FriendlyName}\", text: \"Are you sure you want to delete all the {rel.CollectionFriendlyName.ToLower()}?\" }} as ModalOptions;");
+                s.Add($"        modalRef.result.then(");
+                s.Add($"            () => {{");
                 s.Add($"");
-                s.Add($"        this.{CurrentEntity.Name.ToCamelCase()}Service.delete{rel.CollectionName}({CurrentEntity.KeyFields.Select(o => $"this.{CurrentEntity.Name.ToCamelCase()}.{o.Name.ToCamelCase()}").Aggregate((current, next) => { return current + ", " + next; })})");
-                s.Add($"            .subscribe(");
-                s.Add($"                () => {{");
-                s.Add($"                    this.toastr.success(\"The {rel.CollectionFriendlyName.ToLower()} have been deleted\", \"Delete {rel.CollectionFriendlyName}\");");
-                s.Add($"                    this.load{rel.CollectionName}();");
-                s.Add($"                }},");
-                s.Add($"                err => {{");
-                s.Add($"                    this.errorService.handleError(err, \"{rel.CollectionFriendlyName}\", \"Delete\");");
-                s.Add($"                }}");
-                s.Add($"            );");
+                s.Add($"                this.{CurrentEntity.Name.ToCamelCase()}Service.delete{rel.CollectionName}({CurrentEntity.KeyFields.Select(o => $"this.{CurrentEntity.Name.ToCamelCase()}.{o.Name.ToCamelCase()}").Aggregate((current, next) => { return current + ", " + next; })})");
+                s.Add($"                    .subscribe(");
+                s.Add($"                        () => {{");
+                s.Add($"                            this.toastr.success(\"The {rel.CollectionFriendlyName.ToLower()} have been deleted\", \"Delete {rel.CollectionFriendlyName}\");");
+                s.Add($"                            this.load{rel.CollectionName}();");
+                s.Add($"                        }},");
+                s.Add($"                        err => {{");
+                s.Add($"                            this.errorService.handleError(err, \"{rel.CollectionFriendlyName}\", \"Delete\");");
+                s.Add($"                        }}");
+                s.Add($"                    );");
+                s.Add($"            }}, () => {{ }});");
+                s.Add($"");
                 s.Add($"    }}");
                 s.Add($"");
             }

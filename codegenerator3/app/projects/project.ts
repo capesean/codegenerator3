@@ -282,6 +282,7 @@
         }
 
         function setCheckBoxesByRow(entity, force:any) {
+            if (entity.exclude) return;
             var checked = !vm.multideploy[entity.entityId]["model"];
             if (force !== undefined) checked = force;
             if (!checked || !entity.preventModelDeployment) vm.multideploy[entity.entityId]["model"] = checked;

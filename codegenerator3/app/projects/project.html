@@ -57,7 +57,7 @@
                         </div>
                     </div>
 
-                    <div class="col-sm-6 col-md-4" uib-popover-html="'This is the <strong>relative</strong> path from the <code>RootPath</code> defined in <code>Web.config</code> to the root of your Web project. Example: If your web project is on path <code>c:\\source\\mywebsite</code>, your <code>RootPath</code> should be <code>c:\\source\\</code> and your <code>Web Path</code> should be <code>mywebsite</code>. (This allows you to have Web and Models in different projects, or they could be the same value if it's a single project.')'" popover-trigger="'mouseenter'" popover-append-to-body="true" popover-title="Web Path">
+                    <div class="col-sm-6 col-md-4" uib-popover-html="'This is the <strong>relative</strong> path from the <code>RootPath</code> defined in <code>Web.config</code> to the root of your Web project. Example: If your web project is on path <code>c:\\source\\mywebsite</code>, your <code>RootPath</code> should be <code>c:\\source\\</code> and your <code>Web Path</code> should be <code>mywebsite</code>. (This allows you to have Web and Models in different projects, or they could be the same value if it is a single project.)'" popover-trigger="'mouseenter'" popover-append-to-body="true" popover-title="Web Path">
                         <div class="form-group" ng-class="{ 'has-error':  mainForm.$submitted && mainForm.webPath.$invalid }">
                             <label for="webPath" class="control-label">
                                 Web Path:
@@ -66,7 +66,7 @@
                         </div>
                     </div>
 
-                    <div class="col-sm-6 col-md-4 col-lg-3" uib-popover-html="'This is the <strong>relative</strong> path from the <code>RootPath</code> defined in <code>Web.config</code> to the root of your Models project. Example: If your models project is on path <code>c:\\source\\mymodels</code>, your <code>RootPath</code> should be <code>c:\\source\\</code> and your <code>Models Path</code> should be <code>mymodels</code>. (This allows you to have Web and Models in different projects, or they could be the same value if it's a single project.)'" popover-trigger="'mouseenter'" popover-append-to-body="true" popover-title="Models Path">
+                    <div class="col-sm-6 col-md-4 col-lg-3" uib-popover-html="'This is the <strong>relative</strong> path from the <code>RootPath</code> defined in <code>Web.config</code> to the root of your Models project. Example: If your models project is on path <code>c:\\source\\mymodels</code>, your <code>RootPath</code> should be <code>c:\\source\\</code> and your <code>Models Path</code> should be <code>mymodels</code>. (This allows you to have Web and Models in different projects, or they could be the same value if it is a single project.)'" popover-trigger="'mouseenter'" popover-append-to-body="true" popover-title="Models Path">
                         <div class="form-group" ng-class="{ 'has-error':  mainForm.$submitted && mainForm.modelsPath.$invalid }">
                             <label for="modelsPath" class="control-label">
                                 Models Path:
@@ -216,30 +216,39 @@
                 </tr>
             </thead>
             <tbody>
-                <tr ng-repeat="entity in vm.entities" ng-click="vm.goToEntity(entity.project.projectId, entity.entityId)">
+                <tr ng-repeat="entity in vm.entities" ng-class="{ 'table-disabled':  entity.exclude }">
                     <td ng-click="$event.stopPropagation();vm.setCheckBoxesByRow(entity);"><a ng-click="$event.stopPropagation();$event.preventDefault();vm.goToEntity(entity.project.projectId, entity.entityId);" href="/projects/{{vm.project.projectId}}/entities/{{entity.entityId}}">{{ entity.name }}</a></td>
-                    <td class="text-center" ng-click="$event.stopPropagation()" uib-tooltip="{{entity.preventModelDeployment}}"><input type="checkbox" ng-disabled="!!entity.preventModelDeployment" ng-model="vm.multideploy[entity.entityId].model" /></td>
-                    <td class="text-center" ng-click="$event.stopPropagation()" uib-tooltip="{{entity.preventTypeScriptModelDeployment}}"><input type="checkbox" ng-disabled="!!entity.preventTypeScriptModelDeployment" ng-model="vm.multideploy[entity.entityId].typeScriptModel" /></td>
-                    <td class="text-center" ng-click="$event.stopPropagation()"><input type="checkbox" ng-model="vm.multideploy[entity.entityId].enums" /></td>
-                    <td class="text-center" ng-click="$event.stopPropagation()" uib-tooltip="{{entity.preventDTODeployment}}"><input type="checkbox" ng-disabled="!!entity.preventDTODeployment" ng-model="vm.multideploy[entity.entityId].dto" /></td>
-                    <td class="text-center" ng-click="$event.stopPropagation()"><input type="checkbox" ng-model="vm.multideploy[entity.entityId].settingsDTO" /></td>
-                    <td class="text-center" ng-click="$event.stopPropagation()" uib-tooltip="{{entity.preventDbContextDeployment}}"><input type="checkbox" ng-disabled="!!entity.preventDbContextDeployment" ng-model="vm.multideploy[entity.entityId].dbContext" /></td>
-                    <td class="text-center" ng-click="$event.stopPropagation()" uib-tooltip="{{entity.preventControllerDeployment}}"><input type="checkbox" ng-disabled="!!entity.preventControllerDeployment" ng-model="vm.multideploy[entity.entityId].controller" /></td>
-                    <td class="text-center" ng-click="$event.stopPropagation()" uib-tooltip="{{entity.preventBundleConfigDeployment}}"><input type="checkbox" ng-disabled="!!entity.preventBundleConfigDeployment" ng-model="vm.multideploy[entity.entityId].bundleConfig" /></td>
-                    <td class="text-center" ng-click="$event.stopPropagation()" uib-tooltip="{{entity.preventAppRouterDeployment}}"><input type="checkbox" ng-disabled="!!entity.preventAppRouterDeployment" ng-model="vm.multideploy[entity.entityId].appRouter" /></td>
-                    <td class="text-center" ng-click="$event.stopPropagation()" uib-tooltip="{{entity.preventApiResourceDeployment}}"><input type="checkbox" ng-disabled="!!entity.preventApiResourceDeployment" ng-model="vm.multideploy[entity.entityId].apiResource" /></td>
-                    <td class="text-center" ng-click="$event.stopPropagation()" uib-tooltip="{{entity.preventListHtmlDeployment}}"><input type="checkbox" ng-disabled="!!entity.preventListHtmlDeployment" ng-model="vm.multideploy[entity.entityId].listHtml" /></td>
-                    <td class="text-center" ng-click="$event.stopPropagation()" uib-tooltip="{{entity.preventListTypeScriptDeployment}}"><input type="checkbox" ng-disabled="!!entity.preventListTypeScriptDeployment" ng-model="vm.multideploy[entity.entityId].listTypeScript" /></td>
-                    <td class="text-center" ng-click="$event.stopPropagation()" uib-tooltip="{{entity.preventEditHtmlDeployment}}"><input type="checkbox" ng-disabled="!!entity.preventEditHtmlDeployment" ng-model="vm.multideploy[entity.entityId].editHtml" /></td>
-                    <td class="text-center" ng-click="$event.stopPropagation()" uib-tooltip="{{entity.preventEditTypeScriptDeployment}}"><input type="checkbox" ng-disabled="!!entity.preventEditTypeScriptDeployment" ng-model="vm.multideploy[entity.entityId].editTypeScript" /></td>
-                    <td class="text-center" ng-click="$event.stopPropagation()" uib-tooltip="{{entity.preventAppSelectHtmlDeployment}}"><input type="checkbox" ng-disabled="!!entity.preventAppSelectHtmlDeployment" ng-model="vm.multideploy[entity.entityId].appSelectHtml" /></td>
-                    <td class="text-center" ng-click="$event.stopPropagation()" uib-tooltip="{{entity.preventAppSelectTypeScriptDeployment}}"><input type="checkbox" ng-disabled="!!entity.preventAppSelectHtmlDeployment" ng-model="vm.multideploy[entity.entityId].appSelectTypeScript" /></td>
-                    <td class="text-center" ng-click="$event.stopPropagation()" uib-tooltip="{{entity.preventSelectModalHtmlDeployment}}"><input type="checkbox" ng-disabled="!!entity.preventSelectModalHtmlDeployment" ng-model="vm.multideploy[entity.entityId].selectModalHtml" /></td>
-                    <td class="text-center" ng-click="$event.stopPropagation()" uib-tooltip="{{entity.preventSelectModalTypeScriptDeployment}}"><input type="checkbox" ng-disabled="!!entity.preventSelectModalHtmlDeployment" ng-model="vm.multideploy[entity.entityId].selectModalTypeScript" /></td>
+                    <td class="text-center" ng-click="$event.stopPropagation()" uib-tooltip="{{entity.preventModelDeployment}}"><input type="checkbox" ng-disabled="entity.exclude || !!entity.preventModelDeployment" ng-model="vm.multideploy[entity.entityId].model" /></td>
+                    <td class="text-center" ng-click="$event.stopPropagation()" uib-tooltip="{{entity.preventTypeScriptModelDeployment}}"><input type="checkbox" ng-disabled="entity.exclude || !!entity.preventTypeScriptModelDeployment" ng-model="vm.multideploy[entity.entityId].typeScriptModel" /></td>
+                    <td class="text-center" ng-click="$event.stopPropagation()"><input type="checkbox" ng-disabled="entity.exclude" ng-model="vm.multideploy[entity.entityId].enums" /></td>
+                    <td class="text-center" ng-click="$event.stopPropagation()" uib-tooltip="{{entity.preventDTODeployment}}"><input type="checkbox" ng-disabled="entity.exclude || !!entity.preventDTODeployment" ng-model="vm.multideploy[entity.entityId].dto" /></td>
+                    <td class="text-center" ng-click="$event.stopPropagation()"><input type="checkbox" ng-disabled="entity.exclude" ng-model="vm.multideploy[entity.entityId].settingsDTO" /></td>
+                    <td class="text-center" ng-click="$event.stopPropagation()" uib-tooltip="{{entity.preventDbContextDeployment}}"><input type="checkbox" ng-disabled="entity.exclude || !!entity.preventDbContextDeployment" ng-model="vm.multideploy[entity.entityId].dbContext" /></td>
+                    <td class="text-center" ng-click="$event.stopPropagation()" uib-tooltip="{{entity.preventControllerDeployment}}"><input type="checkbox" ng-disabled="entity.exclude || !!entity.preventControllerDeployment" ng-model="vm.multideploy[entity.entityId].controller" /></td>
+                    <td class="text-center" ng-click="$event.stopPropagation()" uib-tooltip="{{entity.preventBundleConfigDeployment}}"><input type="checkbox" ng-disabled="entity.exclude || !!entity.preventBundleConfigDeployment" ng-model="vm.multideploy[entity.entityId].bundleConfig" /></td>
+                    <td class="text-center" ng-click="$event.stopPropagation()" uib-tooltip="{{entity.preventAppRouterDeployment}}"><input type="checkbox" ng-disabled="entity.exclude || !!entity.preventAppRouterDeployment" ng-model="vm.multideploy[entity.entityId].appRouter" /></td>
+                    <td class="text-center" ng-click="$event.stopPropagation()" uib-tooltip="{{entity.preventApiResourceDeployment}}"><input type="checkbox" ng-disabled="entity.exclude || !!entity.preventApiResourceDeployment" ng-model="vm.multideploy[entity.entityId].apiResource" /></td>
+                    <td class="text-center" ng-click="$event.stopPropagation()" uib-tooltip="{{entity.preventListHtmlDeployment}}"><input type="checkbox" ng-disabled="entity.exclude || !!entity.preventListHtmlDeployment" ng-model="vm.multideploy[entity.entityId].listHtml" /></td>
+                    <td class="text-center" ng-click="$event.stopPropagation()" uib-tooltip="{{entity.preventListTypeScriptDeployment}}"><input type="checkbox" ng-disabled="entity.exclude || !!entity.preventListTypeScriptDeployment" ng-model="vm.multideploy[entity.entityId].listTypeScript" /></td>
+                    <td class="text-center" ng-click="$event.stopPropagation()" uib-tooltip="{{entity.preventEditHtmlDeployment}}"><input type="checkbox" ng-disabled="entity.exclude || !!entity.preventEditHtmlDeployment" ng-model="vm.multideploy[entity.entityId].editHtml" /></td>
+                    <td class="text-center" ng-click="$event.stopPropagation()" uib-tooltip="{{entity.preventEditTypeScriptDeployment}}"><input type="checkbox" ng-disabled="entity.exclude || !!entity.preventEditTypeScriptDeployment" ng-model="vm.multideploy[entity.entityId].editTypeScript" /></td>
+                    <td class="text-center" ng-click="$event.stopPropagation()" uib-tooltip="{{entity.preventAppSelectHtmlDeployment}}"><input type="checkbox" ng-disabled="entity.exclude || !!entity.preventAppSelectHtmlDeployment" ng-model="vm.multideploy[entity.entityId].appSelectHtml" /></td>
+                    <td class="text-center" ng-click="$event.stopPropagation()" uib-tooltip="{{entity.preventAppSelectTypeScriptDeployment}}"><input type="checkbox" ng-disabled="entity.exclude || !!entity.preventAppSelectHtmlDeployment" ng-model="vm.multideploy[entity.entityId].appSelectTypeScript" /></td>
+                    <td class="text-center" ng-click="$event.stopPropagation()" uib-tooltip="{{entity.preventSelectModalHtmlDeployment}}"><input type="checkbox" ng-disabled="entity.exclude || !!entity.preventSelectModalHtmlDeployment" ng-model="vm.multideploy[entity.entityId].selectModalHtml" /></td>
+                    <td class="text-center" ng-click="$event.stopPropagation()" uib-tooltip="{{entity.preventSelectModalTypeScriptDeployment}}"><input type="checkbox" ng-disabled="entity.exclude || !!entity.preventSelectModalHtmlDeployment" ng-model="vm.multideploy[entity.entityId].selectModalTypeScript" /></td>
                 </tr>
             </tbody>
         </table>
-
+        <style>
+            .table-disabled td {
+                background-color: #ccc !important;
+                cursor: not-allowed;
+            }
+            .table-disabled input {
+                pointer-events: none;
+                cursor: not-allowed;
+            }
+        </style>
         <div class="alert alert-info" ng-if="vm.entities.length">
             Click on an entity name (hyperlink) above to navigate to that entity; click on the cell/row to select all checkboxes in the row.
         </div>

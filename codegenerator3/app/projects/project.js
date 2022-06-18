@@ -223,6 +223,8 @@
             });
         }
         function setCheckBoxesByRow(entity, force) {
+            if (entity.exclude)
+                return;
             var checked = !vm.multideploy[entity.entityId]["model"];
             if (force !== undefined)
                 checked = force;
