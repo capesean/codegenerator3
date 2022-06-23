@@ -104,15 +104,29 @@
                 </div>
             </div>
 
-            <div class="col-sm-4 col-md-3 col-lg-2" ng-if="!vm.entity.preventBundleConfigDeployment">
+            <div class="col-sm-4 col-md-3 col-lg-2" ng-if="!vm.entity.preventGeneratedConfigDeployment">
                 <div class="form-group">
-                    <label for="bundleConfig" class="control-label">
-                        Bundle Config:
+                    <label for="generatedModule" class="control-label">
+                        Generated Module:
                     </label>
                     <div class="checkbox">
                         <label>
-                            <input type="checkbox" id="bundleConfig" name="bundleConfig" ng-model="vm.deploymentOptions.bundleConfig" />
-                            Bundle Config
+                            <input type="checkbox" id="generatedModule" name="generatedModule" ng-model="vm.deploymentOptions.generatedModule" />
+                            Generated Module
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-4 col-md-3 col-lg-2" ng-if="!vm.entity.preventSharedConfigDeployment">
+                <div class="form-group">
+                    <label for="SharedModule" class="control-label">
+                        Shared Module:
+                    </label>
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" id="SharedModule" name="SharedModule" ng-model="vm.deploymentOptions.SharedModule" />
+                            Shared Module
                         </label>
                     </div>
                 </div>
@@ -281,7 +295,8 @@
             <li role="presentation"><a href="##settingsDTOTab" aria-controls="settingsDTO" role="tab" data-toggle="tab">Settings DTO</a></li>
             <li role="presentation" xng-if="vm.entity.preventDbContextDeployment === ''"><a href="##dbContextTab" aria-controls="dbContext" role="tab" data-toggle="tab">DbContext</a></li>
             <li role="presentation" xng-if="vm.entity.preventControllerDeployment === ''"><a href="##controllerTab" aria-controls="controller" role="tab" data-toggle="tab">Controller</a></li>
-            <li role="presentation" xng-if="vm.entity.preventBundleConfigDeployment === ''"><a href="##bundleConfigTab" aria-controls="bundleConfig" role="tab" data-toggle="tab">Bundle Config</a></li>
+            <li role="presentation" xng-if="vm.entity.preventGeneratedModuleDeployment === ''"><a href="##generatedModuleTab" aria-controls="generatedModule" role="tab" data-toggle="tab">Generated Module</a></li>
+            <li role="presentation" xng-if="vm.entity.preventSharedModuleDeployment === ''"><a href="##sharedModuleTab" aria-controls="sharedModule" role="tab" data-toggle="tab">Shared Module</a></li>
             <li role="presentation" xng-if="vm.entity.preventAppRouterDeployment === ''"><a href="##appRouterTab" aria-controls="appRouter" role="tab" data-toggle="tab">App Router</a></li>
             <li role="presentation" xng-if="vm.entity.preventApiResourceDeployment === ''"><a href="##apiResourceTab" aria-controls="apiResource" role="tab" data-toggle="tab">Api Resource</a></li>
             <li role="presentation" xng-if="vm.entity.preventListHtmlDeployment === ''"><a href="##listHtmlTab" aria-controls="listHtml" role="tab" data-toggle="tab">List Html</a></li>
@@ -358,15 +373,26 @@
                 <pre><code class="csharp" ng-bind-html="vm.escapedCode.dbContext"></code></pre>
 
             </div>
-            <div role="tabpanel" class="tab-pane" id="bundleConfigTab">
+            <div role="tabpanel" class="tab-pane" id="generatedModuleTab">
 
                 <br />
 
-                <div class="alert alert-info" ng-if="vm.entity.preventBundleConfigDeployment">Deployment disabled</div>
+                <div class="alert alert-info" ng-if="vm.entity.preventGeneratedModuleDeployment">Deployment disabled</div>
 
-                <div class="row"><div class="col-sm-12"><button class="btn btn-default copyButton" ng-click="vm.copy('bundleConfig')">Copy<i class="fa fa-copy"></i></button></div></div>
+                <div class="row"><div class="col-sm-12"><button class="btn btn-default copyButton" ng-click="vm.copy('generatedModule')">Copy<i class="fa fa-copy"></i></button></div></div>
 
-                <pre><code class="csharp" ng-bind-html="vm.escapedCode.bundleConfig"></code></pre>
+                <pre><code class="csharp" ng-bind-html="vm.escapedCode.generatedModule"></code></pre>
+
+            </div>
+            <div role="tabpanel" class="tab-pane" id="sharedModuleTab">
+
+                <br />
+
+                <div class="alert alert-info" ng-if="vm.entity.preventSharedModuleDeployment">Deployment disabled</div>
+
+                <div class="row"><div class="col-sm-12"><button class="btn btn-default copyButton" ng-click="vm.copy('sharedModule')">Copy<i class="fa fa-copy"></i></button></div></div>
+
+                <pre><code class="csharp" ng-bind-html="vm.escapedCode.sharedModule"></code></pre>
 
             </div>
             <div role="tabpanel" class="tab-pane" id="appRouterTab">

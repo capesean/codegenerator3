@@ -645,6 +645,10 @@
     <Compile Include="Migrations\202206080702438_Initial.designer.cs">
       <DependentUpon>202206080702438_Initial.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202206231206262_test.cs" />
+    <Compile Include="Migrations\202206231206262_test.designer.cs">
+      <DependentUpon>202206231206262_test.cs</DependentUpon>
+    </Compile>
     <Compile Include="Models\Relationship_.cs" />
     <Compile Include="Startup.cs" />
     <Compile Include="Utilities\ApiException.cs" />
@@ -758,6 +762,9 @@
   <ItemGroup>
     <EmbeddedResource Include="Migrations\202206080702438_Initial.resx">
       <DependentUpon>202206080702438_Initial.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202206231206262_test.resx">
+      <DependentUpon>202206231206262_test.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

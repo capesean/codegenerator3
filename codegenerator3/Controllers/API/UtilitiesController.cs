@@ -22,14 +22,16 @@ namespace WEB.Controllers
             bool enumsHasRun = false;
             bool settingsdtoHasRun = false;
             bool dbcontextHasRun = false;
-            bool bundleconfigHasRun = false;
+            bool generatedModuleHasRun = false;
+            bool sharedModuleHasRun = false;
             bool approuterHasRun = false;
 
             foreach (var option in options)
             {
                 if (option.ApiResource
                     || option.AppRouter
-                    || option.BundleConfig
+                    || option.GeneratedModule
+                    || option.SharedModule
                     || option.Controller
                     || option.DbContext
                     || option.DTO
@@ -73,7 +75,8 @@ namespace WEB.Controllers
                     if (option.SettingsDTO && !settingsdtoHasRun) { RunDeploy(entity, CodeType.SettingsDTO, results); settingsdtoHasRun = false; }
                     if (option.DbContext && !dbcontextHasRun) { RunDeploy(entity, CodeType.DbContext, results); dbcontextHasRun = true; }
                     if (option.Controller) RunDeploy(entity, CodeType.Controller, results);
-                    if (option.BundleConfig && !bundleconfigHasRun) { RunDeploy(entity, CodeType.BundleConfig, results); bundleconfigHasRun = true; }
+                    if (option.GeneratedModule && !generatedModuleHasRun) { RunDeploy(entity, CodeType.GeneratedModule, results); generatedModuleHasRun = true; }
+                    if (option.SharedModule && !sharedModuleHasRun) { RunDeploy(entity, CodeType.SharedModule, results); sharedModuleHasRun = true; }
                     if (option.AppRouter && !approuterHasRun) { RunDeploy(entity, CodeType.AppRouter, results); approuterHasRun = true; }
                     if (option.ApiResource) RunDeploy(entity, CodeType.ApiResource, results);
                     if (option.ListHtml) RunDeploy(entity, CodeType.ListHtml, results);
@@ -100,7 +103,8 @@ namespace WEB.Controllers
             options.SettingsDTO = codeType == CodeType.SettingsDTO;
             options.DbContext = codeType == CodeType.DbContext;
             options.Controller = codeType == CodeType.Controller;
-            options.BundleConfig = codeType == CodeType.BundleConfig;
+            options.GeneratedModule = codeType == CodeType.GeneratedModule;
+            options.SharedModule = codeType == CodeType.SharedModule;
             options.AppRouter = codeType == CodeType.AppRouter;
             options.ApiResource = codeType == CodeType.ApiResource;
             options.ListHtml = codeType == CodeType.ListHtml;
@@ -141,7 +145,8 @@ namespace WEB.Controllers
         public bool SettingsDTO { get; set; } = false;
         public bool DbContext { get; set; } = false;
         public bool Controller { get; set; } = false;
-        public bool BundleConfig { get; set; } = false;
+        public bool GeneratedModule { get; set; } = false;
+        public bool SharedModule { get; set; } = false;
         public bool AppRouter { get; set; } = false;
         public bool ApiResource { get; set; } = false;
         public bool ListHtml { get; set; } = false;

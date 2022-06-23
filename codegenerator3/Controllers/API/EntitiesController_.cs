@@ -65,25 +65,14 @@ namespace WEB.Controllers
 
             var result = new ApiCodeResult();
 
-            //if (string.IsNullOrWhiteSpace(entity.PreventModelDeployment)) result.Model = code.GenerateModel(); else result.Model = "--prevented--";
-            //if (string.IsNullOrWhiteSpace(entity.PreventDTODeployment)) result.DTO = code.GenerateDTO(); else result.DTO = "--prevented--";
-            //if (string.IsNullOrWhiteSpace(entity.PreventDbContextDeployment)) result.DbContext = code.GenerateDbContext(); else result.DbContext = "--prevented--";
-            //if (string.IsNullOrWhiteSpace(entity.PreventControllerDeployment)) result.Controller = code.GenerateController(); else result.Controller = "--prevented--";
-            //if (string.IsNullOrWhiteSpace(entity.PreventBundleConfigDeployment)) result.BundleConfig = code.GenerateBundleConfig(); else result.BundleConfig = "--prevented--";
-            //if (string.IsNullOrWhiteSpace(entity.PreventAppRouterDeployment)) result.AppRouter = code.GenerateAppRouter(); else result.AppRouter = "--prevented--";
-            //if (string.IsNullOrWhiteSpace(entity.PreventApiResourceDeployment)) result.ApiResource = code.GenerateApiResource(); else result.ApiResource = "--prevented--";
-            //if (string.IsNullOrWhiteSpace(entity.PreventListHtmlDeployment)) result.ListHtml = code.GenerateListHtml(); else result.ListHtml = "--prevented--";
-            //if (string.IsNullOrWhiteSpace(entity.PreventListTypeScriptDeployment)) result.ListTypeScript = code.GenerateListTypeScript(); else result.ListTypeScript = "--prevented--";
-            //if (string.IsNullOrWhiteSpace(entity.PreventEditHtmlDeployment)) result.EditHtml = code.GenerateEditHtml(); else result.EditHtml = "--prevented--";
-            //if (string.IsNullOrWhiteSpace(entity.PreventEditTypeScriptDeployment)) result.EditTypeScript = code.GenerateEditTypeScript(); else result.EditTypeScript = "--prevented--";
-
             result.Model = code.GenerateModel();
             result.Enums = code.GenerateEnums();
             result.DTO = code.GenerateDTO();
             //result.SettingsDTO = code.GenerateSettingsDTO();
             result.DbContext = code.GenerateDbContext();
             result.Controller = code.GenerateController();
-            result.BundleConfig = code.GenerateBundleConfig();
+            result.GeneratedModule = code.GenerateGeneratedModule();
+            result.SharedModule = code.GenerateSharedModule();
             result.AppRouter = code.GenerateAppRouter();
             result.ApiResource = code.GenerateApiResource();
             result.ListHtml = code.GenerateListHtml();
@@ -136,7 +125,8 @@ namespace WEB.Controllers
             public string SettingsDTO { get; set; }
             public string DbContext { get; set; }
             public string Controller { get; set; }
-            public string BundleConfig { get; set; }
+            public string GeneratedModule { get; set; }
+            public string SharedModule { get; set; }
             public string AppRouter { get; set; }
             public string ApiResource { get; set; }
             public string ListHtml { get; set; }

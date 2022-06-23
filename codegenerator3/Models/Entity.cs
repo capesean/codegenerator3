@@ -55,7 +55,10 @@ namespace WEB.Models
         public string PreventControllerDeployment { get; set; }
 
         [MaxLength(100)]
-        public string PreventBundleConfigDeployment { get; set; }
+        public string PreventGeneratedModuleDeployment { get; set; }
+
+        [MaxLength(100)]
+        public string PreventSharedModuleDeployment { get; set; }
 
         [MaxLength(100)]
         public string PreventAppRouterDeployment { get; set; }

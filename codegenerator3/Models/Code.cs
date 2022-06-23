@@ -1243,7 +1243,7 @@ namespace WEB.Models
             return RunCodeReplacements(s.ToString(), CodeType.Controller);
         }
 
-        public string GenerateBundleConfig()
+        public string GenerateGeneratedModule()
         {
             var s = new StringBuilder();
 
@@ -1292,7 +1292,7 @@ namespace WEB.Models
             s.Add($"}})");
             s.Add($"export class GeneratedModule {{ }}");
 
-            return RunCodeReplacements(s.ToString(), CodeType.BundleConfig);
+            return RunCodeReplacements(s.ToString(), CodeType.GeneratedModule);
 
         }
 
@@ -1329,6 +1329,12 @@ namespace WEB.Models
                 {
                     s.Add($"import {{ {e.Name}ModalComponent }} from './{e.PluralName.ToLower()}/{e.Name.ToLower()}.modal.component';");
                     componentList += "," + Environment.NewLine + $"        {e.Name}ModalComponent";
+                }
+
+                if (e.HasASortField)
+                {
+                    s.Add($"import {{ {e.Name}SortComponent }} from './{e.PluralName.ToLower()}/{e.Name.ToLower()}.sort.component';");
+                    componentList += "," + Environment.NewLine + $"        {e.Name}SortComponent";
                 }
             }
             s.Add($"");
@@ -1673,6 +1679,8 @@ namespace WEB.Models
                     // todo: needs field list + field.newParameter
                     s.Add(t + $"        <a [routerLink]=\"['./', 'add']\" class=\"btn btn-primary ms-1\">Add<i class=\"fas fa-plus-circle ms-1\"></i></a>");
                 }
+                if (CurrentEntity.HasASortField)
+                    s.Add(t + $"        <button type=\"button\" class=\"btn btn-outline-secondary ms-1\" (click)=\"showSort()\" *ngIf=\"headers.totalRecords > 1\">Sort<i class=\"fas fa-sort ms-1\"></i></button>");
                 s.Add($"");
                 s.Add(t + $"    </fieldset>");
                 s.Add($"");
@@ -1681,22 +1689,19 @@ namespace WEB.Models
             s.Add($"");
             s.Add(t + $"<hr />");
             s.Add($"");
-            // removed (not needed?): id=\"resultsList\" 
-            var useSortColumn = CurrentEntity.HasASortField && !CurrentEntity.RelationshipsAsChild.Any(r => r.Hierarchy);
+            //var useSortColumn = CurrentEntity.HasASortField && !CurrentEntity.RelationshipsAsChild.Any(r => r.Hierarchy);
 
             s.Add(t + $"<table class=\"table table-striped table-hover table-sm row-navigation\">");
             s.Add(t + $"    <thead>");
             s.Add(t + $"        <tr>");
-            if (useSortColumn)
-                s.Add(t + $"            <th class=\"text-center fa-col-width\" *ngIf=\"{CurrentEntity.PluralName.ToCamelCase()}.length > 1\"><i class=\"fas fa-sort\"></i></th>");
+            //if (useSortColumn)
+            //    s.Add(t + $"            <th class=\"text-center fa-col-width\" *ngIf=\"{CurrentEntity.PluralName.ToCamelCase()}.length > 1\"><i class=\"fas fa-sort\"></i></th>");
             foreach (var field in CurrentEntity.Fields.Where(f => f.ShowInSearchResults).OrderBy(f => f.FieldOrder))
                 s.Add(t + $"            <th>{field.Label}</th>");
             s.Add(t + $"        </tr>");
             s.Add(t + $"    </thead>");
-            s.Add(t + $"    <tbody{(useSortColumn ? " cdkDropList (cdkDropListDropped)=\"sort($event)\"" : "")}>");
-            s.Add(t + $"        <tr *ngFor=\"let {CurrentEntity.CamelCaseName} of {CurrentEntity.PluralName.ToCamelCase()}\" (click)=\"goTo{CurrentEntity.Name}({CurrentEntity.CamelCaseName})\"{(useSortColumn ? " cdkDrag" : "")}>");
-            if (useSortColumn)
-                s.Add(t + $"            <td class=\"text-center fa-col-width\" cdkDragHandle (click)=\"$event.stopPropagation();\" *ngIf=\"{CurrentEntity.PluralName.ToCamelCase()}.length > 1\"><span *cdkDragPreview></span><i class=\"fas fa-sort\"></i></td>");
+            s.Add(t + $"    <tbody>");
+            s.Add(t + $"        <tr *ngFor=\"let {CurrentEntity.CamelCaseName} of {CurrentEntity.PluralName.ToCamelCase()}\" (click)=\"goTo{CurrentEntity.Name}({CurrentEntity.CamelCaseName})\">");
             foreach (var field in CurrentEntity.Fields.Where(f => f.ShowInSearchResults).OrderBy(f => f.FieldOrder))
             {
                 s.Add(t + $"            <td>{field.ListFieldHtml}</td>");
@@ -1705,12 +1710,8 @@ namespace WEB.Models
             s.Add(t + $"    </tbody>");
             s.Add(t + $"</table>");
             s.Add($"");
-            // entities with sort fields need to show all (pageSize = 0) for sortability, so no paging needed
-            if (!(CurrentEntity.HasASortField && !CurrentEntity.RelationshipsAsChild.Any(r => r.Hierarchy)))
-            {
-                s.Add(t + $"<pager [headers]=\"headers\" (pageChanged)=\"runSearch($event)\"></pager>");
-                s.Add($"");
-            }
+            s.Add(t + $"<pager [headers]=\"headers\" (pageChanged)=\"runSearch($event)\"></pager>");
+            s.Add($"");
             if (hasChildRoutes)
             {
                 s.Add($"</div>");
@@ -1745,8 +1746,8 @@ namespace WEB.Models
             s.Add($"import {{ Router, ActivatedRoute{(hasChildRoutes ? ", NavigationEnd" : "")} }} from '@angular/router';");
             s.Add($"import {{ Subject{(hasChildRoutes ? ", Subscription" : "")} }} from 'rxjs';");
             s.Add($"import {{ PagingOptions }} from '../common/models/http.model';");
-            if (CurrentEntity.HasASortField)
-                s.Add($"import {{ CdkDragDrop, moveItemInArray }} from '@angular/cdk/drag-drop';");
+            //if (CurrentEntity.HasASortField)
+            //    s.Add($"import {{ CdkDragDrop, moveItemInArray }} from '@angular/cdk/drag-drop';");
             s.Add($"import {{ ErrorService }} from '../common/services/error.service';");
             s.Add($"import {{ {CurrentEntity.Name}SearchOptions, {CurrentEntity.Name}SearchResponse, {CurrentEntity.Name} }} from '../common/models/{CurrentEntity.Name.ToLower()}.model';");
             s.Add($"import {{ {CurrentEntity.Name}Service }} from '../common/services/{CurrentEntity.Name.ToLower()}.service';");
@@ -1756,6 +1757,11 @@ namespace WEB.Models
                 s.Add($"import {{ ToastrService }} from 'ngx-toastr';");
             if (CurrentEntity.EntityType == EntityType.User)
                 s.Add($"import {{ Roles }} from '../common/models/roles.model';");
+            if (CurrentEntity.HasASortField)
+            {
+                s.Add($"import {{ NgbModal }} from '@ng-bootstrap/ng-bootstrap';");
+                s.Add($"import {{ {CurrentEntity.Name}SortComponent }} from './{CurrentEntity.Name.ToLower()}.sort.component';");
+            }
             s.Add($"");
             s.Add($"@Component({{");
             s.Add($"    selector: '{CurrentEntity.Name.ToLower()}-list',");
@@ -1779,7 +1785,7 @@ namespace WEB.Models
             s.Add($"        private router: Router,");
             s.Add($"        private errorService: ErrorService,");
             if (CurrentEntity.HasASortField)
-                s.Add($"        private toastr: ToastrService,");
+                s.Add($"        private modalService: NgbModal,");
             s.Add($"        private {CurrentEntity.Name.ToCamelCase()}Service: {CurrentEntity.Name}Service");
             s.Add($"    ) {{");
             s.Add($"    }}");
@@ -1787,8 +1793,6 @@ namespace WEB.Models
             s.Add($"    ngOnInit(): void {{");
             if (includeEntities)
                 s.Add($"        this.searchOptions.includeEntities = true;");
-            if (CurrentEntity.HasASortField && !CurrentEntity.RelationshipsAsChild.Any(r => r.Hierarchy))
-                s.Add($"        this.searchOptions.pageSize = 0;");
             if (hasChildRoutes)
             {
                 s.Add($"        this.routerSubscription = this.router.events.subscribe(event => {{");
@@ -1831,18 +1835,31 @@ namespace WEB.Models
             s.Add($"");
             if (CurrentEntity.HasASortField)
             {
-                s.Add($"    sort(event: CdkDragDrop<{CurrentEntity.Name}[]>) {{");
-                s.Add($"        moveItemInArray(this.{CurrentEntity.PluralName.ToCamelCase()}, event.previousIndex, event.currentIndex);");
-                s.Add($"        this.{CurrentEntity.Name.ToCamelCase()}Service.sort(this.{CurrentEntity.PluralName.ToCamelCase()}.map(o => o.{CurrentEntity.KeyFields.First().Name.ToCamelCase()})).subscribe(");
+                s.Add($"    showSort() {{");
+                s.Add($"        let modalRef = this.modalService.open(GroupSortComponent, {{ size: 'xl', centered: true, scrollable: true }});");
+                s.Add($"        modalRef.result.then(");
                 s.Add($"            () => {{");
-                s.Add($"                this.toastr.success(\"The sort order has been updated\", \"Change Sort Order\");");
-                s.Add($"            }},");
-                s.Add($"            err => {{");
-                s.Add($"                this.errorService.handleError(err, \"{CurrentEntity.PluralFriendlyName}\", \"Sort\");");
-                s.Add($"            }});");
+                s.Add($"");
+                s.Add($"                this.runSearch(this.headers.pageIndex);");
+                s.Add($"");
+                s.Add($"            }}, () => {{ }});");
                 s.Add($"    }}");
                 s.Add($"");
             }
+            //if (CurrentEntity.HasASortField)
+            //{
+            //    s.Add($"    sort(event: CdkDragDrop<{CurrentEntity.Name}[]>) {{");
+            //    s.Add($"        moveItemInArray(this.{CurrentEntity.PluralName.ToCamelCase()}, event.previousIndex, event.currentIndex);");
+            //    s.Add($"        this.{CurrentEntity.Name.ToCamelCase()}Service.sort(this.{CurrentEntity.PluralName.ToCamelCase()}.map(o => o.{CurrentEntity.KeyFields.First().Name.ToCamelCase()})).subscribe(");
+            //    s.Add($"            () => {{");
+            //    s.Add($"                this.toastr.success(\"The sort order has been updated\", \"Change Sort Order\");");
+            //    s.Add($"            }},");
+            //    s.Add($"            err => {{");
+            //    s.Add($"                this.errorService.handleError(err, \"{CurrentEntity.PluralFriendlyName}\", \"Sort\");");
+            //    s.Add($"            }});");
+            //    s.Add($"    }}");
+            //    s.Add($"");
+            //}
             s.Add($"    goTo{CurrentEntity.Name}({CurrentEntity.Name.ToCamelCase()}: {CurrentEntity.Name}): void {{");
             s.Add($"        this.router.navigate({GetRouterLink(CurrentEntity, CurrentEntity)});");
             s.Add($"    }}");
@@ -3201,7 +3218,8 @@ namespace WEB.Models
 
             if (!String.IsNullOrWhiteSpace(CurrentEntity.PreventApiResourceDeployment) && type == CodeType.ApiResource) return code;
             if (!String.IsNullOrWhiteSpace(CurrentEntity.PreventAppRouterDeployment) && type == CodeType.AppRouter) return code;
-            if (!String.IsNullOrWhiteSpace(CurrentEntity.PreventBundleConfigDeployment) && type == CodeType.BundleConfig) return code;
+            if (!String.IsNullOrWhiteSpace(CurrentEntity.PreventGeneratedModuleDeployment) && type == CodeType.GeneratedModule) return code;
+            if (!String.IsNullOrWhiteSpace(CurrentEntity.PreventSharedModuleDeployment) && type == CodeType.SharedModule) return code;
             if (!String.IsNullOrWhiteSpace(CurrentEntity.PreventControllerDeployment) && type == CodeType.Controller) return code;
             if (!String.IsNullOrWhiteSpace(CurrentEntity.PreventDbContextDeployment) && type == CodeType.DbContext) return code;
             if (!String.IsNullOrWhiteSpace(CurrentEntity.PreventDTODeployment) && type == CodeType.DTO) return code;
@@ -3221,7 +3239,7 @@ namespace WEB.Models
             replacements.InsertRange(0, DbContext.CodeReplacements.Where(o => o.Entity.ProjectId == CurrentEntity.ProjectId && !o.Disabled && o.CodeType == CodeType.Global).ToList());
 
             // common scripts need a common replacement
-            if (type == CodeType.Enums || type == CodeType.AppRouter || type == CodeType.BundleConfig || type == CodeType.DbContext || type == CodeType.SharedModule)
+            if (type == CodeType.Enums || type == CodeType.AppRouter || type == CodeType.GeneratedModule || type == CodeType.SharedModule || type == CodeType.DbContext || type == CodeType.SharedModule)
                 replacements = CodeReplacements.Where(cr => !cr.Disabled && cr.CodeType == type && cr.Entity.ProjectId == CurrentEntity.ProjectId).ToList();
 
             foreach (var replacement in replacements.OrderBy(o => o.SortOrder))
@@ -3331,8 +3349,10 @@ namespace WEB.Models
                 return ("DbContext deployment is not allowed: " + entity.PreventDbContextDeployment);
             if (deploymentOptions.Controller && !string.IsNullOrWhiteSpace(entity.PreventControllerDeployment))
                 return ("Controller deployment is not allowed: " + entity.PreventControllerDeployment);
-            if (deploymentOptions.BundleConfig && !string.IsNullOrWhiteSpace(entity.PreventBundleConfigDeployment))
-                return ("BundleConfig deployment is not allowed: " + entity.PreventBundleConfigDeployment);
+            if (deploymentOptions.GeneratedModule && !string.IsNullOrWhiteSpace(entity.PreventGeneratedModuleDeployment))
+                return ("Generated Module deployment is not allowed: " + entity.PreventGeneratedModuleDeployment);
+            if (deploymentOptions.SharedModule && !string.IsNullOrWhiteSpace(entity.PreventSharedModuleDeployment))
+                return ("Shared Module deployment is not allowed: " + entity.PreventSharedModuleDeployment);
             if (deploymentOptions.AppRouter && !string.IsNullOrWhiteSpace(entity.PreventAppRouterDeployment))
                 return ("AppRouter deployment is not allowed: " + entity.PreventAppRouterDeployment);
             if (deploymentOptions.ApiResource && !string.IsNullOrWhiteSpace(entity.PreventApiResourceDeployment))
@@ -3360,11 +3380,17 @@ namespace WEB.Models
                 if (firstEntity != null)
                     return ("DbContext deployment is not allowed on " + firstEntity.Name + ": " + firstEntity.PreventDbContextDeployment);
             }
-            if (deploymentOptions.BundleConfig)
+            if (deploymentOptions.GeneratedModule)
             {
-                var firstEntity = DbContext.Entities.SingleOrDefault(e => !e.Exclude && e.ProjectId == entity.ProjectId && e.PreventBundleConfigDeployment.Length > 0);
+                var firstEntity = DbContext.Entities.SingleOrDefault(e => !e.Exclude && e.ProjectId == entity.ProjectId && e.PreventGeneratedModuleDeployment.Length > 0);
                 if (firstEntity != null)
-                    return ("BundleConfig deployment is not allowed on " + firstEntity.Name + ": " + firstEntity.PreventBundleConfigDeployment);
+                    return ("Generated Module deployment is not allowed on " + firstEntity.Name + ": " + firstEntity.PreventGeneratedModuleDeployment);
+            }
+            if (deploymentOptions.SharedModule)
+            {
+                var firstEntity = DbContext.Entities.SingleOrDefault(e => !e.Exclude && e.ProjectId == entity.ProjectId && e.PreventSharedModuleDeployment.Length > 0);
+                if (firstEntity != null)
+                    return ("Shared Module deployment is not allowed on " + firstEntity.Name + ": " + firstEntity.PreventSharedModuleDeployment);
             }
             if (deploymentOptions.AppRouter)
             {
@@ -3501,6 +3527,12 @@ namespace WEB.Models
             {
                 if (!CreateAppDirectory(entity.Project, entity.PluralName, codeGenerator.GenerateListTypeScript(), entity.Name.ToLower() + ".list.component.ts"))
                     return ("App path does not exist: " + Path.Combine(entity.Project.RootPathWeb, @"ClientApp\src\app"));
+
+                if (entity.HasASortField)
+                {
+                    if (!CreateAppDirectory(entity.Project, entity.PluralName, $"export class {entity.Name}SortComponent {{}}", entity.Name.ToLower() + ".sort.component.ts"))
+                        return ("App path does not exist: " + Path.Combine(entity.Project.RootPathWeb, @"ClientApp\src\app"));
+                }
             }
             #endregion
 
@@ -3528,16 +3560,22 @@ namespace WEB.Models
             }
             #endregion
 
-            // todo: rename
-            #region bundleconfig
-            if (deploymentOptions.BundleConfig)
+            #region generated module
+            if (deploymentOptions.GeneratedModule)
             {
                 var path = entity.Project.RootPathWeb + @"ClientApp\src\app\";
 
-                var code = codeGenerator.GenerateBundleConfig();
+                var code = codeGenerator.GenerateGeneratedModule();
                 if (code != string.Empty) File.WriteAllText(Path.Combine(path, "generated.module.ts"), code);
+            }
+            #endregion
 
-                code = codeGenerator.GenerateSharedModule();
+            #region shared module
+            if (deploymentOptions.SharedModule)
+            {
+                var path = entity.Project.RootPathWeb + @"ClientApp\src\app\";
+
+                var code = codeGenerator.GenerateSharedModule();
                 if (code != string.Empty) File.WriteAllText(Path.Combine(path, "shared.module.ts"), code);
             }
             #endregion
@@ -3612,7 +3650,8 @@ namespace WEB.Models
         public bool SettingsDTO { get; set; }
         public bool DbContext { get; set; }
         public bool Controller { get; set; }
-        public bool BundleConfig { get; set; }
+        public bool GeneratedModule { get; set; }
+        public bool SharedModule { get; set; }
         public bool AppRouter { get; set; }
         public bool ApiResource { get; set; }
         public bool ListHtml { get; set; }

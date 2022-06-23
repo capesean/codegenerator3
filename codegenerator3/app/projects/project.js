@@ -142,7 +142,8 @@
                     settingsDTO: !!vm.multideploy[entity.entityId].settingsDTO,
                     dbContext: !!vm.multideploy[entity.entityId].dbContext,
                     controller: !!vm.multideploy[entity.entityId].controller,
-                    bundleConfig: !!vm.multideploy[entity.entityId].bundleConfig,
+                    generatedModule: !!vm.multideploy[entity.entityId].generatedModule,
+                    sharedModule: !!vm.multideploy[entity.entityId].sharedModule,
                     appRouter: !!vm.multideploy[entity.entityId].appRouter,
                     apiResource: !!vm.multideploy[entity.entityId].apiResource,
                     listHtml: !!vm.multideploy[entity.entityId].listHtml,
@@ -191,7 +192,9 @@
                     vm.multideploy[entity.entityId][item] = false;
                 else if (item === "controller" && entity.preventControllerDeployment)
                     vm.multideploy[entity.entityId][item] = false;
-                else if (item === "bundleConfig" && entity.preventBundleConfigDeployment)
+                else if (item === "generatedModule" && entity.preventGeneratedModuleDeployment)
+                    vm.multideploy[entity.entityId][item] = false;
+                else if (item === "sharedModule" && entity.preventSharedModuleDeployment)
                     vm.multideploy[entity.entityId][item] = false;
                 else if (item === "appRouter" && entity.preventappRouterDeployment)
                     vm.multideploy[entity.entityId][item] = false;
@@ -240,8 +243,10 @@
                 vm.multideploy[entity.entityId]["dbContext"] = checked;
             if (!checked || !entity.preventControllerDeployment)
                 vm.multideploy[entity.entityId]["controller"] = checked;
-            if (!checked || !entity.preventBundleConfigDeployment)
-                vm.multideploy[entity.entityId]["bundleConfig"] = checked;
+            if (!checked || !entity.preventGeneratedModuleDeployment)
+                vm.multideploy[entity.entityId]["generatedModule"] = checked;
+            if (!checked || !entity.preventSharedModuleDeployment)
+                vm.multideploy[entity.entityId]["sharedModule"] = checked;
             if (!checked || !entity.preventappRouterDeployment)
                 vm.multideploy[entity.entityId]["appRouter"] = checked;
             if (!checked || !entity.preventApiResourceDeployment)

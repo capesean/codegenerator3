@@ -161,11 +161,20 @@
                         </div>
 
                         <div class="col-sm-6 col-md-4">
-                            <div class="form-group" ng-class="{ 'has-error':  mainForm.$submitted && mainForm.preventBundleConfigDeployment.$invalid }">
-                                <label for="preventBundleConfigDeployment" class="control-label">
-                                    Prevent BundleConfig Deployment:
+                            <div class="form-group" ng-class="{ 'has-error':  mainForm.$submitted && mainForm.preventGeneratedModuleDeployment.$invalid }">
+                                <label for="preventGeneratedModuleDeployment" class="control-label">
+                                    Prevent Generated Module Deployment:
                                 </label>
-                                <input type="text" id="preventBundleConfigDeployment" name="preventBundleConfigDeployment" ng-model="vm.entity.preventBundleConfigDeployment" maxlength="100" class="form-control" />
+                                <input type="text" id="preventGeneratedModuleDeployment" name="preventGeneratedModuleDeployment" ng-model="vm.entity.preventGeneratedModuleDeployment" maxlength="100" class="form-control" />
+                            </div>
+                        </div>
+
+                        <div class="col-sm-6 col-md-4">
+                            <div class="form-group" ng-class="{ 'has-error':  mainForm.$submitted && mainForm.preventSharedModuleDeployment.$invalid }">
+                                <label for="preventSharedModuleDeployment" class="control-label">
+                                    Prevent Shared Module Deployment:
+                                </label>
+                                <input type="text" id="preventSharedModuleDeployment" name="preventSharedModuleDeployment" ng-model="vm.entity.preventSharedModuleDeployment" maxlength="100" class="form-control" />
                             </div>
                         </div>
 

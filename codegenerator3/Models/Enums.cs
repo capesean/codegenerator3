@@ -13,7 +13,7 @@ namespace WEB.Models
         DTO,
         DbContext,
         Controller,
-        BundleConfig,
+        GeneratedModule,
         AppRouter,
         ApiResource,
         ListHtml,
@@ -122,8 +122,8 @@ namespace WEB.Models
                     return "DbContext";
                 case CodeType.Controller:
                     return "Controller";
-                case CodeType.BundleConfig:
-                    return "BundleConfig";
+                case CodeType.GeneratedModule:
+                    return "Generated Module";
                 case CodeType.AppRouter:
                     return "AppRouter";
                 case CodeType.ApiResource:

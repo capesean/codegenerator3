@@ -202,7 +202,8 @@
                     <th class="text-center rotate-90" scope="col"><div ng-click="vm.setCheckBoxes('settingsDTO')" class="clickable">SettingsDTO</div></th>
                     <th class="text-center rotate-90" scope="col"><div ng-click="vm.setCheckBoxes('dbContext')" class="clickable">DBContext</div></th>
                     <th class="text-center rotate-90" scope="col"><div ng-click="vm.setCheckBoxes('controller')" class="clickable">Controller</div></th>
-                    <th class="text-center rotate-90" scope="col"><div ng-click="vm.setCheckBoxes('bundleConfig')" class="clickable">BundleConfig</div></th>
+                    <th class="text-center rotate-90" scope="col"><div ng-click="vm.setCheckBoxes('generatedModule')" class="clickable">GeneratedModule</div></th>
+                    <th class="text-center rotate-90" scope="col"><div ng-click="vm.setCheckBoxes('sharedModule')" class="clickable">SharedModule</div></th>
                     <th class="text-center rotate-90" scope="col"><div ng-click="vm.setCheckBoxes('appRouter')" class="clickable">AppRouter</div></th>
                     <th class="text-center rotate-90" scope="col"><div ng-click="vm.setCheckBoxes('apiResource')" class="clickable">ApiResource</div></th>
                     <th class="text-center rotate-90" scope="col"><div ng-click="vm.setCheckBoxes('listHtml')" class="clickable">ListHtml</div></th>
@@ -225,7 +226,8 @@
                     <td class="text-center" ng-click="$event.stopPropagation()"><input type="checkbox" ng-disabled="entity.exclude" ng-model="vm.multideploy[entity.entityId].settingsDTO" /></td>
                     <td class="text-center" ng-click="$event.stopPropagation()" uib-tooltip="{{entity.preventDbContextDeployment}}"><input type="checkbox" ng-disabled="entity.exclude || !!entity.preventDbContextDeployment" ng-model="vm.multideploy[entity.entityId].dbContext" /></td>
                     <td class="text-center" ng-click="$event.stopPropagation()" uib-tooltip="{{entity.preventControllerDeployment}}"><input type="checkbox" ng-disabled="entity.exclude || !!entity.preventControllerDeployment" ng-model="vm.multideploy[entity.entityId].controller" /></td>
-                    <td class="text-center" ng-click="$event.stopPropagation()" uib-tooltip="{{entity.preventBundleConfigDeployment}}"><input type="checkbox" ng-disabled="entity.exclude || !!entity.preventBundleConfigDeployment" ng-model="vm.multideploy[entity.entityId].bundleConfig" /></td>
+                    <td class="text-center" ng-click="$event.stopPropagation()" uib-tooltip="{{entity.preventGeneratedModuleDeployment}}"><input type="checkbox" ng-disabled="entity.exclude || !!entity.preventGeneratedModuleDeployment" ng-model="vm.multideploy[entity.entityId].generatedModule" /></td>
+                    <td class="text-center" ng-click="$event.stopPropagation()" uib-tooltip="{{entity.preventSharedModuleDeployment}}"><input type="checkbox" ng-disabled="entity.exclude || !!entity.preventSharedModuleDeployment" ng-model="vm.multideploy[entity.entityId].sharedModule" /></td>
                     <td class="text-center" ng-click="$event.stopPropagation()" uib-tooltip="{{entity.preventAppRouterDeployment}}"><input type="checkbox" ng-disabled="entity.exclude || !!entity.preventAppRouterDeployment" ng-model="vm.multideploy[entity.entityId].appRouter" /></td>
                     <td class="text-center" ng-click="$event.stopPropagation()" uib-tooltip="{{entity.preventApiResourceDeployment}}"><input type="checkbox" ng-disabled="entity.exclude || !!entity.preventApiResourceDeployment" ng-model="vm.multideploy[entity.entityId].apiResource" /></td>
                     <td class="text-center" ng-click="$event.stopPropagation()" uib-tooltip="{{entity.preventListHtmlDeployment}}"><input type="checkbox" ng-disabled="entity.exclude || !!entity.preventListHtmlDeployment" ng-model="vm.multideploy[entity.entityId].listHtml" /></td>

@@ -52,7 +52,10 @@ namespace WEB.Models
         public string PreventControllerDeployment { get; set; }
 
         [MaxLength(100)]
-        public string PreventBundleConfigDeployment { get; set; }
+        public string PreventGeneratedModuleDeployment { get; set; }
+
+        [MaxLength(100)]
+        public string PreventSharedModuleDeployment { get; set; }
 
         [MaxLength(100)]
         public string PreventAppRouterDeployment { get; set; }
@@ -132,7 +135,8 @@ namespace WEB.Models
             entityDTO.PreventDTODeployment = entity.PreventDTODeployment;
             entityDTO.PreventDbContextDeployment = entity.PreventDbContextDeployment;
             entityDTO.PreventControllerDeployment = entity.PreventControllerDeployment;
-            entityDTO.PreventBundleConfigDeployment = entity.PreventBundleConfigDeployment;
+            entityDTO.PreventGeneratedModuleDeployment = entity.PreventGeneratedModuleDeployment;
+            entityDTO.PreventSharedModuleDeployment = entity.PreventSharedModuleDeployment;
             entityDTO.PreventAppRouterDeployment = entity.PreventAppRouterDeployment;
             entityDTO.PreventApiResourceDeployment = entity.PreventApiResourceDeployment;
             entityDTO.PreventListHtmlDeployment = entity.PreventListHtmlDeployment;
@@ -171,7 +175,8 @@ namespace WEB.Models
             entity.PreventDTODeployment = entityDTO.PreventDTODeployment;
             entity.PreventDbContextDeployment = entityDTO.PreventDbContextDeployment;
             entity.PreventControllerDeployment = entityDTO.PreventControllerDeployment;
-            entity.PreventBundleConfigDeployment = entityDTO.PreventBundleConfigDeployment;
+            entity.PreventGeneratedModuleDeployment = entityDTO.PreventGeneratedModuleDeployment;
+            entity.PreventSharedModuleDeployment = entityDTO.PreventSharedModuleDeployment;
             entity.PreventAppRouterDeployment = entityDTO.PreventAppRouterDeployment;
             entity.PreventApiResourceDeployment = entityDTO.PreventApiResourceDeployment;
             entity.PreventListHtmlDeployment = entityDTO.PreventListHtmlDeployment;
