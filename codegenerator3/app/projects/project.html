@@ -214,6 +214,8 @@
                     <th class="text-center rotate-90" scope="col"><div ng-click="vm.setCheckBoxes('appSelectTypeScript')" class="clickable">AppSelectTS</div></th>
                     <th class="text-center rotate-90" scope="col"><div ng-click="vm.setCheckBoxes('selectModalHtml')" class="clickable">SelectModalHtml</div></th>
                     <th class="text-center rotate-90" scope="col"><div ng-click="vm.setCheckBoxes('selectModalTypeScript')" class="clickable">SelectModalTs</div></th>
+                    <th class="text-center rotate-90" scope="col"><div ng-click="vm.setCheckBoxes('sortHtml')" class="clickable">SortHtml</div></th>
+                    <th class="text-center rotate-90" scope="col"><div ng-click="vm.setCheckBoxes('sortTypeScript')" class="clickable">SortTypeScript</div></th>
                 </tr>
             </thead>
             <tbody>
@@ -238,6 +240,8 @@
                     <td class="text-center" ng-click="$event.stopPropagation()" uib-tooltip="{{entity.preventAppSelectTypeScriptDeployment}}"><input type="checkbox" ng-disabled="entity.exclude || !!entity.preventAppSelectHtmlDeployment" ng-model="vm.multideploy[entity.entityId].appSelectTypeScript" /></td>
                     <td class="text-center" ng-click="$event.stopPropagation()" uib-tooltip="{{entity.preventSelectModalHtmlDeployment}}"><input type="checkbox" ng-disabled="entity.exclude || !!entity.preventSelectModalHtmlDeployment" ng-model="vm.multideploy[entity.entityId].selectModalHtml" /></td>
                     <td class="text-center" ng-click="$event.stopPropagation()" uib-tooltip="{{entity.preventSelectModalTypeScriptDeployment}}"><input type="checkbox" ng-disabled="entity.exclude || !!entity.preventSelectModalHtmlDeployment" ng-model="vm.multideploy[entity.entityId].selectModalTypeScript" /></td>
+                    <td class="text-center" ng-click="$event.stopPropagation()" uib-tooltip="{{entity.preventSortHtml}}"><input type="checkbox" ng-disabled="entity.exclude || !!entity.preventSortHtml" ng-model="vm.multideploy[entity.entityId].sortHtml" /></td>
+                    <td class="text-center" ng-click="$event.stopPropagation()" uib-tooltip="{{entity.preventSortTypeScript}}"><input type="checkbox" ng-disabled="entity.exclude || !!entity.preventSortTypeScript" ng-model="vm.multideploy[entity.entityId].sortTypeScript" /></td>
                 </tr>
             </tbody>
         </table>

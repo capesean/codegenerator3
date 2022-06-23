@@ -1,0 +1,24 @@
+﻿<div class="modal-header">
+    <h4 class="modal-title" id="modal-title">Sort PLURALNAME</h4>
+    <button type="button" class="btn-close" aria-label="Close button" aria-describedby="modal-title" (click)="modal.dismiss()"></button>
+</div>
+<div class="modal-body">
+
+    <table class="table table-striped table-hover table-sm">
+        <thead>
+            <tr>
+                <th class="text-center fa-col-width"><i class="fas fa-sort"></i></th>
+COLUMN_HEADERS            </tr>
+        </thead>
+        <tbody cdkDropList (cdkDropListDropped)="drop($event)">
+            <tr *ngFor="let CAMELCASENAME of PLURALNAME_TOCAMELCASE" cdkDrag cdkDragHandle>
+                <td class="text-center fa-col-width"><i class="fas fa-sort"></i></td>
+COLUMNS            </tr>
+        </tbody>
+    </table>
+
+</div>
+<div class="modal-footer">
+    <button type="button" class="btn btn-outline-secondary" (click)="close()">Ok</button>
+    <button type="button" class="btn btn-danger" (click)="modal.dismiss()">Cancel</button>
+</div>

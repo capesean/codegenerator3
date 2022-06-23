@@ -90,6 +90,12 @@ namespace WEB.Models
         [MaxLength(100)]
         public string PreventSelectModalTypeScriptDeployment { get; set; }
 
+        [MaxLength(100)]
+        public string PreventSortHtmlDeployment { get; set; }
+
+        [MaxLength(100)]
+        public string PreventSortTypeScriptDeployment { get; set; }
+
         [Required]
         public AuthorizationType AuthorizationType { get; set; }
 

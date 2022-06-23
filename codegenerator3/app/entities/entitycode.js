@@ -25,7 +25,9 @@
             appSelectHtml: false,
             appSelectTypeScript: false,
             selectModalHtml: false,
-            selectModalTypeScript: false
+            selectModalTypeScript: false,
+            sortHtml: false,
+            sortTypeScript: false
         };
         vm.loading = true;
         vm.generate = generate;

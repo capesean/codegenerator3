@@ -1689,7 +1689,6 @@ namespace WEB.Models
             s.Add($"");
             s.Add(t + $"<hr />");
             s.Add($"");
-            //var useSortColumn = CurrentEntity.HasASortField && !CurrentEntity.RelationshipsAsChild.Any(r => r.Hierarchy);
 
             s.Add(t + $"<table class=\"table table-striped table-hover table-sm row-navigation\">");
             s.Add(t + $"    <thead>");
@@ -1746,8 +1745,6 @@ namespace WEB.Models
             s.Add($"import {{ Router, ActivatedRoute{(hasChildRoutes ? ", NavigationEnd" : "")} }} from '@angular/router';");
             s.Add($"import {{ Subject{(hasChildRoutes ? ", Subscription" : "")} }} from 'rxjs';");
             s.Add($"import {{ PagingOptions }} from '../common/models/http.model';");
-            //if (CurrentEntity.HasASortField)
-            //    s.Add($"import {{ CdkDragDrop, moveItemInArray }} from '@angular/cdk/drag-drop';");
             s.Add($"import {{ ErrorService }} from '../common/services/error.service';");
             s.Add($"import {{ {CurrentEntity.Name}SearchOptions, {CurrentEntity.Name}SearchResponse, {CurrentEntity.Name} }} from '../common/models/{CurrentEntity.Name.ToLower()}.model';");
             s.Add($"import {{ {CurrentEntity.Name}Service }} from '../common/services/{CurrentEntity.Name.ToLower()}.service';");
@@ -1836,7 +1833,7 @@ namespace WEB.Models
             if (CurrentEntity.HasASortField)
             {
                 s.Add($"    showSort() {{");
-                s.Add($"        let modalRef = this.modalService.open(GroupSortComponent, {{ size: 'xl', centered: true, scrollable: true }});");
+                s.Add($"        let modalRef = this.modalService.open({CurrentEntity.Name}SortComponent, {{ size: 'xl', centered: true, scrollable: true }});");
                 s.Add($"        modalRef.result.then(");
                 s.Add($"            () => {{");
                 s.Add($"");
@@ -1846,20 +1843,6 @@ namespace WEB.Models
                 s.Add($"    }}");
                 s.Add($"");
             }
-            //if (CurrentEntity.HasASortField)
-            //{
-            //    s.Add($"    sort(event: CdkDragDrop<{CurrentEntity.Name}[]>) {{");
-            //    s.Add($"        moveItemInArray(this.{CurrentEntity.PluralName.ToCamelCase()}, event.previousIndex, event.currentIndex);");
-            //    s.Add($"        this.{CurrentEntity.Name.ToCamelCase()}Service.sort(this.{CurrentEntity.PluralName.ToCamelCase()}.map(o => o.{CurrentEntity.KeyFields.First().Name.ToCamelCase()})).subscribe(");
-            //    s.Add($"            () => {{");
-            //    s.Add($"                this.toastr.success(\"The sort order has been updated\", \"Change Sort Order\");");
-            //    s.Add($"            }},");
-            //    s.Add($"            err => {{");
-            //    s.Add($"                this.errorService.handleError(err, \"{CurrentEntity.PluralFriendlyName}\", \"Sort\");");
-            //    s.Add($"            }});");
-            //    s.Add($"    }}");
-            //    s.Add($"");
-            //}
             s.Add($"    goTo{CurrentEntity.Name}({CurrentEntity.Name.ToCamelCase()}: {CurrentEntity.Name}): void {{");
             s.Add($"        this.router.navigate({GetRouterLink(CurrentEntity, CurrentEntity)});");
             s.Add($"    }}");
@@ -2342,20 +2325,6 @@ namespace WEB.Models
                         s.Add($"");
                     }
                     #endregion
-
-                    // entities with sort fields need to show all (pageSize = 0) for sortability, so no paging needed
-                    if (!childEntity.HasASortField)
-                    {
-                        //s.Add(t + $"            <div class=\"row\">");
-                        //s.Add(t + $"                <div class=\"col-sm-7\">");
-                        //s.Add(t + $"                   <{CurrentEntity.Project.AngularDirectivePrefix}-pager headers=\"{relationship.ChildEntity.PluralName.ToCamelCase()}Headers\" callback=\"load{relationship.CollectionName}\"></{CurrentEntity.Project.AngularDirectivePrefix}-pager>");
-                        //s.Add(t + $"                </div>");
-                        //s.Add(t + $"                <div class=\"col-sm-5 text-right resultsInfo\">");
-                        //s.Add(t + $"                   <{CurrentEntity.Project.AngularDirectivePrefix}-pager-info headers=\"{relationship.ChildEntity.PluralName.ToCamelCase()}Headers\"></{CurrentEntity.Project.AngularDirectivePrefix}-pager-info>");
-                        //s.Add(t + $"                </div>");
-                        //s.Add(t + $"            </div>");
-                        //s.Add($"");
-                    }
 
                     s.Add(t + $"            </ng-template>");
                     s.Add($"");
@@ -3073,6 +3042,51 @@ namespace WEB.Models
             return RunCodeReplacements(s.ToString(), CodeType.SelectModalHtml);
         }
 
+        public string GenerateSortHtml()
+        {
+            var s = new StringBuilder();
+
+            var file = File.ReadAllText(AppDomain.CurrentDomain.BaseDirectory + "templates/sort.html");
+
+            var COLUMN_HEADERS = string.Empty;
+            var COLUMNS = string.Empty;
+
+            foreach (var field in CurrentEntity.Fields.Where(f => f.ShowInSearchResults).OrderBy(f => f.FieldOrder))
+            {
+                COLUMN_HEADERS += $"                <th>{field.Label}</th>{Environment.NewLine}";
+                COLUMNS += $"                <td>{field.ListFieldHtml}</td>{Environment.NewLine}";
+            }
+
+            file = RunTemplateReplacements(file)
+                .Replace("COLUMN_HEADERS", COLUMN_HEADERS)
+                .Replace("COLUMNS", COLUMNS);
+
+            s.Add(file);
+
+            return RunCodeReplacements(s.ToString(), CodeType.SortHtml);
+        }
+
+        public string GenerateSortTypeScript()
+        {
+            var s = new StringBuilder();
+
+            var file = File.ReadAllText(AppDomain.CurrentDomain.BaseDirectory + "templates/sort.txt");
+
+            var enumLookups = CurrentEntity.Fields.Where(o => o.FieldType == FieldType.Enum && (o.ShowInSearchResults || o.SearchType == SearchType.Exact)).Select(o => o.Lookup).Distinct().ToList();
+
+            string ENUM_PROPERTIES = string.Empty;
+            foreach (var enumLookup in enumLookups)
+                ENUM_PROPERTIES += $"    public {enumLookup.PluralName.ToCamelCase()}: Enum[] = Enums.{enumLookup.PluralName};{Environment.NewLine}";
+
+            file = RunTemplateReplacements(file)
+                .Replace("ENUM_IMPORTS", enumLookups.Any() ? $"import {{ Enum, Enums }} from '../common/models/enums.model';{Environment.NewLine}" : "")
+                .Replace("ENUM_PROPERTIES", enumLookups.Any() ? ENUM_PROPERTIES : string.Empty);
+
+            s.Add(file);
+
+            return RunCodeReplacements(s.ToString(), CodeType.SortTypeScript);
+        }
+
         public string GenerateModalTypeScript()
         {
             var s = new StringBuilder();
@@ -3373,6 +3387,10 @@ namespace WEB.Models
                 return ("SelectModalHtml deployment is not allowed: " + entity.PreventSelectModalHtmlDeployment);
             if (deploymentOptions.SelectModalTypeScript && !string.IsNullOrWhiteSpace(entity.PreventSelectModalTypeScriptDeployment))
                 return ("SelectModalTypeScript deployment is not allowed: " + entity.PreventSelectModalTypeScriptDeployment);
+            if (deploymentOptions.SortHtml && !string.IsNullOrWhiteSpace(entity.PreventSortHtmlDeployment))
+                return ("SortHtml deployment is not allowed: " + entity.PreventSortHtmlDeployment);
+            if (deploymentOptions.SortTypeScript && !string.IsNullOrWhiteSpace(entity.PreventSortTypeScriptDeployment))
+                return ("SortTypeScript deployment is not allowed: " + entity.PreventSortTypeScriptDeployment);
 
             if (deploymentOptions.DbContext)
             {
@@ -3622,6 +3640,22 @@ namespace WEB.Models
             }
             #endregion
 
+            #region sort html
+            if (deploymentOptions.SortHtml && entity.HasASortField)
+            {
+                if (!CreateAppDirectory(entity.Project, entity.PluralName, codeGenerator.GenerateSortHtml(), entity.Name.ToLower() + ".sort.component.html"))
+                    return ("App path does not exist: " + Path.Combine(entity.Project.RootPathWeb, @"ClientApp\src\app"));
+            }
+            #endregion
+
+            #region sort typescript
+            if (deploymentOptions.SortTypeScript && entity.HasASortField)
+            {
+                if (!CreateAppDirectory(entity.Project, entity.PluralName, codeGenerator.GenerateSortTypeScript(), entity.Name.ToLower() + ".sort.component.ts"))
+                    return ("App path does not exist: " + Path.Combine(entity.Project.RootPathWeb, @"ClientApp\src\app"));
+            }
+            #endregion
+
             return null;
         }
 
@@ -3662,6 +3696,8 @@ namespace WEB.Models
         public bool AppSelectTypeScript { get; set; }
         public bool SelectModalHtml { get; set; }
         public bool SelectModalTypeScript { get; set; }
+        public bool SortHtml { get; set; }
+        public bool SortTypeScript { get; set; }
     }
 
 }

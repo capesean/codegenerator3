@@ -219,7 +219,9 @@
                     appSelectHtml: !!vm.multideploy[entity.entityId].appSelectHtml,
                     appSelectTypeScript: !!vm.multideploy[entity.entityId].appSelectTypeScript,
                     selectModalHtml: !!vm.multideploy[entity.entityId].selectModalHtml,
-                    selectModalTypeScript: !!vm.multideploy[entity.entityId].selectModalTypeScript
+                    selectModalTypeScript: !!vm.multideploy[entity.entityId].selectModalTypeScript,
+                    sortHtml: !!vm.multideploy[entity.entityId].sortHtml,
+                    sortTypeScript: !!vm.multideploy[entity.entityId].sortTypeScript
                 }
                 data.push(item);
 
@@ -272,6 +274,8 @@
                 else if (item === "appSelectTypeScript" && entity.preventAppSelectTypeScriptDeployment) vm.multideploy[entity.entityId][item] = false;
                 else if (item === "selectModalHtml" && entity.preventSelectModalHtmlDeployment) vm.multideploy[entity.entityId][item] = false;
                 else if (item === "selectModalTypeScript" && entity.preventSelectModalTypeScriptDeployment) vm.multideploy[entity.entityId][item] = false;
+                else if (item === "sortHtml" && entity.preventSortHtml) vm.multideploy[entity.entityId][item] = false;
+                else if (item === "sortTypeScript" && entity.preventSortTypeScript) vm.multideploy[entity.entityId][item] = false;
                 else vm.multideploy[entity.entityId][item] = checked;
             });
         }
@@ -305,6 +309,8 @@
             if (!checked || !entity.preventAppSelectTypeScriptDeployment) vm.multideploy[entity.entityId]["appSelectTypeScript"] = checked;
             if (!checked || !entity.preventSelectModalHtmlDeployment) vm.multideploy[entity.entityId]["selectModalHtml"] = checked;
             if (!checked || !entity.preventSelectModalTypeScriptDeployment) vm.multideploy[entity.entityId]["selectModalTypeScript"] = checked;
+            if (!checked || !entity.preventSortHtmlDeployment) vm.multideploy[entity.entityId]["sortHtml"] = checked;
+            if (!checked || !entity.preventSortTypeScriptDeployment) vm.multideploy[entity.entityId]["sortTypeScript"] = checked;
         }
     };
 

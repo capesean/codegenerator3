@@ -47,6 +47,8 @@ namespace WEB.Controllers
                     || option.AppSelectTypeScript
                     || option.SelectModalHtml
                     || option.SelectModalTypeScript
+                    || option.SortHtml
+                    || option.SortTypeScript
                     )
                 {
 
@@ -87,6 +89,8 @@ namespace WEB.Controllers
                     if (option.AppSelectTypeScript) RunDeploy(entity, CodeType.AppSelectTypeScript, results);
                     if (option.SelectModalHtml) RunDeploy(entity, CodeType.SelectModalHtml, results);
                     if (option.SelectModalTypeScript) RunDeploy(entity, CodeType.SelectModalTypeScript, results);
+                    if (option.SortHtml) RunDeploy(entity, CodeType.SortHtml, results);
+                    if (option.SortTypeScript) RunDeploy(entity, CodeType.SortTypeScript, results);
                 }
             }
 
@@ -115,6 +119,8 @@ namespace WEB.Controllers
             options.AppSelectTypeScript = codeType == CodeType.AppSelectTypeScript;
             options.SelectModalHtml = codeType == CodeType.SelectModalHtml;
             options.SelectModalTypeScript = codeType == CodeType.SelectModalTypeScript;
+            options.SortHtml = codeType == CodeType.SortHtml;
+            options.SortTypeScript = codeType == CodeType.SortTypeScript;
 
             var result = Code.RunDeployment(DbContext, entity, options);
             results.Add(new DeploymentResult
@@ -157,6 +163,8 @@ namespace WEB.Controllers
         public bool AppSelectTypeScript { get; set; } = false;
         public bool SelectModalHtml { get; set; } = false;
         public bool SelectModalTypeScript { get; set; } = false;
+        public bool SortHtml { get; set; } = false;
+        public bool SortTypeScript { get; set; } = false;
 
     }
 }

@@ -579,6 +579,8 @@
     <Content Include="scripts\popper.js" />
     <Content Include="scripts\popper.min.js" />
     <Content Include="scripts\sb-admin-2.js" />
+    <Content Include="templates\sort.html" />
+    <Content Include="templates\sort.txt" />
     <Content Include="Web.sample.config" />
     <Content Include="Web.config" />
     <TypeScriptCompile Include="scripts\index.d.ts" />
@@ -648,6 +650,14 @@
     <Compile Include="Migrations\202206231206262_test.cs" />
     <Compile Include="Migrations\202206231206262_test.designer.cs">
       <DependentUpon>202206231206262_test.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202206231323376_preventSortHtml.cs" />
+    <Compile Include="Migrations\202206231323376_preventSortHtml.designer.cs">
+      <DependentUpon>202206231323376_preventSortHtml.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202206231403217_preventSortTypeScript.cs" />
+    <Compile Include="Migrations\202206231403217_preventSortTypeScript.designer.cs">
+      <DependentUpon>202206231403217_preventSortTypeScript.cs</DependentUpon>
     </Compile>
     <Compile Include="Models\Relationship_.cs" />
     <Compile Include="Startup.cs" />
@@ -765,6 +775,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202206231206262_test.resx">
       <DependentUpon>202206231206262_test.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202206231323376_preventSortHtml.resx">
+      <DependentUpon>202206231323376_preventSortHtml.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202206231403217_preventSortTypeScript.resx">
+      <DependentUpon>202206231403217_preventSortTypeScript.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

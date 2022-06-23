@@ -272,6 +272,34 @@
                 </div>
             </div>
 
+            <div class="col-sm-4 col-md-3 col-lg-2" ng-if="!vm.entity.preventSortHtml">
+                <div class="form-group">
+                    <label for="sortHtml" class="control-label">
+                        Sort HTML
+                    </label>
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" id="sortHtml" name="sortHtml" ng-model="vm.deploymentOptions.sortHtml" />
+                            Sort Html
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-4 col-md-3 col-lg-2" ng-if="!vm.entity.preventSortTypeScript">
+                <div class="form-group">
+                    <label for="sortTypeScript" class="control-label">
+                        Sort TypeScript
+                    </label>
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" id="sortTypeScript" name="sortTypeScript" ng-model="vm.deploymentOptions.sortTypeScript" />
+                            Sort TypeScript
+                        </label>
+                    </div>
+                </div>
+            </div>
+
         </fieldset>
 
         <fieldset ng-disabled="vm.loading">
@@ -307,6 +335,8 @@
             <li role="presentation" xng-if="vm.entity.preventAppSelectTypeScriptDeployment === ''"><a href="##appSelectTypeScriptTab" aria-controls="appSelectTypeScript" role="tab" data-toggle="tab">App-Select TypeScript</a></li>
             <li role="presentation" xng-if="vm.entity.preventSelectModalHtmlDeployment === ''"><a href="##selectModalHtmlTab" aria-controls="selectModalHtml" role="tab" data-toggle="tab">Select Modal Html</a></li>
             <li role="presentation" xng-if="vm.entity.preventSelectModalTypeScriptDeployment === ''"><a href="##selectModalTypeScriptTab" aria-controls="selectModalTypeScript" role="tab" data-toggle="tab">Select Modal TypeScript</a></li>
+            <li role="presentation" xng-if="vm.entity.preventSortHtml === ''"><a href="##sortHtmlTab" aria-controls="sortHtml" role="tab" data-toggle="tab">Sort Html</a></li>
+            <li role="presentation" xng-if="vm.entity.preventSortTypeScript === ''"><a href="##sortTypeScriptTab" aria-controls="sortTypeScript" role="tab" data-toggle="tab">Sort TypeScript</a></li>
         </ul>
 
         <!-- Tab panes -->
@@ -514,6 +544,28 @@
                 <div class="row"><div class="col-sm-12"><button class="btn btn-default copyButton" ng-click="vm.copy('selectModalTypeScript')">Copy<i class="fa fa-copy"></i></button></div></div>
 
                 <pre><code class="typescript" ng-bind-html="vm.escapedCode.selectModalTypeScript"></code></pre>
+
+            </div>
+            <div role="tabpanel" class="tab-pane" id="sortHtmlTab">
+
+                <br />
+
+                <div class="alert alert-info" ng-if="vm.entity.preventSortHtml">Deployment disabled</div>
+
+                <div class="row"><div class="col-sm-12"><button class="btn btn-default copyButton" ng-click="vm.copy('sortHtml')">Copy<i class="fa fa-copy"></i></button></div></div>
+
+                <pre><code class="html" ng-bind-html="vm.escapedCode.sortHtml"></code></pre>
+
+            </div>
+            <div role="tabpanel" class="tab-pane" id="sortTypeScriptTab">
+
+                <br />
+
+                <div class="alert alert-info" ng-if="vm.entity.preventSortTypeScript">Deployment disabled</div>
+
+                <div class="row"><div class="col-sm-12"><button class="btn btn-default copyButton" ng-click="vm.copy('sortTypeScript')">Copy<i class="fa fa-copy"></i></button></div></div>
+                
+                <pre><code class="typescript" ng-bind-html="vm.escapedCode.sortTypeScript"></code></pre>
 
             </div>
         </div>

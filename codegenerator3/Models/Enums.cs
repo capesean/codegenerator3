@@ -31,7 +31,9 @@ namespace WEB.Models
         TypeScriptEnums,
         TypeScriptRoles,
         Roles,
-        SharedModule
+        SharedModule,
+        SortHtml,
+        SortTypeScript
     }
 
     public enum EditPageType

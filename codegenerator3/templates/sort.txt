@@ -1,0 +1,50 @@
+﻿import { Component, OnInit } from '@angular/core';
+import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { NAMESearchOptions, NAMESearchResponse, NAME } from '../common/models/NAME_TOLOWER.model';
+import { NAMEService } from '../common/services/NAME_TOLOWER.service';
+import { PagingOptions } from '../common/models/http.model';
+import { ErrorService } from '../common/services/error.service';
+import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
+import { ToastrService } from 'ngx-toastr';
+ENUM_IMPORTS
+@Component({
+    selector: 'HYPHENATEDNAME-sort',
+    templateUrl: './NAME_TOLOWER.sort.component.html'
+})
+export class NAMESortComponent implements OnInit {
+
+    headers: PagingOptions = new PagingOptions();
+    PLURALNAME_TOCAMELCASE: NAME[];
+ENUM_PROPERTIES
+    constructor(
+        public modal: NgbActiveModal,
+        private CAMELCASENAMEService: NAMEService,
+        private errorService: ErrorService,
+        private toastr: ToastrService
+    ) {
+    }
+
+    ngOnInit(): void {
+        this.CAMELCASENAMEService.search({ pageSize: 0 } as NAMESearchOptions)
+            .subscribe(
+                response => this.PLURALNAME_TOCAMELCASE = response.PLURALNAME_TOCAMELCASE,
+                err => this.errorService.handleError(err, "PLURALNAME", "Load")
+            );
+    }
+
+    drop(event: CdkDragDrop<NAME[]>) {
+        moveItemInArray(this.PLURALNAME_TOCAMELCASE, event.previousIndex, event.currentIndex);
+    }
+
+    close() {
+        this.CAMELCASENAMEService.sort(this.PLURALNAME_TOCAMELCASE.map(o => o.KEYFIELD)).subscribe(
+            () => {
+                this.modal.close();
+                this.toastr.success("The sort order has been updated", "Change Sort Order");
+            },
+            err => {
+                this.errorService.handleError(err, "PLURALNAME", "Sort");
+            });
+    }
+
+}
