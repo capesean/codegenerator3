@@ -26,7 +26,8 @@ In the above screenshot, you can see the tabs for each of the different files th
 - `SettingsDTO`: a generic settings DTO
 - `DbContext`: creates part of the DBContext class for EF Core
 - `Controller`: creates a WEB API controller for the RESTful API
-- `BundleConfig`: legacy naming, but this creates the `generated.module.ts` and `shared.module.ts` files
+- `GeneratedModule`: this creates a `generated.module.ts` for all generated components
+- `SharedModule`: this creates a `shared.module.ts` for functionality shared between your generated & custom components
 - `AppRouter`: creates the `generated.routes.ts` file for Angular routing
 - `ApiResource`: creates a typescript service file for each entity, e.g. `user.service.ts`
 - `ListHtml`: creates the HTML for searching/listing each entity
