@@ -1649,9 +1649,7 @@ namespace WEB.Models
                         s.Add(t + $"            <div class=\"form-group\" ngbTooltip=\"From Date\" container=\"body\" placement=\"top\">");
                         s.Add(t + $"                <div class=\"input-group\">");
                         s.Add(t + $"                    <input type=\"text\" id=\"from{field.Name}\" name=\"from{field.Name}\" [(ngModel)]=\"searchOptions.from{field.Name}\" #from{field.Name}=\"ngModel\" class=\"form-control\" readonly placeholder=\"yyyy-mm-dd\" ngbDatepicker #dpFrom{field.Name}=\"ngbDatepicker\" tabindex=\"-1\" (click)=\"dpFrom{field.Name}.toggle()\" />");
-                        s.Add(t + $"                    <div class=\"input-group-append\">");
-                        s.Add(t + $"                        <button class=\"btn btn-secondary calendar\" (click)=\"dpFrom{field.Name}.toggle()\" type=\"button\"><i class=\"fas fa-calendar-alt\"></i></button>");
-                        s.Add(t + $"                    </div>");
+                        s.Add(t + $"                    <button class=\"btn btn-secondary calendar\" (click)=\"dpFrom{field.Name}.toggle()\" type=\"button\"><i class=\"fas fa-calendar-alt\"></i></button>");
                         s.Add(t + $"                </div>");
                         s.Add(t + $"            </div>");
                         s.Add(t + $"        </div>");
@@ -1660,9 +1658,7 @@ namespace WEB.Models
                         s.Add(t + $"            <div class=\"form-group\" ngbTooltip=\"To Date\" container=\"body\" placement=\"top\">");
                         s.Add(t + $"                <div class=\"input-group\">");
                         s.Add(t + $"                    <input type=\"text\" id=\"to{field.Name}\" name=\"to{field.Name}\" [(ngModel)]=\"searchOptions.to{field.Name}\" #to{field.Name}=\"ngModel\" class=\"form-control\" readonly placeholder=\"yyyy-mm-dd\" ngbDatepicker #dpTo{field.Name}=\"ngbDatepicker\" tabindex=\"-1\" (click)=\"dpTo{field.Name}.toggle()\" />");
-                        s.Add(t + $"                    <div class=\"input-group-append\">");
-                        s.Add(t + $"                        <button class=\"btn btn-secondary calendar\" (click)=\"dpTo{field.Name}.toggle()\" type=\"button\"><i class=\"fas fa-calendar-alt\"></i></button>");
-                        s.Add(t + $"                    </div>");
+                        s.Add(t + $"                    <button class=\"btn btn-secondary calendar\" (click)=\"dpTo{field.Name}.toggle()\" type=\"button\"><i class=\"fas fa-calendar-alt\"></i></button>");
                         s.Add(t + $"                </div>");
                         s.Add(t + $"            </div>");
                         s.Add(t + $"        </div>");
@@ -1676,7 +1672,6 @@ namespace WEB.Models
                 s.Add(t + $"        <button type=\"submit\" class=\"btn btn-success\">Search<i class=\"fas fa-search ms-1\"></i></button>");
                 if (CurrentEntity.RelationshipsAsChild.Count(r => r.Hierarchy) == 0)
                 {
-                    // todo: needs field list + field.newParameter
                     s.Add(t + $"        <a [routerLink]=\"['./', 'add']\" class=\"btn btn-primary ms-1\">Add<i class=\"fas fa-plus-circle ms-1\"></i></a>");
                 }
                 if (CurrentEntity.HasASortField)
@@ -1693,8 +1688,6 @@ namespace WEB.Models
             s.Add(t + $"<table class=\"table table-striped table-hover table-sm row-navigation\">");
             s.Add(t + $"    <thead>");
             s.Add(t + $"        <tr>");
-            //if (useSortColumn)
-            //    s.Add(t + $"            <th class=\"text-center fa-col-width\" *ngIf=\"{CurrentEntity.PluralName.ToCamelCase()}.length > 1\"><i class=\"fas fa-sort\"></i></th>");
             foreach (var field in CurrentEntity.Fields.Where(f => f.ShowInSearchResults).OrderBy(f => f.FieldOrder))
                 s.Add(t + $"            <th>{field.Label}</th>");
             s.Add(t + $"        </tr>");
@@ -2144,9 +2137,7 @@ namespace WEB.Models
                 {
                     s.Add(t + $"                    <div class=\"input-group\">");
                     s.Add(t + $"                        {controlHtml}");
-                    s.Add(t + $"                        <div class=\"input-group-append\">");
-                    s.Add(t + $"                            <button class=\"btn btn-secondary calendar\" (click)=\"dp{field.Name}.toggle()\" type=\"button\"><i class=\"fas fa-calendar-alt\"></i></button>");
-                    s.Add(t + $"                        </div>");
+                    s.Add(t + $"                        <button class=\"btn btn-secondary calendar\" (click)=\"dp{field.Name}.toggle()\" type=\"button\"><i class=\"fas fa-calendar-alt\"></i></button>");
                     s.Add(t + $"                    </div>");
                 }
                 else if (field.FieldType == FieldType.VarBinary && field.EditPageType == EditPageType.FileContents)
@@ -2256,14 +2247,19 @@ namespace WEB.Models
 
                     if (relationship.UseMultiSelect)
                     {
-                        s.Add(t + $"                <button class=\"btn btn-primary my-3\" (click)=\"add{relationship.CollectionName}()\">Add {relationship.CollectionFriendlyName}<i class=\"fas fa-plus-circle ms-1\"></i></button><br />");
+                        s.Add(t + $"                <div class=\"my-3\">");
+                        s.Add(t + $"                    <button class=\"btn btn-primary\" (click)=\"add{relationship.CollectionName}()\">Add {relationship.CollectionFriendlyName}<i class=\"fas fa-plus-circle ms-1\"></i></button>");
+                        s.Add(t + $"                </div>");
                         s.Add($"");
                     }
                     else if (relationship.Hierarchy)
                     {
                         // trying to get this to work for instances like African POT Project->Team hierarchy, where I only want 1 add for the userId
-                        s.Add(t + $"                <a [routerLink]=\"['./{childEntity.PluralName.ToLower()}', 'add']\" class=\"btn btn-primary my-3\">Add {childEntity.FriendlyName}<i class=\"fas fa-plus-circle ms-1\"></i></a><br />");
-
+                        s.Add(t + $"                <div class=\"my-3\">");
+                        s.Add(t + $"                    <a [routerLink]=\"['./{childEntity.PluralName.ToLower()}', 'add']\" class=\"btn btn-primary\">Add {childEntity.FriendlyName}<i class=\"fas fa-plus-circle ms-1\"></i></a>");
+                        if (childEntity.HasASortField)
+                            s.Add(t + $"                    <button type=\"button\" class=\"btn btn-outline-secondary ms-1\" (click)=\"show{childEntity.Name}Sort()\" *ngIf=\"{childEntity.PluralName.ToCamelCase()}Headers.totalRecords > 1\">Sort {childEntity.PluralFriendlyName}<i class=\"fas fa-sort ms-1\"></i></button>");
+                        s.Add(t + $"                </div>");
                         s.Add($"");
                     }
 
@@ -2271,8 +2267,6 @@ namespace WEB.Models
                     s.Add(t + $"                <table class=\"table table-striped table-hover table-sm row-navigation\">");
                     s.Add(t + $"                    <thead>");
                     s.Add(t + $"                        <tr>");
-                    if (relationship.Hierarchy && childEntity.HasASortField)
-                        s.Add(t + $"                            <th *ngIf=\"{relationship.CollectionName.ToCamelCase()}.length > 1\" class=\"text-center fa-col-width\"><i class=\"fas fa-sort mt-1\"></i></th>");
                     if (relationship.UseMultiSelect)
                     {
                         var reverseRel = relationship.ChildEntity.RelationshipsAsChild.Where(o => o.RelationshipId != relationship.RelationshipId).SingleOrDefault();
@@ -2286,20 +2280,11 @@ namespace WEB.Models
                             s.Add(t + $"                            <th>{column.Header}</th>");
                         }
                     }
-                    s.Add(t + $"                            <th class=\"fa-col-width text-center\"><i class=\"fas fa-times clickable\" (click)=\"deleteAll{relationship.CollectionName}()\" ngbTooltip=\"Delete all {relationship.CollectionFriendlyName.ToLower()}\" container=\"body\" placement=\"left\"></i></th>");
+                    s.Add(t + $"                            <th class=\"fa-col-width text-center\"><i class=\"fas fa-times text-danger clickable\" (click)=\"delete{relationship.CollectionName}()\" ngbTooltip=\"Delete all {relationship.CollectionFriendlyName.ToLower()}\" container=\"body\" placement=\"left\"></i></th>");
                     s.Add(t + $"                        </tr>");
                     s.Add(t + $"                    </thead>");
-                    if (relationship.Hierarchy && childEntity.HasASortField)
-                    {
-                        s.Add(t + $"                    <tbody cdkDropList (cdkDropListDropped)=\"sort{relationship.CollectionName}($event)\">");
-                        s.Add(t + $"                        <tr *ngFor=\"let {childEntity.Name.ToCamelCase()} of {relationship.CollectionName.ToCamelCase()}\" (click)=\"goTo{childEntity.Name}({childEntity.Name.ToCamelCase()})\" cdkDrag>");
-                        s.Add(t + $"                            <td *ngIf=\"{relationship.CollectionName.ToCamelCase()}.length > 1\" class=\"text-center fa-col-width\" cdkDragHandle (click)=\"$event.stopPropagation();\"><span *cdkDragPreview></span><i class=\"fas fa-sort sortable-handle mt-1\" (click)=\"$event.stopPropagation();\"></i></td>");
-                    }
-                    else
-                    {
-                        s.Add(t + $"                    <tbody>");
-                        s.Add(t + $"                        <tr *ngFor=\"let {childEntity.Name.ToCamelCase()} of {relationship.CollectionName.ToCamelCase()}\" (click)=\"goTo{childEntity.Name}({childEntity.Name.ToCamelCase()})\">");
-                    }
+                    s.Add(t + $"                    <tbody>");
+                    s.Add(t + $"                        <tr *ngFor=\"let {childEntity.Name.ToCamelCase()} of {relationship.CollectionName.ToCamelCase()}\" (click)=\"goTo{relationship.CollectionSingular}({childEntity.Name.ToCamelCase()})\">");
                     // this was added for TrainTrack entityLinks; not sure how it will affect other projects!
                     if (relationship.UseMultiSelect)
                     {
@@ -2314,16 +2299,13 @@ namespace WEB.Models
                             s.Add(t + $"                            <td>{column.Value}</td>");
                         }
                     }
-                    s.Add(t + $"                            <td class=\"text-center\"><i class=\"fas fa-times clickable p-1 text-danger\" (click)=\"delete{relationship.CollectionName}({relationship.ChildEntity.Name.ToCamelCase()}, $event)\"></i></td>");
+                    s.Add(t + $"                            <td class=\"text-center\"><i class=\"fas fa-times clickable p-1 text-danger\" (click)=\"delete{relationship.CollectionSingular}({relationship.ChildEntity.Name.ToCamelCase()}, $event)\"></i></td>");
                     s.Add(t + $"                        </tr>");
                     s.Add(t + $"                    </tbody>");
                     s.Add(t + $"                </table>");
                     s.Add($"");
-                    if (!relationship.ChildEntity.HasASortField)
-                    {
-                        s.Add(t + $"                <pager [headers]=\"{relationship.CollectionName.ToCamelCase()}Headers\" (pageChanged)=\"load{relationship.CollectionName}($event)\"></pager>");
-                        s.Add($"");
-                    }
+                    s.Add(t + $"                <pager [headers]=\"{relationship.CollectionName.ToCamelCase()}Headers\" (pageChanged)=\"load{relationship.CollectionName}($event)\"></pager>");
+                    s.Add($"");
                     #endregion
 
                     s.Add(t + $"            </ng-template>");
@@ -2431,7 +2413,11 @@ namespace WEB.Models
                 if (reverseRel.ParentEntity != CurrentEntity) s.Add($"import {{ {reverseRel.ParentEntity.Name} }} from '../common/models/{reverseRel.ParentEntity.Name.ToLower()}.model';");
             }
             if (relationshipsAsParent.Any(o => o.Hierarchy && o.ChildEntity.HasASortField))
+            {
                 s.Add($"import {{ moveItemInArray, CdkDragDrop }} from '@angular/cdk/drag-drop';");
+                foreach (var entity in relationshipsAsParent.Where(o => o.Hierarchy && o.ChildEntity.HasASortField).Select(o => o.ChildEntity).Distinct())
+                    s.Add($"import {{ {entity.Name}SortComponent }} from '../{entity.PluralName.ToLower()}/{entity.Name.ToLower()}.sort.component';");
+            }
             if (CurrentEntity.PrimaryField.CustomType == CustomType.Date)
                 s.Add($"import * as moment from 'moment';");
             if (hasFileContents)
@@ -2712,13 +2698,10 @@ namespace WEB.Models
             {
                 if (!rel.DisplayListOnParent && !rel.Hierarchy) continue;
 
-                s.Add($"    load{rel.CollectionName}({(rel.ChildEntity.HasASortField ? "" : "pageIndex = 0")}): Subject<{rel.ChildEntity.Name}SearchResponse> {{");
+                s.Add($"    load{rel.CollectionName}(pageIndex = 0): Subject<{rel.ChildEntity.Name}SearchResponse> {{");
                 s.Add($"");
 
-                if (rel.ChildEntity.HasASortField)
-                    s.Add($"        this.{rel.CollectionName.ToCamelCase()}SearchOptions.pageSize = 0;");
-                else
-                    s.Add($"        this.{rel.CollectionName.ToCamelCase()}SearchOptions.pageIndex = pageIndex;");
+                s.Add($"        this.{rel.CollectionName.ToCamelCase()}SearchOptions.pageIndex = pageIndex;");
 
                 s.Add($"");
                 s.Add($"        const subject = new Subject<{rel.ChildEntity.Name}SearchResponse>()");
@@ -2740,7 +2723,7 @@ namespace WEB.Models
                 s.Add($"    }}");
                 s.Add($"");
                 // todo: use relative links? can then disable 'includeEntities' on these entities
-                s.Add($"    goTo{rel.ChildEntity.Name}({rel.ChildEntity.Name.ToCamelCase()}: {rel.ChildEntity.Name}): void {{");
+                s.Add($"    goTo{rel.CollectionSingular}({rel.ChildEntity.Name.ToCamelCase()}: {rel.ChildEntity.Name}): void {{");
                 s.Add($"        this.router.navigate({GetRouterLink(rel.ChildEntity, CurrentEntity)});");
                 s.Add($"    }}");
                 s.Add($"");
@@ -2772,7 +2755,7 @@ namespace WEB.Models
                     s.Add($"    }}");
                     s.Add($"");
                 }
-                s.Add($"    delete{rel.CollectionName}({rel.ChildEntity.Name.ToCamelCase()}: {rel.ChildEntity.Name}, event: MouseEvent): void {{");
+                s.Add($"    delete{rel.CollectionSingular}({rel.ChildEntity.Name.ToCamelCase()}: {rel.ChildEntity.Name}, event: MouseEvent): void {{");
                 s.Add($"        event.stopPropagation();");
                 s.Add($"");
                 s.Add($"        let modalRef = this.modalService.open(ConfirmModalComponent, {{ centered: true }});");
@@ -2784,7 +2767,7 @@ namespace WEB.Models
                 s.Add($"                    .subscribe(");
                 s.Add($"                        () => {{");
                 s.Add($"                            this.toastr.success(\"The {rel.ChildEntity.FriendlyName.ToLower()} has been deleted\", \"Delete {rel.ChildEntity.FriendlyName}\");");
-                s.Add($"                            this.load{rel.CollectionName}();");
+                s.Add($"                            this.load{rel.CollectionName}(this.{rel.CollectionName.ToCamelCase()}Headers.pageIndex);");
                 s.Add($"                        }},");
                 s.Add($"                        err => {{");
                 s.Add($"                            this.errorService.handleError(err, \"{rel.ChildEntity.FriendlyName}\", \"Delete\");");
@@ -2794,7 +2777,7 @@ namespace WEB.Models
                 s.Add($"            }}, () => {{ }});");
                 s.Add($"    }}");
                 s.Add($"");
-                s.Add($"    deleteAll{rel.CollectionName}(): void {{");
+                s.Add($"    delete{rel.CollectionName}(): void {{");
                 s.Add($"        let modalRef = this.modalService.open(ConfirmModalComponent, {{ centered: true }});");
                 s.Add($"        (modalRef.componentInstance as ConfirmModalComponent).options = {{ title: \"Delete {rel.ChildEntity.FriendlyName}\", text: \"Are you sure you want to delete all the {rel.CollectionFriendlyName.ToLower()}?\" }} as ModalOptions;");
                 s.Add($"        modalRef.result.then(");
@@ -2818,15 +2801,14 @@ namespace WEB.Models
 
             foreach (var relationship in relationshipsAsParent.Where(o => o.Hierarchy && o.ChildEntity.HasASortField))
             {
-                s.Add($"    sort{relationship.CollectionName}(event: CdkDragDrop<{relationship.ChildEntity.Name}[]>) {{");
-                s.Add($"        moveItemInArray(this.{relationship.CollectionName.ToCamelCase()}, event.previousIndex, event.currentIndex);");
-                s.Add($"        this.{relationship.ChildEntity.Name.ToCamelCase()}Service.sort(this.{relationship.CollectionName.ToCamelCase()}.map(o => o.{relationship.ChildEntity.KeyFields[0].Name.ToCamelCase()})).subscribe(");
-                s.Add($"            () => {{");
-                s.Add($"                this.toastr.success(\"The sort order has been updated\", \"Change Sort Order\");");
-                s.Add($"            }},");
-                s.Add($"            err => {{");
-                s.Add($"                this.errorService.handleError(err, \"{relationship.ChildEntity.PluralFriendlyName}\", \"Sort\");");
-                s.Add($"            }});");
+                s.Add($"    show{relationship.ChildEntity.Name}Sort() {{");
+                s.Add($"        let modalRef = this.modalService.open({relationship.ChildEntity.Name}SortComponent, {{size: 'xl', centered: true, scrollable: true }});");
+                foreach (var field in relationship.ParentEntity.KeyFields)
+                    s.Add($"        (modalRef.componentInstance as {relationship.ChildEntity.Name}SortComponent).{field.Name.ToCamelCase()} = this.{CurrentEntity.Name.ToCamelCase()}.{field.Name.ToCamelCase()};");
+                s.Add($"        modalRef.result.then(");
+                s.Add($"            () => this.load{relationship.CollectionName}(this.{relationship.CollectionName.ToCamelCase()}Headers.pageIndex),");
+                s.Add($"            () => {{ }}");
+                s.Add($"        );");
                 s.Add($"    }}");
                 s.Add($"");
             }
@@ -3074,13 +3056,28 @@ namespace WEB.Models
 
             var enumLookups = CurrentEntity.Fields.Where(o => o.FieldType == FieldType.Enum && (o.ShowInSearchResults || o.SearchType == SearchType.Exact)).Select(o => o.Lookup).Distinct().ToList();
 
-            string ENUM_PROPERTIES = string.Empty;
+            var ENUM_PROPERTIES = string.Empty;
             foreach (var enumLookup in enumLookups)
                 ENUM_PROPERTIES += $"    public {enumLookup.PluralName.ToCamelCase()}: Enum[] = Enums.{enumLookup.PluralName};{Environment.NewLine}";
 
+            var PARENTPKFIELDS = string.Empty;
+            var SEARCH_PARAMS = string.Empty;
+            var hierarchyRel = CurrentEntity.RelationshipsAsChild.FirstOrDefault(o => o.Hierarchy);
+            if (hierarchyRel != null)
+            {
+                foreach (var field in hierarchyRel.ParentEntity.KeyFields)
+                {
+                    PARENTPKFIELDS += $"    public {field.Name.ToCamelCase()}: string;{Environment.NewLine}";
+                    SEARCH_PARAMS += $"{field.Name.ToCamelCase()}: this.{field.Name.ToCamelCase()}";
+                }
+                SEARCH_PARAMS += ", ";
+            }
+
             file = RunTemplateReplacements(file)
                 .Replace("ENUM_IMPORTS", enumLookups.Any() ? $"import {{ Enum, Enums }} from '../common/models/enums.model';{Environment.NewLine}" : "")
-                .Replace("ENUM_PROPERTIES", enumLookups.Any() ? ENUM_PROPERTIES : string.Empty);
+                .Replace("ENUM_PROPERTIES", enumLookups.Any() ? ENUM_PROPERTIES : string.Empty)
+                .Replace("PARENTPKFIELDS", PARENTPKFIELDS)
+                .Replace("SEARCH_PARAMS", SEARCH_PARAMS);
 
             s.Add(file);
 

@@ -69,6 +69,15 @@
                     </div>
 
                     <div class="col-sm-6 col-md-4">
+                        <div class="form-group" ng-class="{ 'has-error':  mainForm.$submitted && mainForm.collectionSingular.$invalid }">
+                            <label for="collectionSingular" class="control-label">
+                                Name of Collection Singular:
+                            </label>
+                            <input type="text" id="collectionSingular" name="collectionSingular" ng-model="vm.relationship.collectionSingular" maxlength="50" class="form-control" ng-required="true" />
+                        </div>
+                    </div>
+
+                    <div class="col-sm-6 col-md-4">
                         <div class="form-group" ng-class="{ 'has-error':  mainForm.$submitted && mainForm.parentFieldId.$invalid}">
                             <label class="control-label">
                                 Parent Field:

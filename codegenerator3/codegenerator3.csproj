@@ -659,6 +659,10 @@
     <Compile Include="Migrations\202206231403217_preventSortTypeScript.designer.cs">
       <DependentUpon>202206231403217_preventSortTypeScript.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202206232020324_collectionSingular.cs" />
+    <Compile Include="Migrations\202206232020324_collectionSingular.designer.cs">
+      <DependentUpon>202206232020324_collectionSingular.cs</DependentUpon>
+    </Compile>
     <Compile Include="Models\Relationship_.cs" />
     <Compile Include="Startup.cs" />
     <Compile Include="Utilities\ApiException.cs" />
@@ -781,6 +785,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202206231403217_preventSortTypeScript.resx">
       <DependentUpon>202206231403217_preventSortTypeScript.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202206232020324_collectionSingular.resx">
+      <DependentUpon>202206232020324_collectionSingular.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

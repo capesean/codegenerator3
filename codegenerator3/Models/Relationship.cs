@@ -23,6 +23,10 @@ namespace WEB.Models
 
         [Required(AllowEmptyStrings = true)]
         [MaxLength(50)]
+        public string CollectionSingular { get; set; }
+
+        [Required(AllowEmptyStrings = true)]
+        [MaxLength(50)]
         public string CollectionFriendlyName { get; set; }
 
         [Required(AllowEmptyStrings = true)]

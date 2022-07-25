@@ -13,9 +13,9 @@ ENUM_IMPORTS
 })
 export class NAMESortComponent implements OnInit {
 
-    headers: PagingOptions = new PagingOptions();
-    PLURALNAME_TOCAMELCASE: NAME[];
-ENUM_PROPERTIES
+    public headers: PagingOptions = new PagingOptions();
+    public PLURALNAME_TOCAMELCASE: NAME[];
+ENUM_PROPERTIESPARENTPKFIELDS
     constructor(
         public modal: NgbActiveModal,
         private CAMELCASENAMEService: NAMEService,
@@ -25,7 +25,7 @@ ENUM_PROPERTIES
     }
 
     ngOnInit(): void {
-        this.CAMELCASENAMEService.search({ pageSize: 0 } as NAMESearchOptions)
+        this.CAMELCASENAMEService.search({ SEARCH_PARAMSpageSize: 0, includeEntities: true } as NAMESearchOptions)
             .subscribe(
                 response => this.PLURALNAME_TOCAMELCASE = response.PLURALNAME_TOCAMELCASE,
                 err => this.errorService.handleError(err, "PLURALNAME", "Load")

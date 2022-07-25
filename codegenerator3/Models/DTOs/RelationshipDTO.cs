@@ -20,6 +20,10 @@ namespace WEB.Models
 
         [DisplayFormat(ConvertEmptyStringToNull = false)]
         [MaxLength(50)]
+        public string CollectionSingular { get; set; }
+
+        [DisplayFormat(ConvertEmptyStringToNull = false)]
+        [MaxLength(50)]
         public string CollectionFriendlyName { get; set; }
 
         [DisplayFormat(ConvertEmptyStringToNull = false)]
@@ -80,6 +84,7 @@ namespace WEB.Models
             relationshipDTO.ParentEntityId = relationship.ParentEntityId;
             relationshipDTO.ChildEntityId = relationship.ChildEntityId;
             relationshipDTO.CollectionName = relationship.CollectionName;
+            relationshipDTO.CollectionSingular = relationship.CollectionSingular;
             relationshipDTO.CollectionFriendlyName = relationship.CollectionFriendlyName;
             relationshipDTO.ParentName = relationship.ParentName;
             relationshipDTO.ParentFriendlyName = relationship.ParentFriendlyName;
@@ -105,6 +110,7 @@ namespace WEB.Models
             relationship.ParentEntityId = relationshipDTO.ParentEntityId;
             relationship.ChildEntityId = relationshipDTO.ChildEntityId;
             relationship.CollectionName = relationshipDTO.CollectionName;
+            relationship.CollectionSingular = relationshipDTO.CollectionSingular;
             relationship.CollectionFriendlyName = relationshipDTO.CollectionFriendlyName;
             relationship.ParentName = relationshipDTO.ParentName;
             relationship.ParentFriendlyName = relationshipDTO.ParentFriendlyName;
