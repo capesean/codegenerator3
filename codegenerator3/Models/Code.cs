@@ -1648,7 +1648,7 @@ namespace WEB.Models
                         s.Add(t + $"        <div class=\"col-sm-6 col-md-3 col-lg-2\">");
                         s.Add(t + $"            <div class=\"form-group\" ngbTooltip=\"From Date\" container=\"body\" placement=\"top\">");
                         s.Add(t + $"                <div class=\"input-group\">");
-                        s.Add(t + $"                    <input type=\"text\" id=\"from{field.Name}\" name=\"from{field.Name}\" [(ngModel)]=\"searchOptions.from{field.Name}\" #from{field.Name}=\"ngModel\" class=\"form-control\" readonly placeholder=\"yyyy-mm-dd\" ngbDatepicker #dpFrom{field.Name}=\"ngbDatepicker\" tabindex=\"-1\" (click)=\"dpFrom{field.Name}.toggle()\" />");
+                        s.Add(t + $"                    <input type=\"text\" id=\"from{field.Name}\" name=\"from{field.Name}\" [(ngModel)]=\"searchOptions.from{field.Name}\" #from{field.Name}=\"ngModel\" class=\"form-control\" readonly placeholder=\"yyyy-mm-dd\" ngbDatepicker #dpFrom{field.Name}=\"ngbDatepicker\" tabindex=\"-1\" (click)=\"dpFrom{field.Name}.toggle()\" container=\"body\" />");
                         s.Add(t + $"                    <button class=\"btn btn-secondary calendar\" (click)=\"dpFrom{field.Name}.toggle()\" type=\"button\"><i class=\"fas fa-calendar-alt\"></i></button>");
                         s.Add(t + $"                </div>");
                         s.Add(t + $"            </div>");
@@ -1657,7 +1657,7 @@ namespace WEB.Models
                         s.Add(t + $"        <div class=\"col-sm-6 col-md-3 col-lg-2\">");
                         s.Add(t + $"            <div class=\"form-group\" ngbTooltip=\"To Date\" container=\"body\" placement=\"top\">");
                         s.Add(t + $"                <div class=\"input-group\">");
-                        s.Add(t + $"                    <input type=\"text\" id=\"to{field.Name}\" name=\"to{field.Name}\" [(ngModel)]=\"searchOptions.to{field.Name}\" #to{field.Name}=\"ngModel\" class=\"form-control\" readonly placeholder=\"yyyy-mm-dd\" ngbDatepicker #dpTo{field.Name}=\"ngbDatepicker\" tabindex=\"-1\" (click)=\"dpTo{field.Name}.toggle()\" />");
+                        s.Add(t + $"                    <input type=\"text\" id=\"to{field.Name}\" name=\"to{field.Name}\" [(ngModel)]=\"searchOptions.to{field.Name}\" #to{field.Name}=\"ngModel\" class=\"form-control\" readonly placeholder=\"yyyy-mm-dd\" ngbDatepicker #dpTo{field.Name}=\"ngbDatepicker\" tabindex=\"-1\" (click)=\"dpTo{field.Name}.toggle()\" container=\"body\" />");
                         s.Add(t + $"                    <button class=\"btn btn-secondary calendar\" (click)=\"dpTo{field.Name}.toggle()\" type=\"button\"><i class=\"fas fa-calendar-alt\"></i></button>");
                         s.Add(t + $"                </div>");
                         s.Add(t + $"            </div>");
@@ -2004,6 +2004,7 @@ namespace WEB.Models
                         attributes.Add("#dp" + field.Name, "ngbDatepicker");
                         attributes.Add("tabindex", "-1");
                         attributes.Add("(click)", "dp" + field.Name + ".toggle()");
+                        attributes.Add("container", "body");
                     }
                     else
                     {
@@ -3168,7 +3169,7 @@ namespace WEB.Models
             if (CurrentEntity.KeyFields.Count > 1 && input.Contains("KEYFIELD"))
             {
                 // input type=hidden uses KEYFIELD, so app selects can't use where they would return more than 1 key field
-                throw new Exception("Unable to run key field replacements (multiple keys). Disable app-selects if not required? " + CurrentEntity.Name);
+                throw new Exception("Unable to run key field replacements (multiple keys). Disable app-selects & sort if not required? " + CurrentEntity.Name);
             }
 
             return input
@@ -3301,6 +3302,7 @@ namespace WEB.Models
                     list.Add(prefix);
                 }
             }
+            // not 100% sure if this is right when using IncludeAllParents - e.g. Datum->Indicators. Changed that one to include Parent
             else if (relationship.ParentEntity.RelationshipsAsChild.Any() && relationship.ParentEntityId != relationship.ChildEntityId)
             {
                 foreach (var parentRelationship in relationship.ParentEntity.RelationshipsAsChild.Where(r => r.RelationshipAncestorLimit != RelationshipAncestorLimits.Exclude))

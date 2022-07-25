@@ -87,6 +87,12 @@ namespace WEB.Models
         [MaxLength(100)]
         public string PreventSelectModalTypeScriptDeployment { get; set; }
 
+        [MaxLength(100)]
+        public string PreventSortHtmlDeployment { get; set; }
+
+        [MaxLength(100)]
+        public string PreventSortTypeScriptDeployment { get; set; }
+
         [Required]
         public AuthorizationType AuthorizationType { get; set; }
 
@@ -147,6 +153,8 @@ namespace WEB.Models
             entityDTO.PreventAppSelectTypeScriptDeployment = entity.PreventAppSelectTypeScriptDeployment;
             entityDTO.PreventSelectModalHtmlDeployment = entity.PreventSelectModalHtmlDeployment;
             entityDTO.PreventSelectModalTypeScriptDeployment = entity.PreventSelectModalTypeScriptDeployment;
+            entityDTO.PreventSortHtmlDeployment = entity.PreventSortHtmlDeployment;
+            entityDTO.PreventSortTypeScriptDeployment = entity.PreventSortTypeScriptDeployment;
             entityDTO.AuthorizationType = entity.AuthorizationType;
             entityDTO.Exclude = entity.Exclude;
             entityDTO.ReturnOnSave = entity.ReturnOnSave;
@@ -187,6 +195,8 @@ namespace WEB.Models
             entity.PreventAppSelectTypeScriptDeployment = entityDTO.PreventAppSelectTypeScriptDeployment;
             entity.PreventSelectModalHtmlDeployment = entityDTO.PreventSelectModalHtmlDeployment;
             entity.PreventSelectModalTypeScriptDeployment = entityDTO.PreventSelectModalTypeScriptDeployment;
+            entity.PreventSortHtmlDeployment = entityDTO.PreventSortHtmlDeployment;
+            entity.PreventSortTypeScriptDeployment = entityDTO.PreventSortTypeScriptDeployment;
             entity.AuthorizationType = entityDTO.AuthorizationType;
             entity.Exclude = entityDTO.Exclude;
             entity.ReturnOnSave = entityDTO.ReturnOnSave;
