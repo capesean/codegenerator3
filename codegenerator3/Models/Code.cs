@@ -1854,29 +1854,28 @@ namespace WEB.Models
 
             string routerLink = string.Empty;
 
-            if (entity.RelationshipsAsChild.Any(r => r.Hierarchy))
+            // source entity is the same, i.e. from list page to edit page
+            if (sourceEntity.EntityId == entity.EntityId)
             {
-                var hierarchicalRelationship = entity.RelationshipsAsChild.Where(o => o.Hierarchy).Single();
+                var hierarchicalRelationship = entity.RelationshipsAsChild.SingleOrDefault(r => r.Hierarchy);
 
-                if (hierarchicalRelationship.ParentEntityId == sourceEntity.EntityId)
+                // if the entity is not the child in any relationships, then the link is just a relative link
+                if (hierarchicalRelationship == null)
                 {
-
-                    // the navigating from entity is the relationship parent - it just needs a relative link:
-                    var keyFields = entity.GetNonHierarchicalKeyFields();
-                    routerLink = $"[\"{entity.PluralName.ToLower()}\", {keyFields.Select(o => $"{entity.Name.ToCamelCase()}.{o.Name.ToCamelCase()}").Aggregate((current, next) => { return current + ", " + next; })}], {{ relativeTo: this.route }}";
-
+                    routerLink = $"[{entity.KeyFields.Select(o => $"{entity.Name.ToCamelCase()}.{o.Name.ToCamelCase()}").Aggregate((current, next) => { return current + ", " + next; })}], {{ relativeTo: this.route }}";
                 }
+                // navigating from the list page to the edit page but the entity is a hierarchical child...
                 else
                 {
-                    var prefix = string.Empty;
+                    var prefix = "";
 
                     while (hierarchicalRelationship != null)
                     {
-
                         var child = hierarchicalRelationship.ChildEntity;
                         var parent = hierarchicalRelationship.ParentEntity;
                         var keyFields = child.GetNonHierarchicalKeyFields();
                         var keyFieldsRoute = keyFields.Select(o => $"{prefix + child.Name.ToCamelCase()}.{o.Name.ToCamelCase()}").Aggregate((current, next) => { return current + ", " + next; });
+                        var parentName = hierarchicalRelationship.ParentName;
 
                         routerLink = $"\"{child.PluralName.ToLower()}\", " + keyFieldsRoute + (routerLink == string.Empty ? "" : ", ") + routerLink;
 
@@ -1887,7 +1886,7 @@ namespace WEB.Models
                         if (hierarchicalRelationship == null)
                         {
                             keyFields = parent.GetNonHierarchicalKeyFields();
-                            keyFieldsRoute = keyFields.Select(o => $"{prefix + parent.Name.ToCamelCase()}.{o.Name.ToCamelCase()}").Aggregate((current, next) => { return current + ", " + next; });
+                            keyFieldsRoute = keyFields.Select(o => $"{prefix + parentName.ToCamelCase()}.{o.Name.ToCamelCase()}").Aggregate((current, next) => { return current + ", " + next; });
                             routerLink = $"[\"/{parent.PluralName.ToLower()}\", " + keyFieldsRoute + ", " + routerLink + "]";
                         }
 
@@ -1896,11 +1895,54 @@ namespace WEB.Models
             }
             else
             {
-                //routerLink = $"'/{entity.PluralName.ToLower()}', { entity.KeyFields.Select(o => entity.Name.ToCamelCase() + "." + o.Name.ToCamelCase()).Aggregate((current, next) => current + ", " + next) }";
-                if (CurrentEntity == entity)
-                    routerLink = $"[{entity.KeyFields.Select(o => entity.Name.ToCamelCase() + "." + o.Name.ToCamelCase()).Aggregate((current, next) => current + ", " + next)}], {{ relativeTo: this.route }}";
+                if (entity.RelationshipsAsChild.Any(r => r.Hierarchy))
+                {
+                    var hierarchicalRelationship = entity.RelationshipsAsChild.Where(o => o.Hierarchy).Single();
+                    if (hierarchicalRelationship == null) hierarchicalRelationship = entity.RelationshipsAsParent.Where(o => o.Hierarchy).Single();
+
+                    if (hierarchicalRelationship.ParentEntityId == sourceEntity.EntityId)
+                    {
+
+                        // the navigating from entity is the relationship parent - it just needs a relative link:
+                        var keyFields = entity.GetNonHierarchicalKeyFields();
+                        routerLink = $"[\"{entity.PluralName.ToLower()}\", {keyFields.Select(o => $"{entity.Name.ToCamelCase()}.{o.Name.ToCamelCase()}").Aggregate((current, next) => { return current + ", " + next; })}], {{ relativeTo: this.route }}";
+
+                    }
+                    else
+                    {
+                        var prefix = string.Empty;
+
+                        while (hierarchicalRelationship != null)
+                        {
+                            var child = hierarchicalRelationship.ChildEntity;
+                            var parent = hierarchicalRelationship.ParentEntity;
+                            var keyFields = child.GetNonHierarchicalKeyFields();
+                            var keyFieldsRoute = keyFields.Select(o => $"{prefix + child.Name.ToCamelCase()}.{o.Name.ToCamelCase()}").Aggregate((current, next) => { return current + ", " + next; });
+
+                            routerLink = $"\"{child.PluralName.ToLower()}\", " + keyFieldsRoute + (routerLink == string.Empty ? "" : ", ") + routerLink;
+
+                            prefix += hierarchicalRelationship.ChildEntity.Name.ToCamelCase() + ".";
+
+                            hierarchicalRelationship = parent.RelationshipsAsChild.SingleOrDefault(r => r.Hierarchy);
+
+                            if (hierarchicalRelationship == null)
+                            {
+                                keyFields = parent.GetNonHierarchicalKeyFields();
+                                keyFieldsRoute = keyFields.Select(o => $"{prefix + parent.Name.ToCamelCase()}.{o.Name.ToCamelCase()}").Aggregate((current, next) => { return current + ", " + next; });
+                                routerLink = $"[\"/{parent.PluralName.ToLower()}\", " + keyFieldsRoute + ", " + routerLink + "]";
+                            }
+
+                        }
+                    }
+                }
                 else
-                    routerLink = $"[\"/{entity.PluralName.ToLower()}\", {entity.KeyFields.Select(o => entity.Name.ToCamelCase() + "." + o.Name.ToCamelCase()).Aggregate((current, next) => current + ", " + next)}]";
+                {
+                    //routerLink = $"'/{entity.PluralName.ToLower()}', { entity.KeyFields.Select(o => entity.Name.ToCamelCase() + "." + o.Name.ToCamelCase()).Aggregate((current, next) => current + ", " + next) }";
+                    if (CurrentEntity == entity)
+                        routerLink = $"[{entity.KeyFields.Select(o => entity.Name.ToCamelCase() + "." + o.Name.ToCamelCase()).Aggregate((current, next) => current + ", " + next)}], {{ relativeTo: this.route }}";
+                    else
+                        routerLink = $"[\"/{entity.PluralName.ToLower()}\", {entity.KeyFields.Select(o => entity.Name.ToCamelCase() + "." + o.Name.ToCamelCase()).Aggregate((current, next) => current + ", " + next)}]";
+                }
             }
 
             return routerLink;
@@ -3544,12 +3586,6 @@ namespace WEB.Models
             {
                 if (!CreateAppDirectory(entity.Project, entity.PluralName, codeGenerator.GenerateListTypeScript(), entity.Name.ToLower() + ".list.component.ts"))
                     return ("App path does not exist: " + Path.Combine(entity.Project.RootPathWeb, @"ClientApp\src\app"));
-
-                if (entity.HasASortField)
-                {
-                    if (!CreateAppDirectory(entity.Project, entity.PluralName, $"export class {entity.Name}SortComponent {{}}", entity.Name.ToLower() + ".sort.component.ts"))
-                        return ("App path does not exist: " + Path.Combine(entity.Project.RootPathWeb, @"ClientApp\src\app"));
-                }
             }
             #endregion
 
@@ -3642,7 +3678,7 @@ namespace WEB.Models
             #region sort html
             if (deploymentOptions.SortHtml)
             {
-                if(!entity.HasASortField)
+                if (!entity.HasASortField)
                     return ($"Entity {entity.FriendlyName} does not have a sort field");
 
                 if (!CreateAppDirectory(entity.Project, entity.PluralName, codeGenerator.GenerateSortHtml(), entity.Name.ToLower() + ".sort.component.html"))

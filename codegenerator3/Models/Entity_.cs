@@ -440,7 +440,7 @@ namespace WEB.Models
             {
                 var sortFields = Fields.Where(f => f.EditPageType == EditPageType.SortField).ToList();
 
-                if (sortFields.Count == 0) {
+                if (sortFields.Count == 0)
                     return null;
 
                 if (sortFields.Count > 1)
