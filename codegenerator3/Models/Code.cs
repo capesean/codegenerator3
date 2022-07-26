@@ -3640,16 +3640,22 @@ namespace WEB.Models
             #endregion
 
             #region sort html
-            if (deploymentOptions.SortHtml && entity.HasASortField)
+            if (deploymentOptions.SortHtml)
             {
+                if(!entity.HasASortField)
+                    return ($"Entity {entity.FriendlyName} does not have a sort field");
+
                 if (!CreateAppDirectory(entity.Project, entity.PluralName, codeGenerator.GenerateSortHtml(), entity.Name.ToLower() + ".sort.component.html"))
                     return ("App path does not exist: " + Path.Combine(entity.Project.RootPathWeb, @"ClientApp\src\app"));
             }
             #endregion
 
             #region sort typescript
-            if (deploymentOptions.SortTypeScript && entity.HasASortField)
+            if (deploymentOptions.SortTypeScript)
             {
+                if (!entity.HasASortField)
+                    return ($"Entity {entity.FriendlyName} does not have a sort field");
+
                 if (!CreateAppDirectory(entity.Project, entity.PluralName, codeGenerator.GenerateSortTypeScript(), entity.Name.ToLower() + ".sort.component.ts"))
                     return ("App path does not exist: " + Path.Combine(entity.Project.RootPathWeb, @"ClientApp\src\app"));
             }

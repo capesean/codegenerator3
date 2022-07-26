@@ -440,7 +440,8 @@ namespace WEB.Models
             {
                 var sortFields = Fields.Where(f => f.EditPageType == EditPageType.SortField).ToList();
 
-                if (sortFields.Count == 0) return null;
+                if (sortFields.Count == 0) {
+                    return null;
 
                 if (sortFields.Count > 1)
                     throw new InvalidOperationException("Only 1 sort field is allowed per entity");

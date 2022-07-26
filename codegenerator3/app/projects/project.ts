@@ -274,8 +274,8 @@
                 else if (item === "appSelectTypeScript" && entity.preventAppSelectTypeScriptDeployment) vm.multideploy[entity.entityId][item] = false;
                 else if (item === "selectModalHtml" && entity.preventSelectModalHtmlDeployment) vm.multideploy[entity.entityId][item] = false;
                 else if (item === "selectModalTypeScript" && entity.preventSelectModalTypeScriptDeployment) vm.multideploy[entity.entityId][item] = false;
-                else if (item === "sortHtml" && entity.preventSortHtml) vm.multideploy[entity.entityId][item] = false;
-                else if (item === "sortTypeScript" && entity.preventSortTypeScript) vm.multideploy[entity.entityId][item] = false;
+                else if (item === "sortHtml" && entity.preventSortHtmlDeployment) vm.multideploy[entity.entityId][item] = false;
+                else if (item === "sortTypeScript" && entity.preventSortTypeScriptDeployment) vm.multideploy[entity.entityId][item] = false;
                 else vm.multideploy[entity.entityId][item] = checked;
             });
         }
