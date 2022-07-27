@@ -35,9 +35,9 @@
                     <div class="col-sm-6 col-md-4">
                         <div class="form-group" ng-class="{ 'has-error':  mainForm.$submitted && mainForm.parentName.$invalid }">
                             <label for="parentName" class="control-label">
-                                Name of Parent on Child:
+                                Name of Parent on Child
                             </label>
-                            <input type="text" id="parentName" name="parentName" ng-model="vm.relationship.parentName" maxlength="50" class="form-control" ng-required="true" />
+                            <input type="text" id="parentName" name="parentName" ng-model="vm.relationship.parentName" maxlength="50" class="form-control" ng-required="true" ng-pattern="/^\S+$/" />
                         </div>
                     </div>
 
@@ -55,7 +55,7 @@
                             <label for="collectionName" class="control-label">
                                 Name of Collection on Parent:
                             </label>
-                            <input type="text" id="collectionName" name="collectionName" ng-model="vm.relationship.collectionName" maxlength="50" class="form-control" ng-required="true" />
+                            <input type="text" id="collectionName" name="collectionName" ng-model="vm.relationship.collectionName" maxlength="50" class="form-control" ng-required="true" ng-pattern="/^\S+$/" />
                         </div>
                     </div>
 
@@ -73,7 +73,7 @@
                             <label for="collectionSingular" class="control-label">
                                 Name of Collection Singular:
                             </label>
-                            <input type="text" id="collectionSingular" name="collectionSingular" ng-model="vm.relationship.collectionSingular" maxlength="50" class="form-control" ng-required="true" />
+                            <input type="text" id="collectionSingular" name="collectionSingular" ng-model="vm.relationship.collectionSingular" maxlength="50" class="form-control" ng-required="true" ng-pattern="/^\S+$/" />
                         </div>
                     </div>
 
@@ -217,6 +217,9 @@
                     <span ng-message="required">
                         Name of Collection on Parent is required.
                     </span>
+                    <span ng-message="pattern">
+                        Name of Collection on Parent cannot have spaces.
+                    </span>
                 </li>
 
                 <li class="help-block has-error"
@@ -232,6 +235,9 @@
                     ng-messages="mainForm.parentName.$error">
                     <span ng-message="required">
                         Name of Parent on Child is required.
+                    </span>
+                    <span ng-message="pattern">
+                        Name of Parent on Child cannot have spaces.
                     </span>
                 </li>
 
@@ -256,6 +262,17 @@
                     ng-messages="mainForm.relationshipAncestorLimit.$error">
                     <span ng-message="required">
                         Ancestor Limit is required.
+                    </span>
+                </li>
+
+                <li class="help-block has-error"
+                    ng-if="mainForm.$submitted"
+                    ng-messages="mainForm.collectionSingular.$error">
+                    <span ng-message="required">
+                        Name of Collection Singular is required.
+                    </span>
+                    <span ng-message="pattern">
+                        Name of Collection Singular cannot have spaces.
                     </span>
                 </li>
 
