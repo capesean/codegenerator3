@@ -38,6 +38,8 @@ In the above screenshot, you can see the tabs for each of the different files th
 - `AppSelectTypeScript`: creates the selector directive for selecting entities from lists (think of it as an advanced TypeAhead)
 - `SelectModalHtml`: creates the modal directive for selecting entities from lists (think of it as an advanced TypeAhead)
 - `SelectModalTypeScript`: creates the modal directive for selecting entities from lists (think of it as an advanced TypeAhead)
+- `Sort Html` (not in screenshot): if your entity has a sort field, this loads the full list of records for the user to sort with drag-drop functionality.
+- `Sort TypeScript` (not in screenshot): if your entity has a sort field, this loads the full list of records for the user to sort with drag-drop functionality.
 
 These outputs can be deployed directly into your target project if you have set up the `RootPath` value in your **web.config**, as well as the `WebPath` & `ModelsPath` values in the Project screen.
 
