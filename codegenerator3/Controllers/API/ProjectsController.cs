@@ -82,6 +82,8 @@ namespace WEB.Controllers
                 userEntity.EntityType = EntityType.User;
                 userEntity.PartialEntityClass = true;
                 userEntity.AuthorizationType = AuthorizationType.ProtectChanges;
+                userEntity.PreventSortHtmlDeployment = "Not applicable (no sort field)";
+                userEntity.PreventSortTypeScriptDeployment = "Not applicable (no sort field)";
                 DbContext.Entry(userEntity).State = EntityState.Added;
 
                 var fieldOrder = 0;

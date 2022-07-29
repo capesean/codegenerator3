@@ -372,4 +372,8 @@
 
     </form>
 
+    <hr />
+    
+    <div class="alert alert-info" ng-if="vm.field.editPageType === 7 || vm.field.editPageType === 7">To add a file field, you need to add both a <code>File Name</code> and a <code>File Contents</code> field (Edit Page Type). The name of the file will be stored in the File Name field, and the binary array of the file's contents will be stored in the File Contents field. The File Name field therefore needs to be a string/varchar/etc. type, and the File Contents field needs to be a varbinary type. (You will also need to write a download function to download the file.)</div>
+
 </div>

@@ -1313,6 +1313,7 @@ namespace WEB.Models
             s.Add($"import {{ DragDropModule }} from '@angular/cdk/drag-drop';");
             s.Add($"import {{ BreadcrumbModule }} from 'primeng/breadcrumb';");
             s.Add($"import {{ AppFileInputDirective }} from './common/directives/appfileinput';");
+            s.Add($"import {{ FileComponent }} from './common/components/file.component';");
             s.Add($"import {{ AppHasRoleDirective }} from './common/directives/apphasrole';");
 
             var entitiesToBundle = AllEntities.Where(e => !e.Exclude);
@@ -1357,6 +1358,7 @@ namespace WEB.Models
             s.Add($"        MomentPipe,");
             s.Add($"        BooleanPipe,");
             s.Add($"        AppFileInputDirective,");
+            s.Add($"        FileComponent,");
             s.Add($"        AppHasRoleDirective" + componentList);
             s.Add($"    ],");
             s.Add($"    exports: [");
@@ -1367,6 +1369,7 @@ namespace WEB.Models
             s.Add($"        MomentPipe,");
             s.Add($"        BooleanPipe,");
             s.Add($"        AppFileInputDirective,");
+            s.Add($"        FileComponent,");
             s.Add($"        AppHasRoleDirective" + componentList);
             s.Add($"    ]");
             s.Add($"}})");
@@ -1985,6 +1988,7 @@ namespace WEB.Models
                 if (field.EditPageType == EditPageType.Exclude) continue;
                 if (field.EditPageType == EditPageType.SortField) continue;
                 if (field.EditPageType == EditPageType.CalculatedField) continue;
+                if (field.EditPageType == EditPageType.FileContents) continue;
 
                 var isAppSelect = CurrentEntity.RelationshipsAsChild.Any(r => r.RelationshipFields.Any(f => f.ChildFieldId == field.FieldId)) && CurrentEntity.GetParentSearchRelationship(field).UseSelectorDirective;
 
@@ -2010,7 +2014,7 @@ namespace WEB.Models
                 // default = text
                 attributes.Add("type", "text");
 
-                var readOnly = field.EditPageType == EditPageType.ReadOnly || field.EditPageType == EditPageType.FileName;
+                var readOnly = field.EditPageType == EditPageType.ReadOnly;
 
                 if (!readOnly || isAppSelect)
                     attributes.Add("[(ngModel)]", CurrentEntity.Name.ToCamelCase() + "." + fieldName);
@@ -2052,7 +2056,7 @@ namespace WEB.Models
                     {
                         if (!CurrentEntity.RelationshipsAsChild.Any(r => r.RelationshipFields.Any(f => f.ChildFieldId == field.FieldId) && r.UseSelectorDirective))
                         {
-                            if (field.Length > 0) attributes.Add("maxlength", field.Length.ToString());
+                            if (field.Length > 0 && field.EditPageType != EditPageType.FileName) attributes.Add("maxlength", field.Length.ToString());
                             if (field.MinLength > 0) attributes.Add("minlength", field.MinLength.ToString());
                         }
                         if (field.RegexValidation != null)
@@ -2097,23 +2101,21 @@ namespace WEB.Models
                     attributes.Remove("type");
                     attributes.Add("rows", "5");
                 }
-                else if (field.EditPageType == EditPageType.FileContents)
-                {
-                    //ngIf = " *ngIf=\"isNew\"";
-                    field.Label = "File"; //set label to 'File' (don't save!)
-                    attributes["type"] = "file";
-                    attributes.Add("app-file-input", null);
-                    // make ngModel output only so it doesn't error trying to write to the input value (not allowed in html)
-                    attributes.Remove("[(ngModel)]");
-                    attributes.Add("(ngModel)", CurrentEntity.Name.ToCamelCase() + "." + fieldName);
-                    attributes.Add("[(appFileContent)]", CurrentEntity.Name.ToCamelCase() + "." + fieldName);
-                    var fileNameField = CurrentEntity.Fields.SingleOrDefault(o => o.EditPageType == EditPageType.FileName);
-                    if (fileNameField != null) attributes.Add("[(appFileName)]", CurrentEntity.Name.ToCamelCase() + "." + fileNameField.Name.ToCamelCase());
-
-                }
                 else if (field.EditPageType == EditPageType.FileName)
                 {
-                    ngIf = " *ngIf=\"!isNew\"";
+                    tagType = "app-file";
+
+                    //ngIf = " *ngIf=\"isNew\"";
+                    field.Label = field.Label;
+                    attributes.Remove("type");
+                    attributes.Remove("class");
+
+                    var fileContentsField = CurrentEntity.Fields.SingleOrDefault(o => o.EditPageType == EditPageType.FileContents);
+                    attributes.Add("[(fileContents)]", $"{CurrentEntity.Name.ToCamelCase()}.{fileContentsField.Name.ToCamelCase()}");
+                    attributes.Add("[enableDownload]", $"!isNew && !!{CurrentEntity.Name.ToCamelCase()}.{field.Name.ToCamelCase()}");
+                    attributes.Add("[fileId]", $"{CurrentEntity.KeyFields.Select(o => $"this.{CurrentEntity.Name.ToCamelCase()}.{o.Name.ToCamelCase()}").Aggregate((current, next) => { return current + "/" + next; })}");
+                    attributes.Add("(onDownload)", $"download($event)");
+
                 }
 
 
@@ -2207,11 +2209,15 @@ namespace WEB.Models
                 if (!readOnly)
                 {
                     var validationErrors = new Dictionary<string, string>();
-                    if (!field.IsNullable && field.CustomType != CustomType.Boolean && field.EditPageType != EditPageType.ReadOnly) validationErrors.Add("required", $"{field.Label} is required");
+                    if (!field.IsNullable && field.CustomType != CustomType.Boolean && field.EditPageType != EditPageType.ReadOnly)
+                    {
+                        if(field.EditPageType == EditPageType.FileName) validationErrors.Add("required", $"A file is required");
+                        else validationErrors.Add("required", $"{field.Label} is required");
+                    }
                     if (!CurrentEntity.RelationshipsAsChild.Any(r => r.RelationshipFields.Any(f => f.ChildFieldId == field.FieldId) && r.UseSelectorDirective))
                     {
                         if (field.MinLength > 0) validationErrors.Add("minlength", $"{field.Label} must be at least {field.MinLength} characters long");
-                        if (field.Length > 0) validationErrors.Add("maxlength", $"{field.Label} must be at most {field.Length} characters long");
+                        if (field.Length > 0 && field.EditPageType != EditPageType.FileName) validationErrors.Add("maxlength", $"{field.Label} must be at most {field.Length} characters long");
                     }
                     if (field.RegexValidation != null) validationErrors.Add("pattern", $"{field.Label} does not match the specified pattern");
 
@@ -2730,8 +2736,8 @@ namespace WEB.Models
 
             if (hasFileContents)
             {
-                s.Add($"    download(): void {{");
-                s.Add($"        this.downloadService.download{CurrentEntity.Name}({CurrentEntity.KeyFields.Select(o => $"this.{CurrentEntity.Name.ToCamelCase()}.{o.Name.ToCamelCase()}").Aggregate((current, next) => { return current + ", " + next; })}).subscribe();");
+                s.Add($"    download(fileId: string): void {{");
+                s.Add($"        this.downloadService.download{CurrentEntity.Name}File(fileId).subscribe();");
                 s.Add($"    }}");
                 s.Add($"");
 
