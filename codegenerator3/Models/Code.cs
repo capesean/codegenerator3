@@ -2431,7 +2431,7 @@ namespace WEB.Models
             if (relationshipsAsParent.Any())// || CurrentEntity.EntityType == EntityType.User)
                 s.Add($"import {{ Subject{(hasChildRoutes || CurrentEntity.EntityType == EntityType.User ? ", Subscription" : "")} }} from 'rxjs';");
             s.Add($"import {{ HttpErrorResponse }} from '@angular/common/http';");
-            s.Add($"import {{ BreadcrumbService }} from 'angular-crumbs';");
+            s.Add($"import {{ BreadcrumbService }} from 'angular-crumbs-2';");
             s.Add($"import {{ ErrorService }} from '../common/services/error.service';");
             s.Add($"import {{ NgbModal }} from '@ng-bootstrap/ng-bootstrap';");
             s.Add($"import {{ ConfirmModalComponent, ModalOptions }} from '../common/components/confirm.component';");
