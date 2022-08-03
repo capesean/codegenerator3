@@ -8,7 +8,7 @@ To get started, just rename the `Web.Sample.config` and configure it to your env
 - Set the localhost url that the website will run on
 - Run the app and add your first Project!
 
-You will need **Website 3**, which you can find [here](https://github.com/capesean/Website3), as the project into which your generated code will be placed.
+You will need **Website 3**, which you can find [here](https://github.com/capesean/Website3), as the project into which your generated code will be placed, if you deploy the code from CodeGenerator directly/automatically into your target website.
 
 Creating a project automatically adds a `User` entity with fields for `Id`, `Email`, `First Name`, `Last Name`, `Full Name` and `Disabled`. (The `Full Name` is a database-calculated field.) 
 
@@ -38,6 +38,8 @@ In the above screenshot, you can see the tabs for each of the different files th
 - `AppSelectTypeScript`: creates the selector directive for selecting entities from lists (think of it as an advanced TypeAhead)
 - `SelectModalHtml`: creates the modal directive for selecting entities from lists (think of it as an advanced TypeAhead)
 - `SelectModalTypeScript`: creates the modal directive for selecting entities from lists (think of it as an advanced TypeAhead)
+- `Sort Html` (not in screenshot): if your entity has a sort field, this loads the full list of records for the user to sort with drag-drop functionality.
+- `Sort TypeScript` (not in screenshot): if your entity has a sort field, this loads the full list of records for the user to sort with drag-drop functionality.
 
 These outputs can be deployed directly into your target project if you have set up the `RootPath` value in your **web.config**, as well as the `WebPath` & `ModelsPath` values in the Project screen.
 
