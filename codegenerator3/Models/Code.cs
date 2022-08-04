@@ -2299,7 +2299,7 @@ namespace WEB.Models
 
                     if (relationship.UseMultiSelect)
                     {
-                        s.Add(t + $"                <div class=\"my-3\">");
+                        s.Add(t + $"                <div class=\"mb-3\">");
                         s.Add(t + $"                    <button class=\"btn btn-primary\" (click)=\"add{relationship.CollectionName}()\">Add {relationship.CollectionFriendlyName}<i class=\"fas fa-plus-circle ms-1\"></i></button>");
                         s.Add(t + $"                </div>");
                         s.Add($"");
@@ -2307,7 +2307,7 @@ namespace WEB.Models
                     else if (relationship.Hierarchy)
                     {
                         // trying to get this to work for instances like African POT Project->Team hierarchy, where I only want 1 add for the userId
-                        s.Add(t + $"                <div class=\"my-3\">");
+                        s.Add(t + $"                <div class=\"mb-3\">");
                         s.Add(t + $"                    <a [routerLink]=\"['./{childEntity.PluralName.ToLower()}', 'add']\" class=\"btn btn-primary\">Add {childEntity.FriendlyName}<i class=\"fas fa-plus-circle ms-1\"></i></a>");
                         if (childEntity.HasASortField)
                             s.Add(t + $"                    <button type=\"button\" class=\"btn btn-outline-secondary ms-1\" (click)=\"show{childEntity.Name}Sort()\" *ngIf=\"{childEntity.PluralName.ToCamelCase()}Headers.totalRecords > 1\">Sort {childEntity.PluralFriendlyName}<i class=\"fas fa-sort ms-1\"></i></button>");
@@ -2466,7 +2466,6 @@ namespace WEB.Models
             }
             if (relationshipsAsParent.Any(o => o.Hierarchy && o.ChildEntity.HasASortField))
             {
-                s.Add($"import {{ moveItemInArray, CdkDragDrop }} from '@angular/cdk/drag-drop';");
                 foreach (var entity in relationshipsAsParent.Where(o => o.Hierarchy && o.ChildEntity.HasASortField).Select(o => o.ChildEntity).Distinct())
                     s.Add($"import {{ {entity.Name}SortComponent }} from '../{entity.PluralName.ToLower()}/{entity.Name.ToLower()}.sort.component';");
             }
@@ -2854,7 +2853,7 @@ namespace WEB.Models
             foreach (var relationship in relationshipsAsParent.Where(o => o.Hierarchy && o.ChildEntity.HasASortField))
             {
                 s.Add($"    show{relationship.ChildEntity.Name}Sort() {{");
-                s.Add($"        let modalRef = this.modalService.open({relationship.ChildEntity.Name}SortComponent, {{size: 'xl', centered: true, scrollable: true }});");
+                s.Add($"        let modalRef = this.modalService.open({relationship.ChildEntity.Name}SortComponent, {{ size: 'xl', centered: true, scrollable: true }});");
                 foreach (var field in relationship.ParentEntity.KeyFields)
                     s.Add($"        (modalRef.componentInstance as {relationship.ChildEntity.Name}SortComponent).{field.Name.ToCamelCase()} = this.{CurrentEntity.Name.ToCamelCase()}.{field.Name.ToCamelCase()};");
                 s.Add($"        modalRef.result.then(");
