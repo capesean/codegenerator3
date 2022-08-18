@@ -151,6 +151,10 @@ namespace WEB.Models
                         {
                             //?
                         }
+                        else if (field.FieldType == FieldType.Colour)
+                        {
+                            attributes.Add($"MaxLength(7)");
+                        }
                         else if (field.Length > 0)
                         {
                             attributes.Add($"MaxLength({field.Length}){(field.MinLength > 0 ? $", MinLength({field.MinLength})" : "")}");
@@ -512,7 +516,10 @@ namespace WEB.Models
                         else if (field.EditPageType != EditPageType.ReadOnly)
                             attributes.Add("Required");
                     }
-                    if (field.NetType == "string" && field.Length > 0)
+
+                    if (field.FieldType == FieldType.Colour)
+                        attributes.Add($"MaxLength(7)");
+                    else if (field.NetType == "string" && field.Length > 0)
                         attributes.Add($"MaxLength({field.Length}){(field.MinLength > 0 ? $", MinLength({field.MinLength})" : "")}");
                 }
 
@@ -1968,7 +1975,7 @@ namespace WEB.Models
                 s.Add($"");
                 t = "    ";
             }
-            s.Add(t + $"<form name=\"form\" (submit)=\"save(form)\" novalidate #form=\"ngForm\" [ngClass]=\"{{ 'was-validated': form.submitted }}\">");
+            s.Add(t + $"<form id=\"form\" name=\"form\" (submit)=\"save(form)\" novalidate #form=\"ngForm\" [ngClass]=\"{{ 'was-validated': form.submitted }}\">");
             s.Add($"");
             s.Add(t + $"    <fieldset class=\"group\">");
             s.Add($"");
@@ -2043,6 +2050,10 @@ namespace WEB.Models
                         tagType = "select";
                         attributes.Remove("class");
                         attributes.Add("class", "form-select");
+                    }
+                    else if (field.CustomType == CustomType.Colour)
+                    {
+                        attributes["type"] = "colour";
                     }
                     else if (field.FieldType == FieldType.Date || field.FieldType == FieldType.SmallDateTime || field.FieldType == FieldType.DateTime)
                     {
@@ -2214,7 +2225,7 @@ namespace WEB.Models
                     var validationErrors = new Dictionary<string, string>();
                     if (!field.IsNullable && field.CustomType != CustomType.Boolean && field.EditPageType != EditPageType.ReadOnly)
                     {
-                        if(field.EditPageType == EditPageType.FileName) validationErrors.Add("required", $"A file is required");
+                        if (field.EditPageType == EditPageType.FileName) validationErrors.Add("required", $"A file is required");
                         else validationErrors.Add("required", $"{field.Label} is required");
                     }
                     if (!CurrentEntity.RelationshipsAsChild.Any(r => r.RelationshipFields.Any(f => f.ChildFieldId == field.FieldId) && r.UseSelectorDirective))

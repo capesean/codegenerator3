@@ -71,6 +71,8 @@ namespace WEB.Models
                         return CustomType.Binary;
                     case FieldType.Geometry:
                         return CustomType.Geometry;
+                    case FieldType.Colour:
+                        return CustomType.Colour;
                 }
                 throw new NotImplementedException("CustomType: " + FieldType.ToString());
             }
@@ -103,6 +105,7 @@ namespace WEB.Models
                     case FieldType.Varchar:
                     case FieldType.Guid:
                     case FieldType.Geometry:
+                    case FieldType.Colour:
                         return "string";
                     case FieldType.Enum:
                         return Lookup.PluralName;
@@ -172,6 +175,7 @@ namespace WEB.Models
                 case FieldType.nText:
                 case FieldType.Text:
                 case FieldType.Varchar:
+                case FieldType.Colour:
                     return "string";
                 case FieldType.VarBinary:
                     return "byte[]";
@@ -257,7 +261,7 @@ namespace WEB.Models
 
     public enum CustomType
     {
-        Enum, Boolean, Date, Guid, Number, String, Binary, Geometry
+        Enum, Boolean, Date, Guid, Number, String, Binary, Geometry, Colour
     }
 
 }
