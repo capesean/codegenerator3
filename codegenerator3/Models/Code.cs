@@ -2053,7 +2053,7 @@ namespace WEB.Models
                     }
                     else if (field.CustomType == CustomType.Colour)
                     {
-                        attributes["type"] = "colour";
+                        attributes["type"] = "color";
                     }
                     else if (field.FieldType == FieldType.Date || field.FieldType == FieldType.SmallDateTime || field.FieldType == FieldType.DateTime)
                     {
