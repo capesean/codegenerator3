@@ -29,6 +29,8 @@
                         vm.relationship.collectionName = entity.pluralName;
                     if (!vm.relationship.collectionFriendlyName)
                         vm.relationship.collectionFriendlyName = entity.pluralFriendlyName;
+                    if (!vm.relationship.collectionSingular)
+                        vm.relationship.collectionSingular = entity.name;
                 }
             });
             var promises = [];
