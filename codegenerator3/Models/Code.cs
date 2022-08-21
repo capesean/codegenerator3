@@ -237,7 +237,7 @@ namespace WEB.Models
         public string GenerateTypeScriptModel()
         {
             var s = new StringBuilder();
-            s.Add($"import {{ SearchOptions, PagingOptions }} from './http.model';");
+            s.Add($"import {{ SearchOptions, PagingHeaders }} from './http.model';");
             foreach (var relationshipParentEntity in CurrentEntity.RelationshipsAsChild.Where(r => !r.ParentEntity.Exclude && r.ParentEntityId != CurrentEntity.EntityId).Select(o => o.ParentEntity).Distinct().OrderBy(o => o.Name))
             {
                 s.Add($"import {{ {relationshipParentEntity.Name} }} from './{relationshipParentEntity.Name.ToLower()}.model';");
@@ -304,7 +304,7 @@ namespace WEB.Models
 
             s.Add($"export class {CurrentEntity.Name}SearchResponse {{");
             s.Add($"    {CurrentEntity.PluralName.ToCamelCase()}: {CurrentEntity.Name}[] = [];");
-            s.Add($"    headers: PagingOptions;");
+            s.Add($"    headers: PagingHeaders;");
             s.Add($"}}");
 
             return RunCodeReplacements(s.ToString(), CodeType.TypeScriptModel);
@@ -775,9 +775,9 @@ namespace WEB.Models
             foreach (var field in CurrentEntity.RangeSearchFields)
                 fieldsToSearch.Add(field);
 
-            s.Add($"        public async Task<IActionResult> Search([FromQuery] PagingOptions pagingOptions{(CurrentEntity.TextSearchFields.Count > 0 ? ", [FromQuery] string q = null" : "")}{roleSearch}{(fieldsToSearch.Count > 0 ? $", {fieldsToSearch.Select(f => f.ControllerSearchParams).Aggregate((current, next) => current + ", " + next)}" : "")})");
+            s.Add($"        public async Task<IActionResult> Search([FromQuery] SearchOptions searchOptions{(CurrentEntity.TextSearchFields.Count > 0 ? ", [FromQuery] string q = null" : "")}{roleSearch}{(fieldsToSearch.Count > 0 ? $", {fieldsToSearch.Select(f => f.ControllerSearchParams).Aggregate((current, next) => current + ", " + next)}" : "")})");
             s.Add($"        {{");
-            s.Add($"            if (pagingOptions == null) pagingOptions = new PagingOptions();");
+            s.Add($"            if (searchOptions == null) searchOptions = new SearchOptions();");
             s.Add($"");
 
             if (CurrentEntity.EntityType == EntityType.User)
@@ -798,7 +798,7 @@ namespace WEB.Models
 
             if (CurrentEntity.RelationshipsAsChild.Where(r => r.RelationshipAncestorLimit != RelationshipAncestorLimits.Exclude).Any())
             {
-                s.Add($"            if (pagingOptions.IncludeEntities)");
+                s.Add($"            if (searchOptions.IncludeParents)");
                 s.Add($"            {{");
                 foreach (var relationship in CurrentEntity.RelationshipsAsChild.OrderBy(r => r.SortOrderOnChild).ThenBy(o => o.ParentName))
                 {
@@ -862,11 +862,11 @@ namespace WEB.Models
             {
                 s.Add($"            var roles = await db.Roles.ToListAsync();");
                 s.Add($"");
-                s.Add($"            return Ok((await GetPaginatedResponse(results, pagingOptions)).Select(o => ModelFactory.Create(o, roles)));");
+                s.Add($"            return Ok((await GetPaginatedResponse(results, searchOptions)).Select(o => ModelFactory.Create(o, roles)));");
             }
             else
             {
-                s.Add($"            return Ok((await GetPaginatedResponse(results, pagingOptions)).Select(o => ModelFactory.Create(o)));");
+                s.Add($"            return Ok((await GetPaginatedResponse(results, searchOptions)).Select(o => ModelFactory.Create(o)));");
             }
             s.Add($"        }}");
             s.Add($"");
@@ -1309,7 +1309,7 @@ namespace WEB.Models
 
             s.Add($"import {{ NgModule }} from '@angular/core';");
             s.Add($"import {{ CommonModule }} from '@angular/common';");
-            s.Add($"import {{ PagerComponent }} from './common/pager.component';");
+            s.Add($"import {{ PagerComponent }} from './common/components/pager.component';");
             s.Add($"import {{ RouterModule }} from '@angular/router';");
             s.Add($"import {{ MainComponent }} from './main.component';");
             s.Add($"import {{ NavMenuComponent }} from './common/nav-menu/nav-menu.component';");
@@ -1488,7 +1488,7 @@ namespace WEB.Models
             s.Add($"import {{ Observable }} from 'rxjs';");
             s.Add($"import {{ map }} from 'rxjs/operators';");
             s.Add($"import {{ {CurrentEntity.Name}, {CurrentEntity.Name}SearchOptions, {CurrentEntity.Name}SearchResponse }} from '../models/{CurrentEntity.Name.ToLower()}.model';");
-            s.Add($"import {{ SearchQuery, PagingOptions }} from '../models/http.model';");
+            s.Add($"import {{ SearchQuery, SearchOptions, PagingHeaders }} from '../models/http.model';");
             s.Add($"");
             s.Add($"@Injectable({{ providedIn: 'root' }})");
             s.Add($"export class {CurrentEntity.Name}Service extends SearchQuery {{");
@@ -1504,7 +1504,7 @@ namespace WEB.Models
             s.Add($"        return this.http.get(`${{environment.baseApiUrl}}{CurrentEntity.PluralName.ToLower()}`, {{ params: queryParams, observe: 'response' }})");
             s.Add($"            .pipe(");
             s.Add($"                map(response => {{");
-            s.Add($"                    const headers = JSON.parse(response.headers.get(\"x-pagination\")) as PagingOptions;");
+            s.Add($"                    const headers = JSON.parse(response.headers.get(\"x-pagination\")) as PagingHeaders;");
             s.Add($"                    const {CurrentEntity.PluralName.ToCamelCase()} = response.body as {CurrentEntity.Name}[];");
             s.Add($"                    return {{ {CurrentEntity.PluralName.ToCamelCase()}: {CurrentEntity.PluralName.ToCamelCase()}, headers: headers }};");
             s.Add($"                }})");
@@ -1729,14 +1729,14 @@ namespace WEB.Models
 
         public string GenerateListTypeScript()
         {
-            bool includeEntities = false;
+            bool includeParents = false;
             if (CurrentEntity.RelationshipsAsChild.Any(r => r.Hierarchy))
-                includeEntities = true;
+                includeParents = true;
             else
                 foreach (var field in CurrentEntity.Fields.Where(f => f.ShowInSearchResults).OrderBy(f => f.FieldOrder))
                     if (CurrentEntity.RelationshipsAsChild.Any(r => r.RelationshipFields.Any(f => f.ChildFieldId == field.FieldId)))
                     {
-                        includeEntities = true;
+                        includeParents = true;
                         break;
                     }
             var enumLookups = CurrentEntity.Fields.Where(o => o.FieldType == FieldType.Enum && (o.ShowInSearchResults || o.SearchType == SearchType.Exact)).Select(o => o.Lookup).Distinct().ToList();
@@ -1750,7 +1750,7 @@ namespace WEB.Models
             s.Add($"import {{ Component, OnInit{(hasChildRoutes ? ", OnDestroy" : "")} }} from '@angular/core';");
             s.Add($"import {{ Router, ActivatedRoute{(hasChildRoutes ? ", NavigationEnd" : "")} }} from '@angular/router';");
             s.Add($"import {{ Subject{(hasChildRoutes ? ", Subscription" : "")} }} from 'rxjs';");
-            s.Add($"import {{ PagingOptions }} from '../common/models/http.model';");
+            s.Add($"import {{ PagingHeaders }} from '../common/models/http.model';");
             s.Add($"import {{ ErrorService }} from '../common/services/error.service';");
             s.Add($"import {{ {CurrentEntity.Name}SearchOptions, {CurrentEntity.Name}SearchResponse, {CurrentEntity.Name} }} from '../common/models/{CurrentEntity.Name.ToLower()}.model';");
             s.Add($"import {{ {CurrentEntity.Name}Service }} from '../common/services/{CurrentEntity.Name.ToLower()}.service';");
@@ -1774,7 +1774,7 @@ namespace WEB.Models
             s.Add($"");
             s.Add($"    public {CurrentEntity.PluralName.ToCamelCase()}: {CurrentEntity.Name}[] = [];");
             s.Add($"    public searchOptions = new {CurrentEntity.Name}SearchOptions();");
-            s.Add($"    public headers = new PagingOptions();");
+            s.Add($"    public headers = new PagingHeaders();");
             if (hasChildRoutes)
                 s.Add($"    private routerSubscription: Subscription;");
             foreach (var enumLookup in enumLookups)
@@ -1794,8 +1794,8 @@ namespace WEB.Models
             s.Add($"    }}");
             s.Add($"");
             s.Add($"    ngOnInit(): void {{");
-            if (includeEntities)
-                s.Add($"        this.searchOptions.includeEntities = true;");
+            if (includeParents)
+                s.Add($"        this.searchOptions.includeParents = true;");
             if (hasChildRoutes)
             {
                 s.Add($"        this.routerSubscription = this.router.events.subscribe(event => {{");
@@ -2447,7 +2447,7 @@ namespace WEB.Models
             s.Add($"import {{ NgbModal }} from '@ng-bootstrap/ng-bootstrap';");
             s.Add($"import {{ ConfirmModalComponent, ModalOptions }} from '../common/components/confirm.component';");
             if (relationshipsAsParent.Any())
-                s.Add($"import {{ PagingOptions }} from '../common/models/http.model';");
+                s.Add($"import {{ PagingHeaders }} from '../common/models/http.model';");
             s.Add($"import {{ {CurrentEntity.Name} }} from '../common/models/{CurrentEntity.Name.ToLower()}.model';");
             s.Add($"import {{ {CurrentEntity.Name}Service }} from '../common/services/{CurrentEntity.Name.ToLower()}.service';");
             if (enumLookups.Count > 0 || addEnum)
@@ -2510,7 +2510,7 @@ namespace WEB.Models
             foreach (var rel in relationshipsAsParent)
             {
                 s.Add($"    private {rel.CollectionName.ToCamelCase()}SearchOptions = new {rel.ChildEntity.Name}SearchOptions();");
-                s.Add($"    public {rel.CollectionName.ToCamelCase()}Headers = new PagingOptions();");
+                s.Add($"    public {rel.CollectionName.ToCamelCase()}Headers = new PagingHeaders();");
                 s.Add($"    public {rel.CollectionName.ToCamelCase()}: {rel.ChildEntity.Name}[] = [];");
                 s.Add($"");
             }
@@ -2589,7 +2589,7 @@ namespace WEB.Models
             {
                 foreach (var relField in rel.RelationshipFields)
                     s.Add($"                this.{rel.CollectionName.ToCamelCase()}SearchOptions.{relField.ChildField.Name.ToCamelCase()} = {relField.ParentField.Name.ToCamelCase()};");
-                s.Add($"                this.{rel.CollectionName.ToCamelCase()}SearchOptions.includeEntities = true;");
+                s.Add($"                this.{rel.CollectionName.ToCamelCase()}SearchOptions.includeParents = true;");
                 s.Add($"                this.load{rel.CollectionName}();");
                 s.Add($"");
             }
@@ -2784,7 +2784,7 @@ namespace WEB.Models
                 s.Add($"");
                 s.Add($"    }}");
                 s.Add($"");
-                // todo: use relative links? can then disable 'includeEntities' on these entities
+                // todo: use relative links? can then disable 'includeParents' on these entities
                 s.Add($"    goTo{rel.CollectionSingular}({rel.ChildEntity.Name.ToCamelCase()}: {rel.ChildEntity.Name}): void {{");
                 s.Add($"        this.router.navigate({GetRouterLink(rel.ChildEntity, CurrentEntity)});");
                 s.Add($"    }}");

@@ -3,7 +3,7 @@ import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { Observable } from 'rxjs';
 import { NAMESearchOptions, NAMESearchResponse, NAME } from '../common/models/NAME_TOLOWER.model';
 import { NAMEService } from '../common/services/NAME_TOLOWER.service';
-import { PagingOptions } from '../common/models/http.model';
+import { PagingHeaders } from '../common/models/http.model';
 import { ErrorService } from '../common/services/error.service';
 /*IMPORTS*/
 @Component({
@@ -15,7 +15,7 @@ export class NAMEModalComponent implements OnInit {
     modal: NgbModalRef;
     CAMELCASENAME: NAME | NAME[];
     selectedItems: NAME[] = [];
-    headers: PagingOptions = new PagingOptions();
+    headers: PagingHeaders = new PagingHeaders();
     searchOptions: NAMESearchOptions = new NAMESearchOptions();
     PLURALNAME_TOCAMELCASE: NAME[];
     allSelected = false;
@@ -36,7 +36,7 @@ export class NAMEModalComponent implements OnInit {
     }
 
     ngOnInit(): void {
-        this.searchOptions.includeEntities = true;
+        this.searchOptions.includeParents = true;
     }
 
     open(): NgbModalRef {
