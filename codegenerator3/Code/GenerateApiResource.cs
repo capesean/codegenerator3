@@ -1,0 +1,103 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+
+namespace WEB.Models
+{
+    public partial class Code
+    {
+        public string GenerateApiResource()
+        {
+            var s = new StringBuilder();
+
+            var noKeysEntity = NormalEntities.FirstOrDefault(e => e.KeyFields.Count == 0);
+            if (noKeysEntity != null)
+                throw new InvalidOperationException(noKeysEntity.FriendlyName + " has no keys defined");
+
+            s.Add($"import {{ environment }} from '../../../environments/environment';");
+            s.Add($"import {{ Injectable }} from '@angular/core';");
+            s.Add($"import {{ HttpClient, HttpParams }} from '@angular/common/http';");
+            s.Add($"import {{ Observable }} from 'rxjs';");
+            s.Add($"import {{ map }} from 'rxjs/operators';");
+            s.Add($"import {{ {CurrentEntity.Name}, {CurrentEntity.Name}SearchOptions, {CurrentEntity.Name}SearchResponse }} from '../models/{CurrentEntity.Name.ToLower()}.model';");
+            s.Add($"import {{ SearchQuery, SearchOptions, PagingHeaders }} from '../models/http.model';");
+            s.Add($"");
+            s.Add($"@Injectable({{ providedIn: 'root' }})");
+            s.Add($"export class {CurrentEntity.Name}Service extends SearchQuery {{");
+            s.Add($"");
+
+            s.Add($"    constructor(private http: HttpClient) {{");
+            s.Add($"        super();");
+            s.Add($"    }}");
+            s.Add($"");
+
+            s.Add($"    search(params: {CurrentEntity.Name}SearchOptions): Observable<{CurrentEntity.Name}SearchResponse> {{");
+            s.Add($"        const queryParams: HttpParams = this.buildQueryParams(params);");
+            s.Add($"        return this.http.get(`${{environment.baseApiUrl}}{CurrentEntity.PluralName.ToLower()}`, {{ params: queryParams, observe: 'response' }})");
+            s.Add($"            .pipe(");
+            s.Add($"                map(response => {{");
+            s.Add($"                    const headers = JSON.parse(response.headers.get(\"x-pagination\")) as PagingHeaders;");
+            s.Add($"                    const {CurrentEntity.PluralName.ToCamelCase()} = response.body as {CurrentEntity.Name}[];");
+            s.Add($"                    return {{ {CurrentEntity.PluralName.ToCamelCase()}: {CurrentEntity.PluralName.ToCamelCase()}, headers: headers }};");
+            s.Add($"                }})");
+            s.Add($"            );");
+            s.Add($"    }}");
+            s.Add($"");
+
+            var getParams = CurrentEntity.KeyFields.Select(o => o.Name.ToCamelCase() + ": " + o.JavascriptType).Aggregate((current, next) => current + ", " + next);
+            var saveParams = CurrentEntity.Name.ToCamelCase() + ": " + CurrentEntity.Name;
+            var getUrl = CurrentEntity.KeyFields.Select(o => "${" + o.Name.ToCamelCase() + "}").Aggregate((current, next) => current + "/" + next);
+            var saveUrl = CurrentEntity.KeyFields.Select(o => "${" + CurrentEntity.Name.ToCamelCase() + "." + o.Name.ToCamelCase() + "}").Aggregate((current, next) => current + "/" + next);
+
+            s.Add($"    get({getParams}): Observable<{CurrentEntity.Name}> {{");
+            s.Add($"        return this.http.get<{CurrentEntity.Name}>(`${{environment.baseApiUrl}}{CurrentEntity.PluralName.ToLower()}/{getUrl}`);");
+            s.Add($"    }}");
+            s.Add($"");
+
+            s.Add($"    save({saveParams}): Observable<{CurrentEntity.Name}> {{");
+            s.Add($"        return this.http.post<{CurrentEntity.Name}>(`${{environment.baseApiUrl}}{CurrentEntity.PluralName.ToLower()}/{saveUrl}`, {CurrentEntity.Name.ToCamelCase()});");
+            s.Add($"    }}");
+            s.Add($"");
+
+            s.Add($"    delete({getParams}): Observable<void> {{");
+            s.Add($"        return this.http.delete<void>(`${{environment.baseApiUrl}}{CurrentEntity.PluralName.ToLower()}/{getUrl}`);");
+            s.Add($"    }}");
+            s.Add($"");
+
+            if (CurrentEntity.HasASortField)
+            {
+                s.Add($"    sort(ids: {CurrentEntity.KeyFields.First().JavascriptType}[]): Observable<void> {{");
+                s.Add($"        return this.http.post<void>(`${{environment.baseApiUrl}}{CurrentEntity.PluralName.ToLower()}/sort`, ids);");
+                s.Add($"    }}");
+                s.Add($"");
+            }
+
+            var processedEntities = new List<Guid>();
+            foreach (var rel in CurrentEntity.RelationshipsAsParent.Where(o => o.UseMultiSelect && !o.ChildEntity.Exclude))
+            {
+                if (processedEntities.Contains(rel.ChildEntity.EntityId)) continue;
+                processedEntities.Add(rel.ChildEntity.EntityId);
+
+                var reverseRel = rel.ChildEntity.RelationshipsAsChild.Where(o => o.RelationshipId != rel.RelationshipId).SingleOrDefault();
+
+                s.Add($"    save{rel.ChildEntity.PluralName}({rel.RelationshipFields.First().ParentField.Name.ToCamelCase()}: {rel.RelationshipFields.First().ParentField.JavascriptType}, {reverseRel.RelationshipFields.First().ParentField.Name.ToCamelCase()}s: {reverseRel.RelationshipFields.First().ParentField.JavascriptType}[]): Observable<void> {{");
+                s.Add($"        return this.http.post<void>(`${{environment.baseApiUrl}}{CurrentEntity.PluralName.ToLower()}/{getUrl}/{rel.ChildEntity.PluralName.ToLower()}`, {reverseRel.RelationshipFields.First().ParentField.Name.ToCamelCase()}s);");
+                s.Add($"    }}");
+                s.Add($"");
+            }
+
+            foreach (var rel in CurrentEntity.RelationshipsAsParent.Where(r => !r.ChildEntity.Exclude && r.DisplayListOnParent).OrderBy(r => r.SortOrder))
+            {
+                s.Add($"    delete{rel.CollectionName}({rel.RelationshipFields.First().ParentField.Name.ToCamelCase()}: {rel.RelationshipFields.First().ParentField.JavascriptType}): Observable<void> {{");
+                s.Add($"        return this.http.delete<void>(`${{environment.baseApiUrl}}{CurrentEntity.PluralName.ToLower()}/{getUrl}/{rel.CollectionName.ToLower()}`);");
+                s.Add($"    }}");
+                s.Add($"");
+            }
+            s.Add($"}}");
+
+            return RunCodeReplacements(s.ToString(), CodeType.ApiResource);
+
+        }
+    }
+}

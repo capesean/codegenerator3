@@ -640,6 +640,27 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="App_Code\Highlight\Highlight.cs" />
+    <Compile Include="Code\GenerateController.cs" />
+    <Compile Include="Code\GenerateGeneratedModule.cs" />
+    <Compile Include="Code\GenerateSharedModule.cs" />
+    <Compile Include="Code\GenerateAppRouter.cs" />
+    <Compile Include="Code\GenerateApiResource.cs" />
+    <Compile Include="Code\GenerateListHtml.cs" />
+    <Compile Include="Code\GenerateListTypeScript.cs" />
+    <Compile Include="Code\GenerateEditHtml.cs" />
+    <Compile Include="Code\GenerateEditTypeScript.cs" />
+    <Compile Include="Code\GenerateSelectHtml.cs" />
+    <Compile Include="Code\GenerateSelectTypeScript.cs" />
+    <Compile Include="Code\GenerateModalHtml.cs" />
+    <Compile Include="Code\GenerateSortHtml.cs" />
+    <Compile Include="Code\GenerateSortTypeScript.cs" />
+    <Compile Include="Code\GenerateModalTypeScript.cs" />
+    <Compile Include="Code\GenerateDTO.cs" />
+    <Compile Include="Code\GenerateEnums.cs" />
+    <Compile Include="Code\GenerateTypeScriptEnums.cs" />
+    <Compile Include="Code\GenerateTypeScriptModel.cs" />
+    <Compile Include="Code\GenerateModel.cs" />
+    <Compile Include="Code\GenerateDbContext.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -703,7 +724,7 @@
     <Compile Include="Models\ApplicationUserManager.cs" />
     <Compile Include="Models\ApplicationUser_.cs" />
     <Compile Include="Models\AppUserStore.cs" />
-    <Compile Include="Models\Code.cs" />
+    <Compile Include="Code\Code.cs" />
     <Compile Include="Models\CodeReplacement.cs" />
     <Compile Include="Models\DTOs\AccountViewModels.cs" />
     <Compile Include="Models\DTOs\ApplicationUserDTO.cs" />
