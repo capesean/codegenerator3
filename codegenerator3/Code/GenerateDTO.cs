@@ -14,7 +14,8 @@ namespace WEB.Models
     {
         public string GenerateDTO()
         {
-            //if (CurrentEntity.EntityType == EntityType.User) return string.Empty;
+            var relationshipsAsChild = CurrentEntity.RelationshipsAsChild.OrderBy(o => o.ParentFriendlyName);
+            var relationshipsAsParent = CurrentEntity.RelationshipsAsParent.OrderBy(o => o.ParentFriendlyName);
 
             var s = new StringBuilder();
 
@@ -78,6 +79,14 @@ namespace WEB.Models
                 s.Add($"        public {relationship.ParentEntity.Name}DTO {relationship.ParentName} {{ get; set; }}");
                 s.Add($"");
             }
+
+            foreach (var relationship in CurrentEntity.RelationshipsAsParent.Where(o => !o.ParentEntity.Exclude).OrderBy(r => r.ParentEntity.Name).ThenBy(o => o.ParentName))
+            {
+                s.Add($"        public virtual List<{relationship.ChildEntity.Name}DTO> {relationship.CollectionName} {{ get; set; }} = new List<{relationship.ChildEntity.Name}DTO>();");
+                s.Add($"");
+            }
+
+
             if (CurrentEntity.EntityType == EntityType.User)
             {
                 s.Add($"        public IList<string> Roles {{ get; set; }}");
@@ -87,7 +96,7 @@ namespace WEB.Models
             s.Add($"");
             s.Add($"    public static partial class ModelFactory");
             s.Add($"    {{");
-            s.Add($"        public static {CurrentEntity.DTOName} Create({CurrentEntity.Name} {CurrentEntity.CamelCaseName}{(CurrentEntity.EntityType == EntityType.User ? ", List<Role> dbRoles = null" : "")})");
+            s.Add($"        public static {CurrentEntity.DTOName} Create({CurrentEntity.Name} {CurrentEntity.CamelCaseName}, bool includeParents = true, bool includeChildren = false{(CurrentEntity.EntityType == EntityType.User ? ", List<Role> dbRoles = null" : "")})");
             s.Add($"        {{");
             s.Add($"            if ({CurrentEntity.CamelCaseName} == null) return null;");
             s.Add($"");
@@ -108,14 +117,39 @@ namespace WEB.Models
             {
                 s.Add($"            {CurrentEntity.DTOName.ToCamelCase()}.Roles = userRoles;");
             }
-            foreach (var relationship in CurrentEntity.RelationshipsAsChild.OrderBy(o => o.ParentFriendlyName))
+
+            if (relationshipsAsChild.Any())
             {
-                // using exclude to avoid circular references. example: KTU-PACK: version => localisation => contentset => version (UpdateFromVersion)
-                if (relationship.RelationshipAncestorLimit == RelationshipAncestorLimits.Exclude) continue;
-                if (relationship.RelationshipFields.Count == 1 && relationship.RelationshipFields.First().ChildField.EditPageType == EditPageType.Exclude) continue;
-                s.Add($"            {CurrentEntity.DTOName.ToCamelCase()}.{relationship.ParentName} = Create({CurrentEntity.CamelCaseName}.{relationship.ParentName});");
+                s.Add($"");
+                s.Add($"            if (includeParents)");
+                s.Add($"            {{");
+                foreach (var relationship in relationshipsAsChild)
+                {
+                    // using exclude to avoid circular references. example: KTU-PACK: version => localisation => contentset => version (UpdateFromVersion)
+                    if (relationship.RelationshipAncestorLimit == RelationshipAncestorLimits.Exclude) continue;
+                    if (relationship.RelationshipFields.Count == 1 && relationship.RelationshipFields.First().ChildField.EditPageType == EditPageType.Exclude) continue;
+                    s.Add($"                {CurrentEntity.DTOName.ToCamelCase()}.{relationship.ParentName} = Create({CurrentEntity.CamelCaseName}.{relationship.ParentName});");
+                }
+                s.Add($"            }}");
+                s.Add($"");
             }
-            s.Add($"");
+
+            if (relationshipsAsParent.Any())
+            {
+                s.Add($"            if (includeChildren)");
+                s.Add($"            {{");
+                foreach (var relationship in relationshipsAsParent)
+                {
+                    if (relationship.RelationshipFields.Count == 1 && relationship.RelationshipFields.First().ChildField.EditPageType == EditPageType.Exclude) continue;
+                    
+                    s.Add($"                foreach (var {relationship.CollectionSingular.ToCamelCase()} in {CurrentEntity.CamelCaseName}.{relationship.CollectionName})");
+                    s.Add($"                    {CurrentEntity.DTOName.ToCamelCase()}.{relationship.CollectionName}.Add(Create({relationship.CollectionSingular.ToCamelCase()}));");
+                }
+                s.Add($"            }}");
+                s.Add($"");
+            }
+
+
             s.Add($"            return {CurrentEntity.DTOName.ToCamelCase()};");
             s.Add($"        }}");
             s.Add($"");

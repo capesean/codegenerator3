@@ -145,11 +145,11 @@ namespace WEB.Models
             {
                 s.Add($"            var roles = await db.Roles.ToListAsync();");
                 s.Add($"");
-                s.Add($"            return Ok((await GetPaginatedResponse(results, searchOptions)).Select(o => ModelFactory.Create(o, roles)));");
+                s.Add($"            return Ok((await GetPaginatedResponse(results, searchOptions)).Select(o => ModelFactory.Create(o, searchOptions.IncludeParents, searchOptions.IncludeChildren, roles)));");
             }
             else
             {
-                s.Add($"            return Ok((await GetPaginatedResponse(results, searchOptions)).Select(o => ModelFactory.Create(o)));");
+                s.Add($"            return Ok((await GetPaginatedResponse(results, searchOptions)).Select(o => ModelFactory.Create(o, searchOptions.IncludeParents, searchOptions.IncludeChildren)));");
             }
             s.Add($"        }}");
             s.Add($"");
@@ -184,11 +184,15 @@ namespace WEB.Models
             s.Add($"            if ({CurrentEntity.CamelCaseName} == null)");
             s.Add($"                return NotFound();");
             s.Add($"");
+
+            var relationshipsAsChild = CurrentEntity.RelationshipsAsChild.OrderBy(o => o.ParentFriendlyName);
+            var relationshipsAsParent = CurrentEntity.RelationshipsAsParent.OrderBy(o => o.ParentFriendlyName);
+
             if (CurrentEntity.EntityType == EntityType.User)
             {
                 s.Add($"            var roles = await db.Roles.ToListAsync();");
                 s.Add($"");
-                s.Add($"            return Ok(ModelFactory.Create({CurrentEntity.CamelCaseName}, roles));");
+                s.Add($"            return Ok(ModelFactory.Create({CurrentEntity.CamelCaseName}, dbRoles: roles));");
             }
             else
             {
