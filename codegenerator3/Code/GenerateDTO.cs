@@ -80,7 +80,7 @@ namespace WEB.Models
                 s.Add($"");
             }
 
-            foreach (var relationship in CurrentEntity.RelationshipsAsParent.Where(o => !o.ParentEntity.Exclude).OrderBy(r => r.ParentEntity.Name).ThenBy(o => o.ParentName))
+            foreach (var relationship in CurrentEntity.RelationshipsAsParent.Where(o => !o.ParentEntity.Exclude).OrderBy(r => r.ChildEntity.Name).ThenBy(o => o.CollectionName).ThenBy(o => o.RelationshipId))
             {
                 s.Add($"        public virtual List<{relationship.ChildEntity.Name}DTO> {relationship.CollectionName} {{ get; set; }} = new List<{relationship.ChildEntity.Name}DTO>();");
                 s.Add($"");

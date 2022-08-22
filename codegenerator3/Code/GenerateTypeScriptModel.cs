@@ -13,6 +13,11 @@ namespace WEB.Models
     {
         public string GenerateTypeScriptModel()
         {
+            var relAsParent = CurrentEntity.RelationshipsAsParent
+                .Where(r => r.RelationshipAncestorLimit != RelationshipAncestorLimits.Exclude)
+                .OrderBy(r => r.SortOrderOnChild).ThenBy(o => o.ParentName)
+                .ToList();
+
             var s = new StringBuilder();
             s.Add($"import {{ SearchOptions, PagingHeaders }} from './http.model';");
             foreach (var relationshipParentEntity in CurrentEntity.RelationshipsAsChild.Where(r => !r.ParentEntity.Exclude && r.ParentEntityId != CurrentEntity.EntityId).Select(o => o.ParentEntity).Distinct().OrderBy(o => o.Name))
@@ -24,6 +29,11 @@ namespace WEB.Models
                 var lookups = CurrentEntity.Fields.Where(o => o.FieldType == FieldType.Enum).Select(o => o.Lookup.PluralName).OrderBy(o => o).Distinct().Aggregate((current, next) => { return current + ", " + next; });
                 s.Add($"import {{ {lookups} }} from './enums.model';");
             }
+            foreach(var entity in relAsParent
+                .Where(o => o.ChildEntityId != CurrentEntity.EntityId)
+                .Select(o => o.ChildEntity)
+                .Distinct())
+                s.Add($"import {{ {entity.Name} }} from './{entity.Name.ToLower()}.model';");
             s.Add($"");
 
             s.Add($"export class {CurrentEntity.Name} {{");
@@ -43,6 +53,13 @@ namespace WEB.Models
                 s.Add($"    roles: string[] = [];");
             }
             s.Add($"");
+
+            foreach (var relationship in relAsParent)
+            {
+                s.Add($"    {relationship.CollectionName.ToCamelCase()}: {relationship.ChildEntity.Name}[];");
+            }
+            if (relAsParent.Any())
+                s.Add($"");
 
             s.Add($"    constructor() {{");
             // can't do this for composite key fields, else they all get set to a value (000-000-000) and 

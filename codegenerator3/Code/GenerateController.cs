@@ -79,16 +79,34 @@ namespace WEB.Models
                 s.Add($"");
             }
 
-            if (CurrentEntity.RelationshipsAsChild.Where(r => r.RelationshipAncestorLimit != RelationshipAncestorLimits.Exclude).Any())
+            var relAsChild = CurrentEntity.RelationshipsAsChild
+                .Where(r => r.RelationshipAncestorLimit != RelationshipAncestorLimits.Exclude)
+                .OrderBy(r => r.SortOrderOnChild).ThenBy(o => o.ParentName)
+                .ToList();
+            if (relAsChild.Any())
             {
                 s.Add($"            if (searchOptions.IncludeParents)");
                 s.Add($"            {{");
-                foreach (var relationship in CurrentEntity.RelationshipsAsChild.OrderBy(r => r.SortOrderOnChild).ThenBy(o => o.ParentName))
+                foreach (var relationship in relAsChild)
                 {
-                    if (relationship.RelationshipAncestorLimit == RelationshipAncestorLimits.Exclude) continue;
-
                     foreach (var result in GetTopAncestors(new List<string>(), "o", relationship, relationship.RelationshipAncestorLimit, includeIfHierarchy: true))
                         s.Add($"                results = results.Include(o => {result});");
+                }
+                s.Add($"            }}");
+                s.Add($"");
+            }
+
+            var relAsParent = CurrentEntity.RelationshipsAsParent
+                .Where(r => r.RelationshipAncestorLimit != RelationshipAncestorLimits.Exclude)
+                .OrderBy(r => r.SortOrderOnChild).ThenBy(o => o.ParentName)
+                .ToList();
+            if (relAsParent.Any())
+            {
+                s.Add($"            if (searchOptions.IncludeChildren)");
+                s.Add($"            {{");
+                foreach (var relationship in relAsParent)
+                {
+                    s.Add($"                results = results.Include(o => o.{relationship.CollectionName});");
                 }
                 s.Add($"            }}");
                 s.Add($"");
