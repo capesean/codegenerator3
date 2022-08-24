@@ -367,7 +367,6 @@ namespace WEB.Models
 
         private string RunCodeReplacements(string code, CodeType type)
         {
-
             if (!String.IsNullOrWhiteSpace(CurrentEntity.PreventApiResourceDeployment) && type == CodeType.ApiResource) return code;
             if (!String.IsNullOrWhiteSpace(CurrentEntity.PreventAppRouterDeployment) && type == CodeType.AppRouter) return code;
             if (!String.IsNullOrWhiteSpace(CurrentEntity.PreventGeneratedModuleDeployment) && type == CodeType.GeneratedModule) return code;
@@ -777,7 +776,7 @@ namespace WEB.Models
             if (deploymentOptions.SortHtml)
             {
                 if (!entity.HasASortField)
-                    return ($"Entity {entity.FriendlyName} does not have a sort field");
+                    return ($"Entity {entity.FriendlyName} does not have a sort field. Either add a field with Edit Page Type: Sort, or enter a Prevent Sort Html Deployment comment");
 
                 if (!CreateAppDirectory(entity.Project, entity.PluralName, codeGenerator.GenerateSortHtml(), entity.Name.ToLower() + ".sort.component.html"))
                     return ("App path does not exist: " + Path.Combine(entity.Project.RootPathWeb, @"ClientApp\src\app"));
@@ -788,7 +787,7 @@ namespace WEB.Models
             if (deploymentOptions.SortTypeScript)
             {
                 if (!entity.HasASortField)
-                    return ($"Entity {entity.FriendlyName} does not have a sort field");
+                    return ($"Entity {entity.FriendlyName} does not have a sort field. Either add a field with Edit Page Type: Sort, or enter a Prevent Sort Html Deployment comment");
 
                 if (!CreateAppDirectory(entity.Project, entity.PluralName, codeGenerator.GenerateSortTypeScript(), entity.Name.ToLower() + ".sort.component.ts"))
                     return ("App path does not exist: " + Path.Combine(entity.Project.RootPathWeb, @"ClientApp\src\app"));
