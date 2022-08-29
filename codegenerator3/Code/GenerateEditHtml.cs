@@ -99,7 +99,9 @@ namespace WEB.Models
                     }
                     else if (field.CustomType == CustomType.Colour)
                     {
-                        attributes["type"] = "color";
+                        tagType = "app-color";
+                        attributes.Remove("type");
+                        attributes.Remove("class");
                     }
                     else if (field.FieldType == FieldType.Date || field.FieldType == FieldType.SmallDateTime || field.FieldType == FieldType.DateTime)
                     {

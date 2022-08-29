@@ -23,8 +23,7 @@ namespace WEB.Models
 
             if (CurrentEntity.EntityType == EntityType.User)
             {
-                imports += $"import {{ Role }} from '../common/models/roles.model';" + Environment.NewLine;
-                inputs += $"    @Input() role: Role;" + Environment.NewLine;
+                inputs += $"    @Input() role: Enum;" + Environment.NewLine;
             }
 
             var imported = new List<string>();

@@ -15,7 +15,7 @@ namespace WEB.Models
         public string GenerateDTO()
         {
             var relationshipsAsChild = CurrentEntity.RelationshipsAsChild.OrderBy(o => o.ParentFriendlyName);
-            var relationshipsAsParent = CurrentEntity.RelationshipsAsParent.OrderBy(o => o.ParentFriendlyName);
+            var relationshipsAsParent = CurrentEntity.RelationshipsAsParent.OrderBy(o => o.CollectionName);
 
             var s = new StringBuilder();
 
@@ -131,11 +131,11 @@ namespace WEB.Models
                     s.Add($"                {CurrentEntity.DTOName.ToCamelCase()}.{relationship.ParentName} = Create({CurrentEntity.CamelCaseName}.{relationship.ParentName});");
                 }
                 s.Add($"            }}");
-                s.Add($"");
             }
 
             if (relationshipsAsParent.Any())
             {
+                s.Add($"");
                 s.Add($"            if (includeChildren)");
                 s.Add($"            {{");
                 foreach (var relationship in relationshipsAsParent)
@@ -146,10 +146,10 @@ namespace WEB.Models
                     s.Add($"                    {CurrentEntity.DTOName.ToCamelCase()}.{relationship.CollectionName}.Add(Create({relationship.CollectionSingular.ToCamelCase()}));");
                 }
                 s.Add($"            }}");
-                s.Add($"");
             }
 
 
+            s.Add($"");
             s.Add($"            return {CurrentEntity.DTOName.ToCamelCase()};");
             s.Add($"        }}");
             s.Add($"");

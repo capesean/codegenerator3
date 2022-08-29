@@ -36,8 +36,8 @@ namespace WEB.Models
                 s.Add($"import {{ Enum, Enums }} from '../common/models/enums.model';");
             if (CurrentEntity.HasASortField)
                 s.Add($"import {{ ToastrService }} from 'ngx-toastr';");
-            if (CurrentEntity.EntityType == EntityType.User)
-                s.Add($"import {{ Roles }} from '../common/models/roles.model';");
+            if (CurrentEntity.EntityType == EntityType.User && !enumLookups.Any())
+                s.Add($"import {{ Enums }} from '../common/models/enums.model';");
             if (CurrentEntity.HasASortField)
             {
                 s.Add($"import {{ NgbModal }} from '@ng-bootstrap/ng-bootstrap';");
@@ -58,7 +58,7 @@ namespace WEB.Models
             foreach (var enumLookup in enumLookups)
                 s.Add($"    public {enumLookup.PluralName.ToCamelCase()}: Enum[] = Enums.{enumLookup.PluralName};");
             if (CurrentEntity.EntityType == EntityType.User)
-                s.Add($"    public roles = Roles.List;");
+                s.Add($"    public roles = Enums.Roles;");
 
             s.Add($"");
             s.Add($"    constructor(");

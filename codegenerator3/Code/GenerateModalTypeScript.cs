@@ -22,16 +22,17 @@ namespace WEB.Models
             var properties = string.Empty;
             var searchOptions = string.Empty;
 
+            var lookups = CurrentEntity.Fields.Where(f => f.SearchType == SearchType.Exact && f.FieldType == FieldType.Enum).Select(f => f.Lookup).Distinct().OrderBy(o => o.Name);
+
             if (CurrentEntity.EntityType == EntityType.User)
             {
-                imports += $"import {{ Role }} from '../common/models/roles.model';" + Environment.NewLine;
-                inputs += $"    @Input() role: Role;" + Environment.NewLine;
+                if (!lookups.Any()) imports += $"import {{ Enum }} from '../common/models/enums.model';" + Environment.NewLine;
+                inputs += $"    @Input() role: Enum;" + Environment.NewLine;
                 searchOptions += $"        this.searchOptions.roleName = this.role ? this.role.name : undefined;" + Environment.NewLine;
             }
 
-            var lookups = CurrentEntity.Fields.Where(f => f.SearchType == SearchType.Exact && f.FieldType == FieldType.Enum).Select(f => f.Lookup).Distinct().OrderBy(o => o.Name);
             if (lookups.Any())
-                imports += $"import {{ Enum, Enums }} from '../common/models/enums.model';" + Environment.NewLine;
+                imports += $"import {{ Enum, Enums{(CurrentEntity.EntityType == EntityType.User ? "Role" : "")} }} from '../common/models/enums.model';" + Environment.NewLine;
 
             if (!lookups.Any() && CurrentEntity.Fields.Where(o => o.ShowInSearchResults && o.FieldType == FieldType.Enum).Any())
             {

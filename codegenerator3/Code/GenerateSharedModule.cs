@@ -16,8 +16,8 @@ namespace WEB.Models
             s.Add($"import {{ RouterModule }} from '@angular/router';");
             s.Add($"import {{ MainComponent }} from './main.component';");
             s.Add($"import {{ NavMenuComponent }} from './common/nav-menu/nav-menu.component';");
-            s.Add($"import {{ MomentPipe }} from './common/pipes/momentPipe';");
-            s.Add($"import {{ BooleanPipe }} from './common/pipes/booleanPipe';");
+            s.Add($"import {{ MomentPipe }} from './common/pipes/momentpipe';");
+            s.Add($"import {{ BooleanPipe }} from './common/pipes/booleanpipe';");
             s.Add($"import {{ ConfirmModalComponent }} from './common/components/confirm.component';");
             s.Add($"import {{ FormsModule }} from '@angular/forms';");
             s.Add($"import {{ NgbModule }} from '@ng-bootstrap/ng-bootstrap';");
@@ -25,6 +25,7 @@ namespace WEB.Models
             s.Add($"import {{ BreadcrumbModule }} from 'primeng/breadcrumb';");
             s.Add($"import {{ AppFileInputDirective }} from './common/directives/appfileinput';");
             s.Add($"import {{ FileComponent }} from './common/components/file.component';");
+            s.Add($"import {{ ColorComponent }} from './common/components/color.component';");
             s.Add($"import {{ AppHasRoleDirective }} from './common/directives/apphasrole';");
 
             var entitiesToBundle = AllEntities.Where(e => !e.Exclude);
@@ -71,6 +72,7 @@ namespace WEB.Models
             s.Add($"        ConfirmModalComponent,");
             s.Add($"        AppFileInputDirective,");
             s.Add($"        FileComponent,");
+            s.Add($"        ColorComponent,"); 
             s.Add($"        AppHasRoleDirective" + componentList);
             s.Add($"    ],");
             s.Add($"    exports: [");
@@ -83,6 +85,7 @@ namespace WEB.Models
             s.Add($"        ConfirmModalComponent,");
             s.Add($"        AppFileInputDirective,");
             s.Add($"        FileComponent,");
+            s.Add($"        ColorComponent,");
             s.Add($"        AppHasRoleDirective" + componentList);
             s.Add($"    ]");
             s.Add($"}})");

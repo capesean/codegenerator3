@@ -90,39 +90,6 @@ namespace WEB.Models
             DbContext = dbContext;
         }
 
-        public string GenerateTypeScriptRoles()
-        {
-            var s = new StringBuilder();
-
-            s.Add($"export class Role {{");
-            s.Add($"   value: number;");
-            s.Add($"   name: string;");
-            s.Add($"   label: string;");
-            s.Add($"}}");
-            s.Add($"");
-
-            s.Add($"export class Roles {{");
-            if (CurrentEntity.Project.Lookups.Where(o => o.IsRoleList).Count() > 1) throw new Exception("Project has more than 1 IsRoleList Lookups");
-            var roleLookup = CurrentEntity.Project.Lookups.SingleOrDefault(o => o.IsRoleList);
-            if (roleLookup == null)
-            {
-                s.Add($"   static List: Roles[] = [];");
-            }
-            else
-            {
-                var counter = 0;
-                foreach (var option in roleLookup.LookupOptions.OrderBy(o => o.Name))
-                {
-                    s.Add($"   static {option.Name}: Role = {{ value: {(option.Value.HasValue ? option.Value : counter)}, name: '{option.Name}', label: '{option.FriendlyName}' }};");
-                    counter++;
-                }
-                s.Add($"   static List: Role[] = [{(roleLookup.LookupOptions.Select(o => "Roles." + o.Name).OrderBy(o => o).Aggregate((current, next) => { return current + ", " + next; }))}];");
-            }
-            s.Add($"}}");
-
-            return RunCodeReplacements(s.ToString(), CodeType.TypeScriptRoles);
-        }
-
         public string GenerateRoles()
         {
             var s = new StringBuilder();
@@ -393,7 +360,7 @@ namespace WEB.Models
             if (type == CodeType.Enums || type == CodeType.AppRouter || type == CodeType.GeneratedModule || type == CodeType.SharedModule || type == CodeType.DbContext || type == CodeType.SharedModule)
                 replacements = CodeReplacements.Where(cr => !cr.Disabled && cr.CodeType == type && cr.Entity.ProjectId == CurrentEntity.ProjectId).ToList();
 
-            foreach (var replacement in replacements.OrderBy(o => o.SortOrder))
+            foreach (var replacement in replacements.OrderBy(o => o.CodeType == CodeType.Global ? 0 : 1).ThenBy(o => o.SortOrder))
             {
                 var findCode = replacement.FindCode.Replace("\\", @"\\").Replace("(", "\\(").Replace(")", "\\)").Replace("[", "\\[").Replace("]", "\\]").Replace("?", "\\?").Replace("*", "\\*").Replace("$", "\\$").Replace("+", "\\+").Replace("{", "\\{").Replace("}", "\\}").Replace("|", "\\|").Replace("^", "\\^").Replace("\n", "\r\n").Replace("\r\r", "\r");
                 var re = new Regex(findCode);
@@ -621,10 +588,6 @@ namespace WEB.Models
 
                 // todo: move this to own deployment option
                 if (!CreateAppDirectory(entity.Project, "common\\models", codeGenerator.GenerateTypeScriptEnums(), "enums.model.ts"))
-                    return ("App path does not exist: " + path);
-
-                // todo: move this to own deployment option
-                if (!CreateAppDirectory(entity.Project, "common\\models", codeGenerator.GenerateTypeScriptRoles(), "roles.model.ts"))
                     return ("App path does not exist: " + path);
 
                 // todo: move this to own deployment option

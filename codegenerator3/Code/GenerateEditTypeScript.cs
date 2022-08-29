@@ -38,7 +38,7 @@ namespace WEB.Models
             s.Add($"import {{ Router, ActivatedRoute{(hasChildRoutes ? ", NavigationEnd" : "")} }} from '@angular/router';");
             s.Add($"import {{ ToastrService }} from 'ngx-toastr';");
             s.Add($"import {{ NgForm }} from '@angular/forms';");
-            if (relationshipsAsParent.Any())// || CurrentEntity.EntityType == EntityType.User)
+            if (relationshipsAsParent.Any())
                 s.Add($"import {{ Subject{(hasChildRoutes || CurrentEntity.EntityType == EntityType.User ? ", Subscription" : "")} }} from 'rxjs';");
             s.Add($"import {{ HttpErrorResponse }} from '@angular/common/http';");
             s.Add($"import {{ BreadcrumbService }} from 'angular-crumbs-2';");
@@ -49,7 +49,7 @@ namespace WEB.Models
                 s.Add($"import {{ PagingHeaders }} from '../common/models/http.model';");
             s.Add($"import {{ {CurrentEntity.Name} }} from '../common/models/{CurrentEntity.Name.ToLower()}.model';");
             s.Add($"import {{ {CurrentEntity.Name}Service }} from '../common/services/{CurrentEntity.Name.ToLower()}.service';");
-            if (enumLookups.Count > 0 || addEnum)
+            if (CurrentEntity.EntityType != EntityType.User && (enumLookups.Count > 0 || addEnum))
                 s.Add($"import {{ Enum, Enums{(CurrentEntity.PrimaryField.FieldType == FieldType.Enum ? ", " + CurrentEntity.PrimaryField.Lookup.PluralName : "")} }} from '../common/models/enums.model';");
             foreach (var relChildEntity in relationshipsAsParent.Select(o => o.ChildEntity).Distinct().OrderBy(o => o.Name))
             {
@@ -59,7 +59,7 @@ namespace WEB.Models
             }
             if (CurrentEntity.EntityType == EntityType.User)
             {
-                s.Add($"import {{ Roles, Role }} from '../common/models/roles.model';");
+                s.Add($"import {{ Enum, Enums, Roles }} from '../common/models/enums.model';");
                 s.Add($"import {{ ProfileModel }} from '../common/models/profile.models';");
                 s.Add($"import {{ ProfileService }} from '../common/services/profile.service';");
             }
@@ -101,7 +101,7 @@ namespace WEB.Models
                 s.Add($"    public {enumLookup.PluralName.ToCamelCase()}: Enum[] = Enums.{enumLookup.PluralName};");
             if (CurrentEntity.EntityType == EntityType.User)
             {
-                s.Add($"    public roles: Role[] = Roles.List;");
+                s.Add($"    public roles: Enum[] = Enums.Roles;");
                 s.Add($"    private profile: ProfileModel;");
             }
             //foreach(var x in CurrentEntity.RelationshipsAsParent.Where(o => (o.DisplayListOnParent || o.Hierarchy) && o.ChildEntity.Fields.Any(f => f.ShowInSearchResults && f.RelationshipFieldsAsChild.Any(rf => rf.ParentField.Entity.PrimaryField.FieldType == FieldType.Enum)

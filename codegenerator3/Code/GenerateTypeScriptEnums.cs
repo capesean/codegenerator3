@@ -27,7 +27,7 @@ namespace WEB.Models
             s.Add($"}}");
             s.Add($"");
 
-            foreach (var lookup in Lookups.Where(o => !o.IsRoleList))
+            foreach (var lookup in Lookups)
             {
                 s.Add($"export enum {lookup.PluralName} {{");
                 var options = lookup.LookupOptions.OrderBy(o => o.SortOrder);
@@ -39,7 +39,7 @@ namespace WEB.Models
 
             s.Add($"export class Enums {{");
             s.Add($"");
-            foreach (var lookup in Lookups.Where(o => !o.IsRoleList))
+            foreach (var lookup in Lookups)
             {
                 s.Add($"     static {lookup.PluralName}: Enum[] = [");
                 var options = lookup.LookupOptions.OrderBy(o => o.SortOrder);
