@@ -69,7 +69,7 @@ namespace WEB.Models
                     if (field.FieldType == FieldType.Enum)
                     {
                         appSelectFilters += $"                    <div class=\"col-sm-6 col-md-6 col-lg-4\" *ngIf=\"!{field.Name.ToCamelCase()}\">" + Environment.NewLine;
-                        appSelectFilters += $"                        <select id=\"{field.Name.ToCamelCase()}\" name=\"{field.Name.ToCamelCase()}\" [(ngModel)]=\"searchOptions.{field.Name.ToCamelCase()}\" #{field.Name.ToCamelCase()}=\"ngModel\" class=\"form-control\">" + Environment.NewLine;
+                        appSelectFilters += $"                        <select id=\"{field.Name.ToCamelCase()}\" name=\"{field.Name.ToCamelCase()}\" [(ngModel)]=\"searchOptions.{field.Name.ToCamelCase()}\" #{field.Name.ToCamelCase()}=\"ngModel\" class=\"form-select\">" + Environment.NewLine;
                         appSelectFilters += $"                            <option *ngFor=\"let {field.Lookup.Name.ToCamelCase()} of {field.Lookup.PluralName.ToCamelCase()}\" [ngValue]=\"{field.Lookup.Name.ToCamelCase()}.value\">{{{{ {field.Lookup.Name.ToCamelCase()}.label }}}}</option>" + Environment.NewLine;
                         appSelectFilters += $"                        </select>" + Environment.NewLine;
                         appSelectFilters += $"                    </div>" + Environment.NewLine;

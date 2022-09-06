@@ -61,7 +61,7 @@ namespace WEB.Models
             {
                 s.Add($"import {{ Enum, Enums, Roles }} from '../common/models/enums.model';");
                 s.Add($"import {{ ProfileModel }} from '../common/models/profile.models';");
-                s.Add($"import {{ ProfileService }} from '../common/services/profile.service';");
+                s.Add($"import {{ AuthService }} from '../common/services/auth.service';");
             }
             var processedEntityIds = new List<Guid>();
             foreach (var rel in multiSelectRelationships)
@@ -136,7 +136,7 @@ namespace WEB.Models
             foreach (var relChildEntity in relChildEntities)
                 s.Add($"        private {relChildEntity.Name.ToCamelCase()}Service: {relChildEntity.Name}Service,");
             if (CurrentEntity.EntityType == EntityType.User)
-                s.Add($"        private profileService: ProfileService,");
+                s.Add($"        private authService: AuthService,");
             if (hasFileContents)
                 s.Add($"        private downloadService: DownloadService,");
 
@@ -150,7 +150,7 @@ namespace WEB.Models
 
             if (CurrentEntity.EntityType == EntityType.User)
             {
-                s.Add($"        this.profileService.getProfile().subscribe(profile => {{");
+                s.Add($"        this.authService.getProfile().subscribe(profile => {{");
                 s.Add($"            this.profile = profile;");
                 s.Add($"        }});");
                 s.Add($"");
@@ -277,7 +277,7 @@ namespace WEB.Models
                 s.Add($"                    else {{");
                 s.Add($"                        // reload profile if editing self");
                 s.Add($"                        if (this.user.id === this.profile.userId)");
-                s.Add($"                            this.profileService.getProfile(true).subscribe();");
+                s.Add($"                            this.authService.getProfile(true).subscribe();");
                 s.Add($"                    }}");
             }
             //else if (!CurrentEntity.ReturnOnSave)
