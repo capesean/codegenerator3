@@ -323,7 +323,7 @@ namespace WEB.Models
             s.Add($"");
 
             s.Add(t + $"    <fieldset class=\"my-3\">");
-            s.Add(t + $"        <button type=\"submit\" class=\"btn btn-success me-2 mb-1\">Save<i class=\"fas fa-check me-2 mb-1\"></i></button>");
+            s.Add(t + $"        <button type=\"submit\" class=\"btn btn-success me-2 mb-1\">Save<i class=\"fas fa-check ms-1\"></i></button>");
             s.Add(t + $"        <button type=\"button\" *ngIf=\"!isNew\" class=\"btn btn-outline-danger me-2 mb-1\" (click)=\"delete()\">Delete<i class=\"fas fa-times ms-1\"></i></button>");
             s.Add(t + $"    </fieldset>");
             s.Add($"");
