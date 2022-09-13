@@ -120,13 +120,13 @@ namespace WEB.Models
                 s.Add($"");
                 s.Add(t + $"    <fieldset class=\"my-3\">");
                 s.Add($"");
-                s.Add(t + $"        <button type=\"submit\" class=\"btn btn-success\">Search<i class=\"fas fa-search ms-1\"></i></button>");
+                s.Add(t + $"        <button type=\"submit\" class=\"btn btn-success me-2 mb-1\">Search<i class=\"fas fa-search ms-1\"></i></button>");
                 if (CurrentEntity.RelationshipsAsChild.Count(r => r.Hierarchy) == 0)
                 {
-                    s.Add(t + $"        <a [routerLink]=\"['./', 'add']\" class=\"btn btn-primary ms-1\">Add<i class=\"fas fa-plus-circle ms-1\"></i></a>");
+                    s.Add(t + $"        <a [routerLink]=\"['./', 'add']\" class=\"btn btn-primary me-2 mb-1\">Add<i class=\"fas fa-plus-circle ms-1\"></i></a>");
                 }
                 if (CurrentEntity.HasASortField)
-                    s.Add(t + $"        <button type=\"button\" class=\"btn btn-outline-secondary ms-1\" (click)=\"showSort()\" *ngIf=\"headers.totalRecords > 1\">Sort<i class=\"fas fa-sort ms-1\"></i></button>");
+                    s.Add(t + $"        <button type=\"button\" class=\"btn btn-outline-secondary me-2 mb-1\" (click)=\"showSort()\" *ngIf=\"headers.totalRecords > 1\">Sort<i class=\"fas fa-sort ms-1\"></i></button>");
                 s.Add($"");
                 s.Add(t + $"    </fieldset>");
                 s.Add($"");
