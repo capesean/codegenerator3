@@ -22,7 +22,7 @@ namespace WEB.Models
             var properties = string.Empty;
             var searchOptions = string.Empty;
 
-            var lookups = CurrentEntity.Fields.Where(f => f.SearchType == SearchType.Exact && f.FieldType == FieldType.Enum).Select(f => f.Lookup).Distinct().OrderBy(o => o.Name);
+            var lookups = CurrentEntity.Fields.Where(f => f.FieldType == FieldType.Enum && (f.SearchType == SearchType.Exact || f.ShowInSearchResults)).Select(f => f.Lookup).Distinct().OrderBy(o => o.Name);
 
             if (CurrentEntity.EntityType == EntityType.User)
             {
