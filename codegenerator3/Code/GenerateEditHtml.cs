@@ -358,7 +358,7 @@ namespace WEB.Models
 
                     if (relationship.UseMultiSelect)
                     {
-                        s.Add(t + $"                <div class=\"my-3\">");
+                        s.Add(t + $"                <div class=\"mb-3\">");
                         s.Add(t + $"                    <button class=\"btn btn-primary me-2 mb-1\" (click)=\"add{relationship.CollectionName}()\">Add {relationship.CollectionFriendlyName}<i class=\"fas fa-plus-circle ms-1\"></i></button>");
                         s.Add(t + $"                </div>");
                         s.Add($"");
@@ -366,7 +366,7 @@ namespace WEB.Models
                     else if (relationship.Hierarchy)
                     {
                         // trying to get this to work for instances like African POT Project->Team hierarchy, where I only want 1 add for the userId
-                        s.Add(t + $"                <div class=\"my-3\">");
+                        s.Add(t + $"                <div class=\"mb-3\">");
                         s.Add(t + $"                    <a [routerLink]=\"['./{childEntity.PluralName.ToLower()}', 'add']\" class=\"btn btn-primary me-2 mb-1\">Add {childEntity.FriendlyName}<i class=\"fas fa-plus-circle ms-1\"></i></a>");
                         if (childEntity.HasASortField)
                             s.Add(t + $"                    <button type=\"button\" class=\"btn btn-outline-secondary me-2 mb-1\" (click)=\"show{childEntity.Name}Sort()\" *ngIf=\"{childEntity.PluralName.ToCamelCase()}Headers.totalRecords > 1\">Sort {childEntity.PluralFriendlyName}<i class=\"fas fa-sort ms-1\"></i></button>");

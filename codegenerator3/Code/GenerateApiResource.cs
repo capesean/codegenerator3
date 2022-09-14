@@ -67,8 +67,19 @@ namespace WEB.Models
 
             if (CurrentEntity.HasASortField)
             {
-                s.Add($"    sort(ids: {CurrentEntity.KeyFields.First().JavascriptType}[]): Observable<void> {{");
-                s.Add($"        return this.http.post<void>(`${{environment.baseApiUrl}}{CurrentEntity.PluralName.ToLower()}/sort`, ids);");
+                var relHierarchy = CurrentEntity.RelationshipsAsChild.SingleOrDefault(o => o.Hierarchy);
+                if (relHierarchy != null)
+                {
+                    var sortParams = relHierarchy.RelationshipFields.Select(o => $"{o.ChildField.Name.ToCamelCase()}: {o.ChildField.JavascriptType}").Aggregate((current, next) => current + ", " + next);
+                    s.Add($"    sort({sortParams}, ids: {CurrentEntity.KeyFields.First().JavascriptType}[]): Observable<void> {{");
+                    var sortQuery = relHierarchy.RelationshipFields.Select(o => $"{o.ChildField.Name.ToLower()}=${{{o.ChildField.Name.ToCamelCase()}}}").Aggregate((current, next) => current + "&" + next);
+                    s.Add($"        return this.http.post<void>(`${{environment.baseApiUrl}}{CurrentEntity.PluralName.ToLower()}/sort?{sortQuery}`, ids);");
+                }
+                else
+                {
+                    s.Add($"    sort(ids: {CurrentEntity.KeyFields.First().JavascriptType}[]): Observable<void> {{");
+                    s.Add($"        return this.http.post<void>(`${{environment.baseApiUrl}}{CurrentEntity.PluralName.ToLower()}/sort`, ids);");
+                }
                 s.Add($"    }}");
                 s.Add($"");
             }

@@ -24,6 +24,7 @@ namespace WEB.Models
 
             var PARENTPKFIELDS = string.Empty;
             var SEARCH_PARAMS = string.Empty;
+            var HIERARCHYFIELDS = string.Empty;
             var hierarchyRel = CurrentEntity.RelationshipsAsChild.FirstOrDefault(o => o.Hierarchy);
             if (hierarchyRel != null)
             {
@@ -31,6 +32,7 @@ namespace WEB.Models
                 {
                     PARENTPKFIELDS += $"    public {field.Name.ToCamelCase()}: string;{Environment.NewLine}";
                     SEARCH_PARAMS += $"{field.Name.ToCamelCase()}: this.{field.Name.ToCamelCase()}";
+                    HIERARCHYFIELDS += $"this.{field.Name.ToCamelCase()}, ";
                 }
                 SEARCH_PARAMS += ", ";
             }
@@ -39,6 +41,7 @@ namespace WEB.Models
                 .Replace("ENUM_IMPORTS", enumLookups.Any() ? $"import {{ Enum, Enums }} from '../common/models/enums.model';{Environment.NewLine}" : "")
                 .Replace("ENUM_PROPERTIES", enumLookups.Any() ? ENUM_PROPERTIES : string.Empty)
                 .Replace("PARENTPKFIELDS", PARENTPKFIELDS)
+                .Replace("HIERARCHYFIELDS", HIERARCHYFIELDS)
                 .Replace("SEARCH_PARAMS", SEARCH_PARAMS);
 
             s.Add(file);

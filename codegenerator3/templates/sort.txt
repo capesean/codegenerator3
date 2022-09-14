@@ -37,7 +37,7 @@ ENUM_PROPERTIESPARENTPKFIELDS
     }
 
     close() {
-        this.CAMELCASENAMEService.sort(this.PLURALNAME_TOCAMELCASE.map(o => o.KEYFIELD)).subscribe(
+        this.CAMELCASENAMEService.sort(HIERARCHYFIELDSthis.PLURALNAME_TOCAMELCASE.map(o => o.KEYFIELD)).subscribe(
             () => {
                 this.modal.close();
                 this.toastr.success("The sort order has been updated", "Change Sort Order");

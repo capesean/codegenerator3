@@ -453,13 +453,21 @@ namespace WEB.Models
             if (CurrentEntity.HasASortField)
             {
                 s.Add($"        [HttpPost(\"sort\"){(CurrentEntity.AuthorizationType == AuthorizationType.None ? "" : ", AuthorizeRoles(Roles.Administrator)")}]");
-                s.Add($"        public async Task<IActionResult> Sort([FromBody] Guid[] sortedIds)");
+                var relHierarchy = CurrentEntity.RelationshipsAsChild.SingleOrDefault(o => o.Hierarchy);
+                if (relHierarchy == null)
+                    s.Add($"        public async Task<IActionResult> Sort([FromBody] Guid[] sortedIds)");
+                else
+                {
+                    var sortFilter = relHierarchy.RelationshipFields.Select(o => $"[FromQuery] {o.ChildField.NetType} {o.ChildField.Name.ToCamelCase()}").Aggregate((current, next) => current + ", " + next);
+                    s.Add($"        public async Task<IActionResult> Sort({sortFilter}, [FromBody] Guid[] sortedIds)");
+                }
                 s.Add($"        {{");
                 // if it's a child entity, just sort the id's that were sent
-                if (CurrentEntity.RelationshipsAsChild.Any(r => r.Hierarchy))
+                if (relHierarchy != null)
                 {
+                    var sortFilter = relHierarchy.RelationshipFields.Select(o => $"o.{o.ChildField.Name} == {o.ChildField.Name.ToCamelCase()}").Aggregate((current, next) => current + " && " + next);
                     s.Add($"            var {CurrentEntity.PluralName.ToCamelCase()} = await {CurrentEntity.Project.DbContextVariable}.{CurrentEntity.PluralName}");
-                    s.Add($"                .Where(o => sortedIds.Contains(o.{CurrentEntity.KeyFields[0].Name}))");
+                    s.Add($"                .Where(o => {sortFilter})");
                 }
                 else
                     s.Add($"            var {CurrentEntity.PluralName.ToCamelCase()} = await {CurrentEntity.Project.DbContextVariable}.{CurrentEntity.PluralName}");
