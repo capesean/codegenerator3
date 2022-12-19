@@ -463,7 +463,7 @@ namespace WEB.Models
             foreach (var relationship in relationshipsAsParent.Where(o => o.Hierarchy && o.ChildEntity.HasASortField))
             {
                 s.Add($"    show{relationship.ChildEntity.Name}Sort() {{");
-                s.Add($"        let modalRef = this.modalService.open({relationship.ChildEntity.Name}SortComponent, {{ size: 'xl', centered: true, scrollable: true }});");
+                s.Add($"        let modalRef = this.modalService.open({relationship.ChildEntity.Name}SortComponent, {{ size: 'xl', centered: true, scrollable: false }});");
                 foreach (var field in relationship.ParentEntity.KeyFields)
                     s.Add($"        (modalRef.componentInstance as {relationship.ChildEntity.Name}SortComponent).{field.Name.ToCamelCase()} = this.{CurrentEntity.Name.ToCamelCase()}.{field.Name.ToCamelCase()};");
                 s.Add($"        modalRef.result.then(");
