@@ -643,7 +643,7 @@
     <Compile Include="Code\GenerateController.cs" />
     <Compile Include="Code\GenerateGeneratedModule.cs" />
     <Compile Include="Code\GenerateSharedModule.cs" />
-    <Compile Include="Code\GenerateAppRouter.cs" />
+    <Compile Include="Code\GenerateRoutes.cs" />
     <Compile Include="Code\GenerateApiResource.cs" />
     <Compile Include="Code\GenerateListHtml.cs" />
     <Compile Include="Code\GenerateListTypeScript.cs" />

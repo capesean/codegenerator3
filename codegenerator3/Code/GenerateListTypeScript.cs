@@ -48,7 +48,7 @@ namespace WEB.Models
             s.Add($"    selector: '{CurrentEntity.Name.ToLower()}-list',");
             s.Add($"    templateUrl: './{CurrentEntity.Name.ToLower()}.list.component.html'");
             s.Add($"}})");
-            s.Add($"export class {CurrentEntity.Name}ListComponent implements OnInit {{");
+            s.Add($"export class {CurrentEntity.Name}ListComponent implements OnInit{(hasChildRoutes ? ", OnDestroy" : "")} {{");
             s.Add($"");
             s.Add($"    public {CurrentEntity.PluralName.ToCamelCase()}: {CurrentEntity.Name}[] = [];");
             s.Add($"    public searchOptions = new {CurrentEntity.Name}SearchOptions();");

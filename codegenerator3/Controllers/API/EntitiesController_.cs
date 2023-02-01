@@ -73,7 +73,7 @@ namespace WEB.Controllers
             result.Controller = code.GenerateController();
             result.GeneratedModule = code.GenerateGeneratedModule();
             result.SharedModule = code.GenerateSharedModule();
-            result.AppRouter = code.GenerateAppRouter();
+            result.AppRouter = code.GenerateRoutes();
             result.ApiResource = code.GenerateApiResource();
             result.ListHtml = code.GenerateListHtml();
             result.ListTypeScript = code.GenerateListTypeScript();

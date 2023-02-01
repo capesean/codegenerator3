@@ -7,7 +7,7 @@ namespace WEB.Models
 {
     public partial class Code
     {
-        public string GenerateAppRouter()
+        public string GenerateRoutes()
         {
             var s = new StringBuilder();
 
@@ -35,7 +35,9 @@ namespace WEB.Models
                 s.Add($"        canActivate: [AccessGuard],");
                 s.Add($"        canActivateChild: [AccessGuard],");
                 s.Add($"        component: {entity.Name}ListComponent,");
-                s.Add($"        data: {{ breadcrumb: '{entity.PluralFriendlyName}' }}" + (editOnRoot ? "," : ""));
+                s.Add($"        data: {{");
+                s.Add($"            breadcrumb: '{entity.PluralFriendlyName}'");
+                s.Add($"        }}," + (editOnRoot ? "," : ""));
                 if (editOnRoot)
                 {
                     s.Add($"        children: [");

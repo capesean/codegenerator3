@@ -698,7 +698,7 @@ namespace WEB.Models
             {
                 var path = entity.Project.RootPathWeb + @"ClientApp\src\app\";
 
-                var code = codeGenerator.GenerateAppRouter();
+                var code = codeGenerator.GenerateRoutes();
                 if (code != string.Empty) File.WriteAllText(Path.Combine(path, "generated.routes.ts"), code);
             }
             #endregion
