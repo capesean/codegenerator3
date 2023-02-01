@@ -684,6 +684,10 @@
     <Compile Include="Migrations\202206232020324_collectionSingular.designer.cs">
       <DependentUpon>202206232020324_collectionSingular.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202302011248457_Menu.cs" />
+    <Compile Include="Migrations\202302011248457_Menu.designer.cs">
+      <DependentUpon>202302011248457_Menu.cs</DependentUpon>
+    </Compile>
     <Compile Include="Models\Relationship_.cs" />
     <Compile Include="Startup.cs" />
     <Compile Include="Utilities\ApiException.cs" />
@@ -809,6 +813,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202206232020324_collectionSingular.resx">
       <DependentUpon>202206232020324_collectionSingular.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202302011248457_Menu.resx">
+      <DependentUpon>202302011248457_Menu.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

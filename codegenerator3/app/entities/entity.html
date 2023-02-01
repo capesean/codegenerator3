@@ -116,6 +116,15 @@
                         </div>
 
                         <div class="col-sm-6 col-md-4">
+                            <div class="form-group" ng-class="{ 'has-error':  mainForm.$submitted && mainForm.menu.$invalid }">
+                                <label for="menu" class="control-label">
+                                    Menu:
+                                </label>
+                                <input type="text" id="menu" name="menu" ng-model="vm.entity.menu" maxlength="50" class="form-control" />
+                            </div>
+                        </div>
+
+                        <div class="col-sm-6 col-md-4">
                             <div class="form-group" ng-class="{ 'has-error':  mainForm.$submitted && mainForm.breadcrumb.$invalid }">
                                 <label for="breadcrumb" class="control-label">
                                     Breadcrumb:

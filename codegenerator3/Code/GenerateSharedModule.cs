@@ -16,6 +16,7 @@ namespace WEB.Models
             s.Add($"import {{ RouterModule }} from '@angular/router';");
             s.Add($"import {{ MainComponent }} from './main.component';");
             s.Add($"import {{ NavMenuComponent }} from './common/nav-menu/nav-menu.component';");
+            s.Add($"import {{ HeaderComponent }} from './common/header/header.component';");
             s.Add($"import {{ MomentPipe }} from './common/pipes/momentpipe';");
             s.Add($"import {{ BooleanPipe }} from './common/pipes/booleanpipe';");
             s.Add($"import {{ ConfirmModalComponent }} from './common/components/confirm.component';");
@@ -67,6 +68,7 @@ namespace WEB.Models
             s.Add($"        PagerComponent,");
             s.Add($"        MainComponent,");
             s.Add($"        NavMenuComponent,");
+            s.Add($"        HeaderComponent,");
             s.Add($"        MomentPipe,");
             s.Add($"        BooleanPipe,");
             s.Add($"        ConfirmModalComponent,");
@@ -79,6 +81,7 @@ namespace WEB.Models
             s.Add($"        PagerComponent,");
             s.Add($"        MainComponent,");
             s.Add($"        NavMenuComponent,");
+            s.Add($"        HeaderComponent,");
             s.Add($"        NgbModule,");
             s.Add($"        MomentPipe,");
             s.Add($"        BooleanPipe,");

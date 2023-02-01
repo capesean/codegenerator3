@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Web.UI.WebControls;
 
 namespace WEB.Models
 {
@@ -36,8 +37,10 @@ namespace WEB.Models
                 s.Add($"        canActivateChild: [AccessGuard],");
                 s.Add($"        component: {entity.Name}ListComponent,");
                 s.Add($"        data: {{");
+                if (!string.IsNullOrWhiteSpace(entity.Menu))
+                    s.Add($"            menu: '{entity.Menu}',");
                 s.Add($"            breadcrumb: '{entity.PluralFriendlyName}'");
-                s.Add($"        }}," + (editOnRoot ? "," : ""));
+                s.Add($"        }}" + (editOnRoot ? "," : ""));
                 if (editOnRoot)
                 {
                     s.Add($"        children: [");
@@ -49,6 +52,7 @@ namespace WEB.Models
                         s.Add($"                canActivate: [AccessGuard],");
                         s.Add($"                canActivateChild: [AccessGuard],");
                         s.Add($"                data: {{");
+                        s.Add($"                    menu: '{entity.Menu}',");
                         s.Add($"                    breadcrumb: 'Add {entity.FriendlyName}'");
                         s.Add($"                }}" + (childRelationships.Any() ? "," : ""));
                     }

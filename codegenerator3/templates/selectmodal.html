@@ -43,10 +43,10 @@ FIELD_LIST
     <div class="modal-footer" [ngClass]="{ 'justify-content-between': multiple }">
         <button type="button" class="btn btn-info me-2" *ngIf="multiple">{{selectedItems.length}} selected</button>
         <div>
-            <button type="button" class="btn btn-info ms-2" (click)="addNew()" target="_blank" *ngIf="showAddNew">Add New</button>
-            <button type="button" class="btn btn-outline-dark float-right ms-2" (click)="close()">{{(multiple ? "Select Checked" : "Close")}}</button>
-            <button type="button" class="btn btn-outline-dark float-right ms-2" (click)="selectAll()" *ngIf="multiple">Select All</button>
-            <button type="button" class="btn btn-secondary float-right ms-2" (click)="clear()">Clear</button>
+            <button type="button" class="btn btn-info me-2" (click)="addNew()" target="_blank" *ngIf="showAddNew">Add New</button>
+            <button type="button" class="btn btn-outline-dark float-right me-2" (click)="close()">{{(multiple ? "Select Checked" : "Close")}}</button>
+            <button type="button" class="btn btn-outline-dark float-right me-2" (click)="selectAll()" *ngIf="multiple">Select All</button>
+            <button type="button" class="btn btn-secondary float-right" (click)="clear()">Clear</button>
         </div>
     </div>
 </ng-template>
