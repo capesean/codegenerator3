@@ -17,7 +17,7 @@ namespace WEB.Models
             var t = string.Empty;
             if (hasChildRoutes)
             {
-                s.Add($"<div *ngIf=\"route.children.length === 0\">");
+                s.Add($"<ng-container *ngIf=\"route.children.length === 0\">");
                 s.Add($"");
                 t = "    ";
             }
@@ -25,13 +25,13 @@ namespace WEB.Models
             s.Add($"");
             s.Add(t + $"<form id=\"form\" name=\"form\" (submit)=\"save(form)\" novalidate #form=\"ngForm\" [ngClass]=\"{{ 'was-validated': form.submitted }}\">");
             s.Add($"");
-            s.Add(t + $"    <div class=\"card border-0\">");
+            s.Add(t + $"<div class=\"card border-0\">");
             s.Add($"");
-            s.Add(t + $"        <div class=\"card-body\">");
+            s.Add(t + $"    <div class=\"card-body\">");
             s.Add($"");
-            s.Add(t + $"            <fieldset class=\"group\">");
+            s.Add(t + $"        <fieldset class=\"group\">");
             s.Add($"");
-            s.Add(t + $"                <div class=\"row g-3\">");
+            s.Add(t + $"            <div class=\"row g-3\">");
             s.Add($"");
 
             #region form fields
@@ -202,12 +202,12 @@ namespace WEB.Models
                     }
                 }
 
-                s.Add(t + $"                    <div class=\"{controlSize}\"{ngIf}>");
-                s.Add(t + $"                        <div class=\"form-group\"{(readOnly ? "" : $" [ngClass]=\"{{ 'is-invalid': {fieldName}.invalid }}\"")}>");
+                s.Add(t + $"                <div class=\"{controlSize}\"{ngIf}>");
+                s.Add(t + $"                    <div class=\"form-group\"{(readOnly ? "" : $" [ngClass]=\"{{ 'is-invalid': {fieldName}.invalid }}\"")}>");
                 s.Add($"");
-                s.Add(t + $"                            <label for=\"{fieldName.ToCamelCase()}\">");
-                s.Add(t + $"                                {field.Label}:");
-                s.Add(t + $"                            </label>");
+                s.Add(t + $"                        <label for=\"{fieldName.ToCamelCase()}\">");
+                s.Add(t + $"                            {field.Label}:");
+                s.Add(t + $"                        </label>");
                 s.Add($"");
 
                 var controlHtml = $"<{tagType}";
@@ -230,37 +230,37 @@ namespace WEB.Models
 
                 if (attributes.ContainsKey("type") && attributes["type"] == "checkbox")
                 {
-                    s.Add(t + $"                            <div class=\"form-check\">");
-                    s.Add(t + $"                                {controlHtml}");
-                    s.Add(t + $"                                <label class=\"form-check-label\" for=\"{field.Name.ToCamelCase()}\">");
-                    s.Add(t + $"                                    {field.Label}");
-                    s.Add(t + $"                                </label>");
-                    s.Add(t + $"                            </div>");
+                    s.Add(t + $"                        <div class=\"form-check\">");
+                    s.Add(t + $"                            {controlHtml}");
+                    s.Add(t + $"                            <label class=\"form-check-label\" for=\"{field.Name.ToCamelCase()}\">");
+                    s.Add(t + $"                                {field.Label}");
+                    s.Add(t + $"                            </label>");
+                    s.Add(t + $"                        </div>");
                 }
                 else if (field.CustomType == CustomType.Date && !readOnly)
                 {
-                    s.Add(t + $"                            <div class=\"input-group\">");
-                    s.Add(t + $"                                {controlHtml}");
-                    s.Add(t + $"                                <button class=\"btn btn-secondary calendar\" (click)=\"dp{field.Name}.toggle()\" type=\"button\"><i class=\"fas fa-calendar-alt\"></i></button>");
-                    s.Add(t + $"                            </div>");
+                    s.Add(t + $"                        <div class=\"input-group\">");
+                    s.Add(t + $"                            {controlHtml}");
+                    s.Add(t + $"                            <button class=\"btn btn-secondary calendar\" (click)=\"dp{field.Name}.toggle()\" type=\"button\"><i class=\"fas fa-calendar-alt\"></i></button>");
+                    s.Add(t + $"                        </div>");
                 }
                 else if (field.FieldType == FieldType.VarBinary && field.EditPageType == EditPageType.FileContents)
                 {
                     var fileNameField = CurrentEntity.Fields.FirstOrDefault(o => o.EditPageType == EditPageType.FileName);
                     if (fileNameField == null) throw new Exception(CurrentEntity.Name + ": FileContents field doesn't have a matching FileName field");
 
-                    s.Add(t + $"                            <div class=\"input-group\">");
-                    s.Add(t + $"                                <div class=\"input-group-prepend\" *ngIf=\"!isNew\">");
-                    s.Add(t + $"                                    <button type=\"button\" class=\"btn btn-primary\" (click)=\"download()\"><i class=\"fa fa-fw fa-cloud-download-alt\"></i></button>");
-                    s.Add(t + $"                                </div>");
-                    s.Add(t + $"                                <div class=\"custom-file\">");
-                    s.Add(t + $"                                    {controlHtml}");
-                    s.Add(t + $"                                    <label class=\"custom-file-label\" for=\"{field.Name.ToCamelCase()}\">{{{{{CurrentEntity.Name.ToCamelCase()}.{fileNameField.Name.ToCamelCase()} || \"Choose file\"}}}}</label>");
-                    s.Add(t + $"                                </div>");
+                    s.Add(t + $"                        <div class=\"input-group\">");
+                    s.Add(t + $"                            <div class=\"input-group-prepend\" *ngIf=\"!isNew\">");
+                    s.Add(t + $"                                <button type=\"button\" class=\"btn btn-outline-primary\" (click)=\"download()\"><i class=\"fa fa-fw fa-cloud-download-alt\"></i></button>");
                     s.Add(t + $"                            </div>");
+                    s.Add(t + $"                            <div class=\"custom-file\">");
+                    s.Add(t + $"                                {controlHtml}");
+                    s.Add(t + $"                                <label class=\"custom-file-label\" for=\"{field.Name.ToCamelCase()}\">{{{{{CurrentEntity.Name.ToCamelCase()}.{fileNameField.Name.ToCamelCase()} || \"Choose file\"}}}}</label>");
+                    s.Add(t + $"                            </div>");
+                    s.Add(t + $"                        </div>");
                 }
                 else
-                    s.Add(t + $"                            {controlHtml}");
+                    s.Add(t + $"                        {controlHtml}");
 
 
                 s.Add($"");
@@ -282,15 +282,15 @@ namespace WEB.Models
 
                     foreach (var validationError in validationErrors)
                     {
-                        s.Add(t + $"                            <div *ngIf=\"{fieldName}.errors?.{validationError.Key}\" class=\"invalid-feedback\">");
-                        s.Add(t + $"                                {validationError.Value}");
-                        s.Add(t + $"                            </div>");
+                        s.Add(t + $"                        <div *ngIf=\"{fieldName}.errors?.{validationError.Key}\" class=\"invalid-feedback\">");
+                        s.Add(t + $"                            {validationError.Value}");
+                        s.Add(t + $"                        </div>");
                         s.Add($"");
                     }
                 }
 
-                s.Add(t + $"                        </div>");
                 s.Add(t + $"                    </div>");
+                s.Add(t + $"                </div>");
                 s.Add($"");
 
             }
@@ -298,35 +298,35 @@ namespace WEB.Models
 
             if (CurrentEntity.EntityType == EntityType.User)
             {
-                s.Add(t + $"                    <div class=\"col-sm-6 col-md-4\">");
-                s.Add(t + $"                        <div class=\"form-group\">");
+                s.Add(t + $"                <div class=\"col-sm-6 col-md-4\">");
+                s.Add(t + $"                    <div class=\"form-group\">");
                 s.Add($"");
-                s.Add(t + $"                            <label>");
-                s.Add(t + $"                                Roles:");
-                s.Add(t + $"                            </label>");
+                s.Add(t + $"                        <label>");
+                s.Add(t + $"                            Roles:");
+                s.Add(t + $"                        </label>");
                 s.Add($"");
-                s.Add(t + $"                            <select id=\"roles\" name=\"roles\" [multiple]=\"true\" class=\"form-control\" [(ngModel)]=\"user.roles\">");
-                s.Add(t + $"                                <option *ngFor=\"let role of roles\" [ngValue]=\"role.name\">{{{{role.label}}}}</option>");
-                s.Add(t + $"                            </select>");
+                s.Add(t + $"                        <select id=\"roles\" name=\"roles\" [multiple]=\"true\" class=\"form-control\" [(ngModel)]=\"user.roles\">");
+                s.Add(t + $"                            <option *ngFor=\"let role of roles\" [ngValue]=\"role.name\">{{{{role.label}}}}</option>");
+                s.Add(t + $"                        </select>");
                 s.Add($"");
-                s.Add(t + $"                        </div>");
                 s.Add(t + $"                    </div>");
+                s.Add(t + $"                </div>");
                 s.Add($"");
             }
 
-            s.Add(t + $"                </div>");
+            s.Add(t + $"            </div>");
             s.Add($"");
-            s.Add(t + $"            </fieldset>");
-            s.Add($"");
-            s.Add(t + $"        </div>");
+            s.Add(t + $"        </fieldset>");
             s.Add($"");
             s.Add(t + $"    </div>");
             s.Add($"");
+            s.Add(t + $"</div>");
+            s.Add($"");
 
-            s.Add(t + $"    <fieldset class=\"my-3\">");
-            s.Add(t + $"        <button type=\"submit\" class=\"btn btn-success me-2 mb-1\">Save<i class=\"fas fa-check ms-1\"></i></button>");
-            s.Add(t + $"        <button type=\"button\" *ngIf=\"!isNew\" class=\"btn btn-outline-danger me-2 mb-1\" (click)=\"delete()\">Delete<i class=\"fas fa-times ms-1\"></i></button>");
-            s.Add(t + $"    </fieldset>");
+            s.Add(t + $"<fieldset class=\"my-3\">");
+            s.Add(t + $"    <button type=\"submit\" class=\"btn btn-outline-primary me-2 mb-1\">Save<i class=\"fas fa-check ms-2\"></i></button>");
+            s.Add(t + $"    <button type=\"button\" *ngIf=\"!isNew\" class=\"btn btn-outline-danger me-2 mb-1\" (click)=\"delete()\">Delete<i class=\"fas fa-times ms-2\"></i></button>");
+            s.Add(t + $"</fieldset>");
             s.Add($"");
             s.Add(t + $"</form>");
 
@@ -337,21 +337,35 @@ namespace WEB.Models
                 var counter = 0;
 
                 s.Add($"");
-                s.Add(t + $"<div *ngIf=\"!isNew\">");
+                s.Add(t + $"<ng-container *ngIf=\"!isNew\">");
                 s.Add($"");
-                s.Add(t + $"            <hr />");
+                s.Add(t + $"    <hr />");
                 s.Add($"");
-                s.Add(t + $"            <nav ngbNav #nav=\"ngbNav\" class=\"nav-tabs\">");
+                s.Add(t + $"    <nav ngbNav #nav=\"ngbNav\" class=\"nav-tabs\">");
                 s.Add($"");
                 foreach (var relationship in relationships)
                 {
                     counter++;
 
-                    s.Add(t + $"                <ng-container ngbNavItem>");
+                    s.Add(t + $"        <ng-container ngbNavItem class=\"pt-6\">");
                     s.Add($"");
-                    s.Add(t + $"                    <a ngbNavLink>{relationship.CollectionFriendlyName}</a>");
+                    s.Add(t + $"            <a ngbNavLink>{relationship.CollectionFriendlyName}</a>");
                     s.Add($"");
-                    s.Add(t + $"                    <ng-template ngbNavContent>");
+                    s.Add(t + $"            <ng-template ngbNavContent>");
+                    s.Add($"");
+                    s.Add(t + $"                <div class=\"card border-0 search-results\">");
+                    s.Add($"");
+                    s.Add(t + $"                    <div class=\"card-header border-0\">");
+                    s.Add($"");
+                    s.Add(t + $"                        <h4 class=\"card-header-title text-uppercase\">");
+                    s.Add(t + $"                            {relationship.CollectionFriendlyName}");
+                    s.Add(t + $"                        </h4>");
+                    s.Add($"");
+                    s.Add(t + $"                    </div>");
+                    s.Add($"");
+                    s.Add(t + $"                    <div class=\"card-body\">");
+                    s.Add($"");
+                    s.Add(t + $"                        search functions here...");
                     s.Add($"");
 
 
@@ -359,25 +373,29 @@ namespace WEB.Models
 
                     if (relationship.UseMultiSelect)
                     {
-                        s.Add(t + $"                        <div class=\"mb-3\">");
-                        s.Add(t + $"                            <button class=\"btn btn-primary me-2 mb-1\" (click)=\"add{relationship.CollectionName}()\">Add {relationship.CollectionFriendlyName}<i class=\"fas fa-plus-circle ms-1\"></i></button>");
-                        s.Add(t + $"                        </div>");
+                        s.Add(t + $"                    <div class=\"mb-3\">");
+                        s.Add(t + $"                        <button class=\"btn btn-outline-success me-2 mb-1\" (click)=\"add{relationship.CollectionName}()\">Add {relationship.CollectionFriendlyName}<i class=\"fas fa-plus ms-2\"></i></button>");
+                        s.Add(t + $"                    </div>");
                         s.Add($"");
                     }
                     else if (relationship.Hierarchy)
                     {
                         // trying to get this to work for instances like African POT Project->Team hierarchy, where I only want 1 add for the userId
                         s.Add(t + $"                        <div class=\"mb-3\">");
-                        s.Add(t + $"                            <a [routerLink]=\"['./{childEntity.PluralName.ToLower()}', 'add']\" class=\"btn btn-primary me-2 mb-1\">Add {childEntity.FriendlyName}<i class=\"fas fa-plus-circle ms-1\"></i></a>");
+                        s.Add(t + $"                            <a [routerLink]=\"['./{childEntity.PluralName.ToLower()}', 'add']\" class=\"btn btn-outline-success me-2 mb-1\">Add {childEntity.FriendlyName}<i class=\"fas fa-plus ms-2\"></i></a>");
                         if (childEntity.HasASortField)
-                            s.Add(t + $"                            <button type=\"button\" class=\"btn btn-outline-secondary me-2 mb-1\" (click)=\"show{childEntity.Name}Sort()\" *ngIf=\"{childEntity.PluralName.ToCamelCase()}Headers.totalRecords > 1\">Sort {childEntity.PluralFriendlyName}<i class=\"fas fa-sort ms-1\"></i></button>");
+                            s.Add(t + $"                            <button type=\"button\" class=\"btn btn-outline-secondary me-2 mb-1\" (click)=\"show{childEntity.Name}Sort()\" *ngIf=\"{childEntity.PluralName.ToCamelCase()}Headers.totalRecords > 1\">Sort {childEntity.PluralFriendlyName}<i class=\"fas fa-sort ms-2\"></i></button>");
                         s.Add(t + $"                        </div>");
                         s.Add($"");
                     }
+                    s.Add(t + $"                    </div>");
+                    s.Add($"");
 
                     #region table
-                    s.Add(t + $"                        <table class=\"table table-striped table-hover table-sm row-navigation\">");
-                    s.Add(t + $"                            <thead>");
+                    s.Add(t + $"                    <div class=\"table-responsive\">");
+                    s.Add($"");
+                    s.Add(t + $"                        <table class=\"table table-hover table-edge table-nowrap mb-0 align-middle\">");
+                    s.Add(t + $"                            <thead class=\"thead-light\">");
                     s.Add(t + $"                                <tr>");
                     if (relationship.UseMultiSelect)
                     {
@@ -392,10 +410,10 @@ namespace WEB.Models
                             s.Add(t + $"                                    <th>{column.Header}</th>");
                         }
                     }
-                    s.Add(t + $"                                    <th class=\"fa-col-width text-center\"><i class=\"fas fa-times text-danger clickable\" (click)=\"delete{relationship.CollectionName}()\" ngbTooltip=\"Delete all {relationship.CollectionFriendlyName.ToLower()}\" container=\"body\" placement=\"left\"></i></th>");
+                    s.Add(t + $"                                    <th class=\"w-20px text-center\"><i class=\"fas fa-times text-danger clickable\" (click)=\"delete{relationship.CollectionName}()\" ngbTooltip=\"Delete all {relationship.CollectionFriendlyName.ToLower()}\" container=\"body\" placement=\"left\"></i></th>");
                     s.Add(t + $"                                </tr>");
                     s.Add(t + $"                            </thead>");
-                    s.Add(t + $"                            <tbody>");
+                    s.Add(t + $"                            <tbody class=\"list cursor-pointer\">");
                     s.Add(t + $"                                <tr *ngFor=\"let {childEntity.Name.ToCamelCase()} of {relationship.CollectionName.ToCamelCase()}\" (click)=\"goTo{relationship.CollectionSingular}({childEntity.Name.ToCamelCase()})\">");
                     // this was added for TrainTrack entityLinks; not sure how it will affect other projects!
                     if (relationship.UseMultiSelect)
@@ -416,27 +434,36 @@ namespace WEB.Models
                     s.Add(t + $"                            </tbody>");
                     s.Add(t + $"                        </table>");
                     s.Add($"");
+
+                    s.Add(t + $"                    </div>");
+                    s.Add($"");
+
+                    s.Add(t + $"                    <div class=\"card-footer\">");
                     s.Add(t + $"                        <pager [headers]=\"{relationship.CollectionName.ToCamelCase()}Headers\" (pageChanged)=\"load{relationship.CollectionName}($event)\"></pager>");
+                    s.Add(t + $"                    </div>");
+                    s.Add($"");
+
+                    s.Add(t + $"                </div>");
                     s.Add($"");
                     #endregion
 
-                    s.Add(t + $"                    </ng-template>");
+                    s.Add(t + $"            </ng-template>");
                     s.Add($"");
-                    s.Add(t + $"                </ng-container>");
+                    s.Add(t + $"        </ng-container>");
                     s.Add($"");
                 }
-                s.Add(t + $"            </nav>");
+                s.Add(t + $"    </nav>");
                 s.Add($"");
-                s.Add(t + $"            <div [ngbNavOutlet]=\"nav\" class=\"mt-1\"></div>");
+                s.Add(t + $"    <div [ngbNavOutlet]=\"nav\" class=\"mt-1\"></div>");
                 s.Add($"");
-                s.Add(t + $"</div>");
+                s.Add(t + $"</ng-container>");
             }
             #endregion
 
             if (hasChildRoutes)
             {
                 s.Add($"");
-                s.Add($"</div>");
+                s.Add($"</ng-container>");
             }
 
             foreach (var rel in CurrentEntity.RelationshipsAsParent.Where(o => o.UseMultiSelect && !o.ChildEntity.Exclude))
