@@ -30,9 +30,10 @@ namespace WEB.Models
             {
                 foreach (var field in hierarchyRel.ParentEntity.KeyFields)
                 {
-                    PARENTPKFIELDS += $"    public {field.Name.ToCamelCase()}: string;{Environment.NewLine}";
-                    SEARCH_PARAMS += $"{field.Name.ToCamelCase()}: this.{field.Name.ToCamelCase()}";
-                    HIERARCHYFIELDS += $"this.{field.Name.ToCamelCase()}, ";
+                    var childField = hierarchyRel.RelationshipFields.Single(o => o.ParentFieldId == field.FieldId).ChildField;
+                    PARENTPKFIELDS += $"    public {childField.Name.ToCamelCase()}: string;{Environment.NewLine}";
+                    SEARCH_PARAMS += $"{childField.Name.ToCamelCase()}: this.{childField.Name.ToCamelCase()}";
+                    HIERARCHYFIELDS += $"this.{childField.Name.ToCamelCase()}, ";
                 }
                 SEARCH_PARAMS += ", ";
             }
