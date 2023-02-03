@@ -139,7 +139,7 @@ namespace WEB.Models
         //    return RunCodeReplacements(s.ToString(), CodeType.SettingsDTO);
         //}
 
-        private void WriteChildRoutes(IEnumerable<Relationship> relationships, StringBuilder s, int level)
+        private void WriteChildRoutes(IEnumerable<Relationship> relationships, StringBuilder s, int level, string menu)
         {
             if (!relationships.Any()) return;
             var tabs = String.Concat(Enumerable.Repeat("        ", level));
@@ -157,11 +157,13 @@ namespace WEB.Models
                 s.Add(tabs + $"                        canActivate: [AccessGuard],");
                 s.Add(tabs + $"                        canActivateChild: [AccessGuard],");
                 s.Add(tabs + $"                        data: {{");
+                if (!string.IsNullOrWhiteSpace(menu))
+                    s.Add($"                            menu: '{menu}',");
                 s.Add(tabs + $"                            breadcrumb: 'Add {entity.FriendlyName}'");
                 s.Add(tabs + $"                        }}" + (childRelationships.Any() ? "," : ""));
                 if (childRelationships.Any())
                 {
-                    WriteChildRoutes(childRelationships, s, level + 1);
+                    WriteChildRoutes(childRelationships, s, level + 1, menu);
                 }
                 s.Add(tabs + $"                    }}" + (relationship == relationships.OrderBy(o => o.ChildEntity.Name).Last() ? "" : ","));
             }
@@ -292,7 +294,7 @@ namespace WEB.Models
                 .Replace("KEYFIELDTYPE", CurrentEntity.KeyFields.First().JavascriptType)
                 .Replace("KEYFIELD", CurrentEntity.KeyFields.First().Name.ToCamelCase())
                 .Replace("NAME", CurrentEntity.Name)
-                .Replace("STARTSWITHVOWEL", new Regex("^[aeiou]").IsMatch(CurrentEntity.Name.ToLower()) ? "n" : "")
+                .Replace("STARTSWITHVOWEL", new Regex("^[aeiou]").IsMatch(CurrentEntity.Name.ToLower()) && CurrentEntity.Name != "User" ? "n" : "")
                 .Replace("ICONLINK", GetIconLink(CurrentEntity))
                 .Replace("ADDNEWURL", "/" + CurrentEntity.PluralName.ToLower() + "/add")
                 .Replace("// <reference", "/// <reference");

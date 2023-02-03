@@ -41,7 +41,7 @@ namespace WEB.Models
             if (relationshipsAsParent.Any())
                 s.Add($"import {{ Subject{(hasChildRoutes || CurrentEntity.EntityType == EntityType.User ? ", Subscription" : "")} }} from 'rxjs';");
             s.Add($"import {{ HttpErrorResponse }} from '@angular/common/http';");
-            s.Add($"import {{ BreadcrumbService }} from 'angular-crumbs-2';");
+            s.Add($"import {{ BreadcrumbService }} from '../common/services/breadcrumb.service';");
             s.Add($"import {{ ErrorService }} from '../common/services/error.service';");
             s.Add($"import {{ NgbModal }} from '@ng-bootstrap/ng-bootstrap';");
             s.Add($"import {{ ConfirmModalComponent, ModalOptions }} from '../common/components/confirm.component';");
@@ -465,7 +465,10 @@ namespace WEB.Models
                 s.Add($"    show{relationship.ChildEntity.Name}Sort() {{");
                 s.Add($"        let modalRef = this.modalService.open({relationship.ChildEntity.Name}SortComponent, {{ size: 'xl', centered: true, scrollable: false }});");
                 foreach (var field in relationship.ParentEntity.KeyFields)
-                    s.Add($"        (modalRef.componentInstance as {relationship.ChildEntity.Name}SortComponent).{field.Name.ToCamelCase()} = this.{CurrentEntity.Name.ToCamelCase()}.{field.Name.ToCamelCase()};");
+                {
+                    var childField = relationship.RelationshipFields.Single(o => o.ParentFieldId == field.FieldId).ChildField;
+                    s.Add($"        (modalRef.componentInstance as {relationship.ChildEntity.Name}SortComponent).{childField.Name.ToCamelCase()} = this.{CurrentEntity.Name.ToCamelCase()}.{field.Name.ToCamelCase()};");
+                }
                 s.Add($"        modalRef.result.then(");
                 s.Add($"            () => this.load{relationship.CollectionName}(this.{relationship.CollectionName.ToCamelCase()}Headers.pageIndex),");
                 s.Add($"            () => {{ }}");

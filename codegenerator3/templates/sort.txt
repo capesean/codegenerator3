@@ -4,7 +4,7 @@ import { NAMESearchOptions, NAMESearchResponse, NAME } from '../common/models/NA
 import { NAMEService } from '../common/services/NAME_TOLOWER.service';
 import { PagingHeaders } from '../common/models/http.model';
 import { ErrorService } from '../common/services/error.service';
-import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
+import { CdkDragDrop, CdkDragStart, moveItemInArray } from '@angular/cdk/drag-drop';
 import { ToastrService } from 'ngx-toastr';
 ENUM_IMPORTS
 @Component({
@@ -14,6 +14,7 @@ ENUM_IMPORTS
 export class NAMESortComponent implements OnInit {
 
     public headers: PagingHeaders = new PagingHeaders();
+    private bodyElement: HTMLElement = document.body;
     public PLURALNAME_TOCAMELCASE: NAME[];
 ENUM_PROPERTIESPARENTPKFIELDS
     constructor(
@@ -32,7 +33,14 @@ ENUM_PROPERTIESPARENTPKFIELDS
             );
     }
 
+    dragStart(event: CdkDragStart) {
+        this.bodyElement.classList.add('inheritCursors');
+        this.bodyElement.style.cursor = 'grabbing';
+    }
+
     drop(event: CdkDragDrop<NAME[]>) {
+        this.bodyElement.classList.remove('inheritCursors');
+        this.bodyElement.style.cursor = 'unset';
         moveItemInArray(this.PLURALNAME_TOCAMELCASE, event.previousIndex, event.currentIndex);
     }
 

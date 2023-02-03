@@ -44,19 +44,16 @@ namespace WEB.Models
                 if (editOnRoot)
                 {
                     s.Add($"        children: [");
-                    if (editOnRoot)
-                    {
-                        s.Add($"            {{");
-                        s.Add($"                path: '{entity.KeyFields.Select(o => ":" + o.Name.ToCamelCase()).Aggregate((current, next) => { return current + "/" + next; })}',");
-                        s.Add($"                component: {entity.Name}EditComponent,");
-                        s.Add($"                canActivate: [AccessGuard],");
-                        s.Add($"                canActivateChild: [AccessGuard],");
-                        s.Add($"                data: {{");
-                        s.Add($"                    menu: '{entity.Menu}',");
-                        s.Add($"                    breadcrumb: 'Add {entity.FriendlyName}'");
-                        s.Add($"                }}" + (childRelationships.Any() ? "," : ""));
-                    }
-                    WriteChildRoutes(childRelationships, s, 0);
+                    s.Add($"            {{");
+                    s.Add($"                path: '{entity.KeyFields.Select(o => ":" + o.Name.ToCamelCase()).Aggregate((current, next) => { return current + "/" + next; })}',");
+                    s.Add($"                component: {entity.Name}EditComponent,");
+                    s.Add($"                canActivate: [AccessGuard],");
+                    s.Add($"                canActivateChild: [AccessGuard],");
+                    s.Add($"                data: {{");
+                    s.Add($"                    menu: '{entity.Menu}',");
+                    s.Add($"                    breadcrumb: 'Add {entity.FriendlyName}'");
+                    s.Add($"                }}" + (childRelationships.Any() ? "," : ""));
+                    WriteChildRoutes(childRelationships, s, 0, entity.Menu);
                     s.Add($"            }}");
                     s.Add($"        ]");
                 }

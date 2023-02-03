@@ -21,7 +21,7 @@ namespace WEB.Models
                 s.Add($"");
                 t = "    ";
             }
-            s.Add(t + $"<h2>{CurrentEntity.FriendlyName}</h2>");
+            s.Add(t + $"<app-page-title title='{CurrentEntity.FriendlyName}'></app-page-title>");
             s.Add($"");
             s.Add(t + $"<form id=\"form\" name=\"form\" (submit)=\"save(form)\" novalidate #form=\"ngForm\" [ngClass]=\"{{ 'was-validated': form.submitted }}\">");
             s.Add($"");
@@ -410,7 +410,7 @@ namespace WEB.Models
                             s.Add(t + $"                                    <th>{column.Header}</th>");
                         }
                     }
-                    s.Add(t + $"                                    <th class=\"w-20px text-center\"><i class=\"fas fa-times text-danger clickable\" (click)=\"delete{relationship.CollectionName}()\" ngbTooltip=\"Delete all {relationship.CollectionFriendlyName.ToLower()}\" container=\"body\" placement=\"left\"></i></th>");
+                    s.Add(t + $"                                    <th class=\"w-20px text-center\"><i class=\"fas fa-times text-danger cursor-pointer\" (click)=\"delete{relationship.CollectionName}()\" ngbTooltip=\"Delete all {relationship.CollectionFriendlyName.ToLower()}\" container=\"body\" placement=\"left\"></i></th>");
                     s.Add(t + $"                                </tr>");
                     s.Add(t + $"                            </thead>");
                     s.Add(t + $"                            <tbody class=\"list cursor-pointer\">");
@@ -429,7 +429,7 @@ namespace WEB.Models
                             s.Add(t + $"                                    <td>{column.Value}</td>");
                         }
                     }
-                    s.Add(t + $"                                    <td class=\"text-center\"><i class=\"fas fa-times clickable p-1 text-danger\" (click)=\"delete{relationship.CollectionSingular}({relationship.ChildEntity.Name.ToCamelCase()}, $event)\"></i></td>");
+                    s.Add(t + $"                                    <td class=\"text-center\"><i class=\"fas fa-times cursor-pointer p-1 text-danger\" (click)=\"delete{relationship.CollectionSingular}({relationship.ChildEntity.Name.ToCamelCase()}, $event)\"></i></td>");
                     s.Add(t + $"                                </tr>");
                     s.Add(t + $"                            </tbody>");
                     s.Add(t + $"                        </table>");
