@@ -346,6 +346,7 @@ namespace WEB.Models
                 foreach (var relationship in relationships)
                 {
                     counter++;
+                    var entity = relationship.ChildEntity;
 
                     s.Add(t + $"        <ng-container ngbNavItem class=\"pt-6\">");
                     s.Add($"");
@@ -365,9 +366,25 @@ namespace WEB.Models
                     s.Add($"");
                     s.Add(t + $"                    <div class=\"card-body\">");
                     s.Add($"");
-                    s.Add(t + $"                        search functions here...");
+                    s.Add(t + $"                        <form id=\"formSearch{relationship.CollectionName}\" (submit)=\"search{relationship.CollectionName}(0)\" novalidate *ngIf=\"show{relationship.CollectionName}Search\" class=\"mb-5\">");
+                    s.Add($"");
+                    s.Add(t + $"                            <div class=\"row g-3\">");
                     s.Add($"");
 
+                    if (entity.Fields.Any(f => f.SearchType == SearchType.Text))
+                    {
+                        s.Add(t + $"                                <div class=\"col-sm-6 col-md-5 col-lg-4 col-xl-3\">");
+                        s.Add(t + $"                                    <div class=\"form-group\">");
+                        s.Add(t + $"                                        <input type=\"search\" name=\"q\" id=\"q\" [(ngModel)]=\"{relationship.CollectionName.ToCamelCase()}SearchOptions.q\" max=\"100\" class=\"form-control\" placeholder=\"Search {relationship.CollectionFriendlyName.ToLower()}\" />");
+                        s.Add(t + $"                                    </div>");
+                        s.Add(t + $"                                </div>");
+                        s.Add($"");
+                    }
+
+                    s.Add(t + $"                            </div>");
+                    s.Add($"");
+                    s.Add(t + $"                        </form>");
+                    s.Add($"");
 
                     var childEntity = relationship.ChildEntity;
 
@@ -382,9 +399,11 @@ namespace WEB.Models
                     {
                         // trying to get this to work for instances like African POT Project->Team hierarchy, where I only want 1 add for the userId
                         s.Add(t + $"                        <div class=\"mb-3\">");
-                        s.Add(t + $"                            <a [routerLink]=\"['./{childEntity.PluralName.ToLower()}', 'add']\" class=\"btn btn-outline-success me-2 mb-1\">Add {childEntity.FriendlyName}<i class=\"fas fa-plus ms-2\"></i></a>");
+                        s.Add(t + $"                            <a [routerLink]=\"['./{childEntity.PluralName.ToLower()}', 'add']\" class=\"btn btn-outline-success me-2 mb-1\">Add<i class=\"fas fa-plus ms-2\"></i></a>");
+                        s.Add(t + $"                            <button *ngIf=\"!show{relationship.CollectionName}Search\" type=\"button\" class=\"btn btn-outline-secondary me-2 mb-1\" (click)=\"show{relationship.CollectionName}Search=true\">Filter<i class=\"fas fa-filter ms-2\"></i></button>");
+                        s.Add(t + $"                            <button *ngIf=\"show{relationship.CollectionName}Search\" form=\"form{relationship.CollectionName}\" type=\"submit\" class=\"btn btn-outline-primary me-2 mb-1\">Search<i class=\"fas fa-search ms-2\"></i></button>");
                         if (childEntity.HasASortField)
-                            s.Add(t + $"                            <button type=\"button\" class=\"btn btn-outline-secondary me-2 mb-1\" (click)=\"show{childEntity.Name}Sort()\" *ngIf=\"{childEntity.PluralName.ToCamelCase()}Headers.totalRecords > 1\">Sort {childEntity.PluralFriendlyName}<i class=\"fas fa-sort ms-2\"></i></button>");
+                            s.Add(t + $"                            <button type=\"button\" class=\"btn btn-outline-secondary me-2 mb-1\" (click)=\"show{childEntity.Name}Sort()\" *ngIf=\"{childEntity.PluralName.ToCamelCase()}Headers.totalRecords > 1 && !show{relationship.CollectionName}Search\">Sort<i class=\"fas fa-sort ms-2\"></i></button>");
                         s.Add(t + $"                        </div>");
                         s.Add($"");
                     }
@@ -439,7 +458,7 @@ namespace WEB.Models
                     s.Add($"");
 
                     s.Add(t + $"                    <div class=\"card-footer\">");
-                    s.Add(t + $"                        <pager [headers]=\"{relationship.CollectionName.ToCamelCase()}Headers\" (pageChanged)=\"load{relationship.CollectionName}($event)\"></pager>");
+                    s.Add(t + $"                        <pager [headers]=\"{relationship.CollectionName.ToCamelCase()}Headers\" (pageChanged)=\"search{relationship.CollectionName}($event)\"></pager>");
                     s.Add(t + $"                    </div>");
                     s.Add($"");
 

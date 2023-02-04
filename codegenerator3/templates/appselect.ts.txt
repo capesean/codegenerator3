@@ -72,7 +72,9 @@ export class NAMESelectComponent implements OnInit, ControlValueAccessor {
         return this.multiple ? this.PLURALNAME_TOCAMELCASE.map(CAMELCASENAME => LABEL_OUTPUT_MULTI).join(", ") : LABEL_OUTPUT_SINGLE ?? "";
     }
 
-    openModal() {
-        if (!this.disabled) this.modal.open();
+    click(button = false) {
+        if (this.disabled) return;
+        if (button && this.CAMELCASENAME || this.PLURALNAME_TOCAMELCASE) this.CAMELCASENAME = this.PLURALNAME_TOCAMELCASE = null;
+        else this.modal.open();
     }
 }

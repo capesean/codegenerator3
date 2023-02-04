@@ -108,9 +108,10 @@ namespace WEB.Models
             s.Add($"");
             foreach (var rel in relationshipsAsParent)
             {
-                s.Add($"    private {rel.CollectionName.ToCamelCase()}SearchOptions = new {rel.ChildEntity.Name}SearchOptions();");
+                s.Add($"    public {rel.CollectionName.ToCamelCase()}SearchOptions = new {rel.ChildEntity.Name}SearchOptions();");
                 s.Add($"    public {rel.CollectionName.ToCamelCase()}Headers = new PagingHeaders();");
                 s.Add($"    public {rel.CollectionName.ToCamelCase()}: {rel.ChildEntity.Name}[] = [];");
+                s.Add($"    public show{rel.CollectionName}Search = false;");
                 s.Add($"");
             }
             processedEntityIds.Clear();
@@ -189,7 +190,7 @@ namespace WEB.Models
                 foreach (var relField in rel.RelationshipFields)
                     s.Add($"                this.{rel.CollectionName.ToCamelCase()}SearchOptions.{relField.ChildField.Name.ToCamelCase()} = {relField.ParentField.Name.ToCamelCase()};");
                 s.Add($"                this.{rel.CollectionName.ToCamelCase()}SearchOptions.includeParents = true;");
-                s.Add($"                this.load{rel.CollectionName}();");
+                s.Add($"                this.search{rel.CollectionName}();");
                 s.Add($"");
             }
 
@@ -205,7 +206,7 @@ namespace WEB.Models
                 s.Add($"                    // this will double-load on new save, as params change (above) + nav ends");
                 foreach (var rel in relationshipsAsParent.Where(o => o.Hierarchy))
                 {
-                    s.Add($"                    this.load{rel.CollectionName}();");
+                    s.Add($"                    this.search{rel.CollectionName}();");
                 }
                 s.Add($"                }}");
                 s.Add($"            }});");
@@ -359,7 +360,7 @@ namespace WEB.Models
             {
                 if (!rel.DisplayListOnParent && !rel.Hierarchy) continue;
 
-                s.Add($"    load{rel.CollectionName}(pageIndex = 0): Subject<{rel.ChildEntity.Name}SearchResponse> {{");
+                s.Add($"    search{rel.CollectionName}(pageIndex = 0): Subject<{rel.ChildEntity.Name}SearchResponse> {{");
                 s.Add($"");
 
                 s.Add($"        this.{rel.CollectionName.ToCamelCase()}SearchOptions.pageIndex = pageIndex;");
@@ -405,9 +406,9 @@ namespace WEB.Models
                     s.Add($"                () => {{");
                     s.Add($"                    this.toastr.success(\"The {rel.ChildEntity.PluralFriendlyName.ToLower()} have been saved\", \"Save {rel.ChildEntity.PluralFriendlyName}\");");
                     if (rel.ChildEntity.HasASortField)
-                        s.Add($"                    this.load{rel.CollectionName}();");
+                        s.Add($"                    this.search{rel.CollectionName}();");
                     else
-                        s.Add($"                    this.load{rel.CollectionName}(this.{rel.CollectionName.ToCamelCase()}Headers.pageIndex);");
+                        s.Add($"                    this.search{rel.CollectionName}(this.{rel.CollectionName.ToCamelCase()}Headers.pageIndex);");
                     s.Add($"                }},");
                     s.Add($"                err => {{");
                     s.Add($"                    this.errorService.handleError(err, \"{rel.ChildEntity.PluralFriendlyName}\", \"Save\");");
@@ -428,7 +429,7 @@ namespace WEB.Models
                 s.Add($"                    .subscribe(");
                 s.Add($"                        () => {{");
                 s.Add($"                            this.toastr.success(\"The {rel.ChildEntity.FriendlyName.ToLower()} has been deleted\", \"Delete {rel.ChildEntity.FriendlyName}\");");
-                s.Add($"                            this.load{rel.CollectionName}(this.{rel.CollectionName.ToCamelCase()}Headers.pageIndex);");
+                s.Add($"                            this.search{rel.CollectionName}(this.{rel.CollectionName.ToCamelCase()}Headers.pageIndex);");
                 s.Add($"                        }},");
                 s.Add($"                        err => {{");
                 s.Add($"                            this.errorService.handleError(err, \"{rel.ChildEntity.FriendlyName}\", \"Delete\");");
@@ -448,7 +449,7 @@ namespace WEB.Models
                 s.Add($"                    .subscribe(");
                 s.Add($"                        () => {{");
                 s.Add($"                            this.toastr.success(\"The {rel.CollectionFriendlyName.ToLower()} have been deleted\", \"Delete {rel.CollectionFriendlyName}\");");
-                s.Add($"                            this.load{rel.CollectionName}();");
+                s.Add($"                            this.search{rel.CollectionName}();");
                 s.Add($"                        }},");
                 s.Add($"                        err => {{");
                 s.Add($"                            this.errorService.handleError(err, \"{rel.CollectionFriendlyName}\", \"Delete\");");
@@ -470,7 +471,7 @@ namespace WEB.Models
                     s.Add($"        (modalRef.componentInstance as {relationship.ChildEntity.Name}SortComponent).{childField.Name.ToCamelCase()} = this.{CurrentEntity.Name.ToCamelCase()}.{field.Name.ToCamelCase()};");
                 }
                 s.Add($"        modalRef.result.then(");
-                s.Add($"            () => this.load{relationship.CollectionName}(this.{relationship.CollectionName.ToCamelCase()}Headers.pageIndex),");
+                s.Add($"            () => this.search{relationship.CollectionName}(this.{relationship.CollectionName.ToCamelCase()}Headers.pageIndex),");
                 s.Add($"            () => {{ }}");
                 s.Add($"        );");
                 s.Add($"    }}");

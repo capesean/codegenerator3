@@ -1,7 +1,7 @@
 ﻿<div class="input-group" [ngClass]="{ 'disabled': disabled }">
-    ICONLINK<input placeholder="{{placeholder}}" (click)="openModal()" type="text" tabindex="-1" class="form-control cursor-pointer" readonly value="{{getLabel()}}" [disabled]="disabled" />
-    <button type="button" class="btn btn-secondary" (click)="openModal()" [ngClass]="{ 'disabled': disabled}">
-        <i class="fas fa-search"></i>
+    ICONLINK<input placeholder="{{placeholder}}" (click)="click()" type="text" tabindex="-1" class="form-control cursor-pointer" readonly value="{{getLabel()}}" [disabled]="disabled" />
+    <button type="button" class="btn btn-secondary" (click)="click(true)" [ngClass]="{ 'disabled': disabled}">
+        <i class="fas fa-fw" [ngClass]="{ 'fa-search': !CAMELCASENAME && !PLURALNAME_TOCAMELCASE, 'fa-times': !!CAMELCASENAME || !!PLURALNAME_TOCAMELCASE }"></i>
     </button>
 </div>
 
