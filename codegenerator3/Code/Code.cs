@@ -498,6 +498,8 @@ namespace WEB.Models
                 return ("SortHtml deployment is not allowed: " + entity.PreventSortHtmlDeployment);
             if (deploymentOptions.SortTypeScript && !string.IsNullOrWhiteSpace(entity.PreventSortTypeScriptDeployment))
                 return ("SortTypeScript deployment is not allowed: " + entity.PreventSortTypeScriptDeployment);
+            if (deploymentOptions.SearchOptions && !string.IsNullOrWhiteSpace(entity.PreventSearchOptionsDeployment))
+                return ("SearchOptions deployment is not allowed: " + entity.PreventSearchOptionsDeployment);
 
             if (deploymentOptions.DbContext)
             {
@@ -759,6 +761,18 @@ namespace WEB.Models
             }
             #endregion
 
+            #region search options
+            if (deploymentOptions.SearchOptions)
+            {
+                var path = Path.Combine(entity.Project.RootPathModels, "Models\\SearchOptions");
+                if (!Directory.Exists(path))
+                    return ("SearchOptions path does not exist: " + path);
+
+                var code = codeGenerator.GenerateSearchOptions();
+                if (code != string.Empty) File.WriteAllText(Path.Combine(path, entity.Name + "SearchOptions.cs"), code);
+            }
+            #endregion
+
             return null;
         }
 
@@ -801,6 +815,7 @@ namespace WEB.Models
         public bool SelectModalTypeScript { get; set; }
         public bool SortHtml { get; set; }
         public bool SortTypeScript { get; set; }
+        public bool SearchOptions { get; set; }
     }
 
 }

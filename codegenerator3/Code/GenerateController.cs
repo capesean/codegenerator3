@@ -58,10 +58,8 @@ namespace WEB.Models
             foreach (var field in CurrentEntity.RangeSearchFields)
                 fieldsToSearch.Add(field);
 
-            s.Add($"        public async Task<IActionResult> Search([FromQuery] SearchOptions searchOptions{(CurrentEntity.TextSearchFields.Count > 0 ? ", [FromQuery] string q = null" : "")}{roleSearch}{(fieldsToSearch.Count > 0 ? $", {fieldsToSearch.Select(f => f.ControllerSearchParams).Aggregate((current, next) => current + ", " + next)}" : "")})");
+            s.Add($"        public async Task<IActionResult> Search([FromQuery] {CurrentEntity.Name}SearchOptions searchOptions{roleSearch})");
             s.Add($"        {{");
-            s.Add($"            if (searchOptions == null) searchOptions = new SearchOptions();");
-            s.Add($"");
 
             if (CurrentEntity.EntityType == EntityType.User)
             {
@@ -114,8 +112,8 @@ namespace WEB.Models
 
             if (CurrentEntity.TextSearchFields.Count > 0)
             {
-                s.Add($"            if (!string.IsNullOrWhiteSpace(q))");
-                s.Add($"                results = results.Where(o => {(CurrentEntity.EntityType == EntityType.User ? "o.Email.Contains(q) || " : "")}{CurrentEntity.TextSearchFields.Select(o => $"o.{o.Name + (o.CustomType == CustomType.String ? string.Empty : ".ToString()")}.Contains(q)").Aggregate((current, next) => current + " || " + next)});");
+                s.Add($"            if (!string.IsNullOrWhiteSpace(searchOptions.q))");
+                s.Add($"                results = results.Where(o => {(CurrentEntity.EntityType == EntityType.User ? "o.Email.Contains(searchOptions.q) || " : "")}{CurrentEntity.TextSearchFields.Select(o => $"o.{o.Name + (o.CustomType == CustomType.String ? string.Empty : ".ToString()")}.Contains(searchOptions.q)").Aggregate((current, next) => current + " || " + next)});");
                 s.Add($"");
             }
 
@@ -138,12 +136,12 @@ namespace WEB.Models
                         //s.Add($"            if (from{field.Name}.HasValue) {{ var from{field.Name}Utc = from{field.Name}.Value.ToUniversalTime(); results = results.Where(o => o.{ field.Name} >= from{field.Name}Utc); }}");
                         //s.Add($"            if (to{field.Name}.HasValue) {{ var to{field.Name}Utc = to{field.Name}.Value.ToUniversalTime(); results = results.Where(o => o.{ field.Name} <= to{field.Name}Utc); }}");
                         // disabled: in covid.distribution, the date is sent as 2020-04-18, so no conversion needed, else it chops off the end date
-                        s.Add($"            if (from{field.Name}.HasValue) results = results.Where(o => o.{field.Name} >= from{field.Name}.Value.Date);");
-                        s.Add($"            if (to{field.Name}.HasValue) results = results.Where(o => o.{field.Name} < to{field.Name}.Value.Date.AddDays(1));");
+                        s.Add($"            if (searchOptions.from{field.Name}.HasValue) results = results.Where(o => o.{field.Name} >= searchOptions.from{field.Name}.Value.Date);");
+                        s.Add($"            if (searchOptions.to{field.Name}.HasValue) results = results.Where(o => o.{field.Name} < searchOptions.to{field.Name}.Value.Date.AddDays(1));");
                     }
                     else
                     {
-                        s.Add($"            if ({field.Name.ToCamelCase()}{(field.CustomType == CustomType.String ? " != null" : ".HasValue")}) results = results.Where(o => o.{field.Name} == {field.Name.ToCamelCase()});");
+                        s.Add($"            if (searchOptions.{field.Name}{(field.CustomType == CustomType.String ? " != null" : ".HasValue")}) results = results.Where(o => o.{field.Name} == searchOptions.{field.Name});");
                     }
                 }
                 s.Add($"");

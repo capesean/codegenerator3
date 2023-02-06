@@ -1,0 +1,6 @@
+﻿namespace WEB.Models
+{
+    public class NAMESearchOptions : SearchOptions
+    {
+/*SEARCH-FIELDS*/    }
+}

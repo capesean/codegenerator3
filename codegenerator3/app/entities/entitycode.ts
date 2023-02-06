@@ -32,7 +32,8 @@
             selectModalHtml: false,
             selectModalTypeScript: false,
             sortHtml: false,
-            sortTypeScript: false
+            sortTypeScript: false,
+            searchOptions: false
         };
         vm.loading = true;
         vm.generate = generate;

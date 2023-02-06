@@ -300,6 +300,20 @@
                 </div>
             </div>
 
+            <div class="col-sm-4 col-md-3 col-lg-2" ng-if="!vm.entity.preventSearchOptionsDeployment">
+                <div class="form-group">
+                    <label for="searchOptions" class="control-label">
+                        Search Options
+                    </label>
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" id="searchOptions" name="searchOptions" ng-model="vm.deploymentOptions.searchOptions" />
+                            Search Options
+                        </label>
+                    </div>
+                </div>
+            </div>
+
         </fieldset>
 
         <fieldset ng-disabled="vm.loading">
@@ -337,6 +351,7 @@
             <li role="presentation" xng-if="vm.entity.preventSelectModalTypeScriptDeployment === ''"><a href="##selectModalTypeScriptTab" aria-controls="selectModalTypeScript" role="tab" data-toggle="tab">Select Modal TypeScript</a></li>
             <li role="presentation" xng-if="vm.entity.preventSortHtml === ''"><a href="##sortHtmlTab" aria-controls="sortHtml" role="tab" data-toggle="tab">Sort Html</a></li>
             <li role="presentation" xng-if="vm.entity.preventSortTypeScript === ''"><a href="##sortTypeScriptTab" aria-controls="sortTypeScript" role="tab" data-toggle="tab">Sort TypeScript</a></li>
+            <li role="presentation" xng-if="vm.entity.preventSearchOptions === ''"><a href="##searchOptionsTab" aria-controls="searchOptions" role="tab" data-toggle="tab">Search Options</a></li>
         </ul>
 
         <!-- Tab panes -->
@@ -564,8 +579,19 @@
                 <div class="alert alert-info" ng-if="vm.entity.preventSortTypeScript">Deployment disabled</div>
 
                 <div class="row"><div class="col-sm-12"><button class="btn btn-default copyButton" ng-click="vm.copy('sortTypeScript')">Copy<i class="fa fa-copy"></i></button></div></div>
-                
+
                 <pre><code class="typescript" ng-bind-html="vm.escapedCode.sortTypeScript"></code></pre>
+
+            </div>
+            <div role="tabpanel" class="tab-pane" id="searchOptionsTab">
+
+                <br />
+
+                <div class="alert alert-info" ng-if="vm.entity.preventSearchOptions">Search Options disabled</div>
+
+                <div class="row"><div class="col-sm-12"><button class="btn btn-default copyButton" ng-click="vm.copy('searchOptions')">Copy<i class="fa fa-copy"></i></button></div></div>
+
+                <pre><code class="typescript" ng-bind-html="vm.escapedCode.searchOptions"></code></pre>
 
             </div>
         </div>

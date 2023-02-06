@@ -155,7 +155,8 @@
                     selectModalHtml: !!vm.multideploy[entity.entityId].selectModalHtml,
                     selectModalTypeScript: !!vm.multideploy[entity.entityId].selectModalTypeScript,
                     sortHtml: !!vm.multideploy[entity.entityId].sortHtml,
-                    sortTypeScript: !!vm.multideploy[entity.entityId].sortTypeScript
+                    sortTypeScript: !!vm.multideploy[entity.entityId].sortTypeScript,
+                    searchOptions: !!vm.multideploy[entity.entityId].searchOptions
                 };
                 data.push(item);
             });
@@ -222,6 +223,8 @@
                     vm.multideploy[entity.entityId][item] = false;
                 else if (item === "sortTypeScript" && entity.preventSortTypeScriptDeployment)
                     vm.multideploy[entity.entityId][item] = false;
+                else if (item === "searchOptions" && entity.preventSearchOptionsDeployment)
+                    vm.multideploy[entity.entityId][item] = false;
                 else
                     vm.multideploy[entity.entityId][item] = checked;
             });
@@ -277,6 +280,8 @@
                 vm.multideploy[entity.entityId]["sortHtml"] = checked;
             if (!checked || !entity.preventSortTypeScriptDeployment)
                 vm.multideploy[entity.entityId]["sortTypeScript"] = checked;
+            if (!checked || !entity.preventSearchOptionsDeployment)
+                vm.multideploy[entity.entityId]["searchOptions"] = checked;
         }
     }
     ;

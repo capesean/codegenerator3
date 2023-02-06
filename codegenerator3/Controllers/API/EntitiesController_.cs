@@ -87,6 +87,7 @@ namespace WEB.Controllers
             if (string.IsNullOrWhiteSpace(entity.PreventSelectModalTypeScriptDeployment)) result.SelectModalTypeScript = code.GenerateModalTypeScript();
             if (string.IsNullOrWhiteSpace(entity.PreventSortHtmlDeployment)) result.SortHtml = code.GenerateSortHtml();
             if (string.IsNullOrWhiteSpace(entity.PreventSortTypeScriptDeployment)) result.SortTypeScript = code.GenerateSortTypeScript();
+            if (string.IsNullOrWhiteSpace(entity.PreventSearchOptionsDeployment)) result.SearchOptions = code.GenerateSearchOptions();
 
             return Ok(result);
         }
@@ -142,6 +143,7 @@ namespace WEB.Controllers
             public string TypeScriptModel { get; set; }
             public string SortHtml { get; set; }
             public string SortTypeScript { get; set; }
+            public string SearchOptions { get; set; }
         }
     }
 

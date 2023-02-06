@@ -295,6 +295,15 @@
                             </div>
                         </div>
 
+                        <div class="col-sm-6 col-md-4">
+                            <div class="form-group" ng-class="{ 'has-error':  mainForm.$submitted && mainForm.preventSearchOptions.$invalid }">
+                                <label for="preventSearchOptions" class="control-label">
+                                    Prevent Search Options Deployment:
+                                </label>
+                                <input type="text" id="preventSearchOptions" name="preventSearchOptions" ng-model="vm.entity.preventSearchOptionsScriptDeployment" maxlength="100" class="form-control" />
+                            </div>
+                        </div>
+
                         <div class="col-sm-6 col-md-4 col-lg-2">
                             <div class="form-group" ng-class="{ 'has-error':  mainForm.$submitted && mainForm.iconClass.$invalid }">
                                 <label for="iconClass" class="control-label">

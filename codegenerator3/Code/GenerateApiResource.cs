@@ -21,7 +21,7 @@ namespace WEB.Models
             s.Add($"import {{ Observable }} from 'rxjs';");
             s.Add($"import {{ map }} from 'rxjs/operators';");
             s.Add($"import {{ {CurrentEntity.Name}, {CurrentEntity.Name}SearchOptions, {CurrentEntity.Name}SearchResponse }} from '../models/{CurrentEntity.Name.ToLower()}.model';");
-            s.Add($"import {{ SearchQuery, SearchOptions, PagingHeaders }} from '../models/http.model';");
+            s.Add($"import {{ SearchQuery, PagingHeaders }} from '../models/http.model';");
             s.Add($"");
             s.Add($"@Injectable({{ providedIn: 'root' }})");
             s.Add($"export class {CurrentEntity.Name}Service extends SearchQuery {{");

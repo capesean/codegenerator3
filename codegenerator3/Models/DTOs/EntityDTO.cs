@@ -96,6 +96,9 @@ namespace WEB.Models
         [MaxLength(100)]
         public string PreventSortTypeScriptDeployment { get; set; }
 
+        [MaxLength(100)]
+        public string PreventSearchOptionsDeployment { get; set; }
+
         [Required]
         public AuthorizationType AuthorizationType { get; set; }
 
@@ -159,6 +162,7 @@ namespace WEB.Models
             entityDTO.PreventSelectModalTypeScriptDeployment = entity.PreventSelectModalTypeScriptDeployment;
             entityDTO.PreventSortHtmlDeployment = entity.PreventSortHtmlDeployment;
             entityDTO.PreventSortTypeScriptDeployment = entity.PreventSortTypeScriptDeployment;
+            entityDTO.PreventSearchOptionsDeployment = entity.PreventSearchOptionsDeployment;
             entityDTO.AuthorizationType = entity.AuthorizationType;
             entityDTO.Exclude = entity.Exclude;
             entityDTO.ReturnOnSave = entity.ReturnOnSave;
@@ -202,6 +206,7 @@ namespace WEB.Models
             entity.PreventSelectModalTypeScriptDeployment = entityDTO.PreventSelectModalTypeScriptDeployment;
             entity.PreventSortHtmlDeployment = entityDTO.PreventSortHtmlDeployment;
             entity.PreventSortTypeScriptDeployment = entityDTO.PreventSortTypeScriptDeployment;
+            entity.PreventSearchOptionsDeployment = entityDTO.PreventSearchOptionsDeployment;
             entity.AuthorizationType = entityDTO.AuthorizationType;
             entity.Exclude = entityDTO.Exclude;
             entity.ReturnOnSave = entityDTO.ReturnOnSave;

@@ -33,7 +33,8 @@ namespace WEB.Models
         Roles,
         SharedModule,
         SortHtml,
-        SortTypeScript
+        SortTypeScript,
+        SearchOptions
     }
 
     public enum EditPageType

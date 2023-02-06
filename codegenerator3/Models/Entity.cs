@@ -99,6 +99,9 @@ namespace WEB.Models
         [MaxLength(100)]
         public string PreventSortTypeScriptDeployment { get; set; }
 
+        [MaxLength(100)]
+        public string PreventSearchOptionsDeployment { get; set; }
+
         [Required]
         public AuthorizationType AuthorizationType { get; set; }
 

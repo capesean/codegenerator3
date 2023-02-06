@@ -49,6 +49,7 @@ namespace WEB.Controllers
                     || option.SelectModalTypeScript
                     || option.SortHtml
                     || option.SortTypeScript
+                    || option.SearchOptions
                     )
                 {
 
@@ -91,6 +92,7 @@ namespace WEB.Controllers
                     if (option.SelectModalTypeScript) RunDeploy(entity, CodeType.SelectModalTypeScript, results);
                     if (option.SortHtml) RunDeploy(entity, CodeType.SortHtml, results);
                     if (option.SortTypeScript) RunDeploy(entity, CodeType.SortTypeScript, results);
+                    if (option.SearchOptions) RunDeploy(entity, CodeType.SearchOptions, results);
                 }
             }
 
@@ -121,6 +123,7 @@ namespace WEB.Controllers
             options.SelectModalTypeScript = codeType == CodeType.SelectModalTypeScript;
             options.SortHtml = codeType == CodeType.SortHtml;
             options.SortTypeScript = codeType == CodeType.SortTypeScript;
+            options.SearchOptions = codeType == CodeType.SearchOptions;
 
             var result = Code.RunDeployment(DbContext, entity, options);
             results.Add(new DeploymentResult
@@ -165,6 +168,7 @@ namespace WEB.Controllers
         public bool SelectModalTypeScript { get; set; } = false;
         public bool SortHtml { get; set; } = false;
         public bool SortTypeScript { get; set; } = false;
+        public bool SearchOptions { get; set; } = false;
 
     }
 }

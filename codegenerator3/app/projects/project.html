@@ -216,6 +216,7 @@
                     <th class="text-center rotate-90" scope="col"><div ng-click="vm.setCheckBoxes('selectModalTypeScript')" class="clickable">SelectModalTs</div></th>
                     <th class="text-center rotate-90" scope="col"><div ng-click="vm.setCheckBoxes('sortHtml')" class="clickable">SortHtml</div></th>
                     <th class="text-center rotate-90" scope="col"><div ng-click="vm.setCheckBoxes('sortTypeScript')" class="clickable">SortTypeScript</div></th>
+                    <th class="text-center rotate-90" scope="col"><div ng-click="vm.setCheckBoxes('searchOptions')" class="clickable">searchOptions</div></th>
                 </tr>
             </thead>
             <tbody>
@@ -242,6 +243,7 @@
                     <td class="text-center" ng-click="$event.stopPropagation()" uib-tooltip="{{entity.preventSelectModalTypeScriptDeployment}}"><input type="checkbox" ng-disabled="entity.exclude || !!entity.preventSelectModalHtmlDeployment" ng-model="vm.multideploy[entity.entityId].selectModalTypeScript" /></td>
                     <td class="text-center" ng-click="$event.stopPropagation()" uib-tooltip="{{entity.preventSortHtml}}"><input type="checkbox" ng-disabled="entity.exclude || !!entity.preventSortHtmlDeployment" ng-model="vm.multideploy[entity.entityId].sortHtml" /></td>
                     <td class="text-center" ng-click="$event.stopPropagation()" uib-tooltip="{{entity.preventSortTypeScript}}"><input type="checkbox" ng-disabled="entity.exclude || !!entity.preventSortTypeScriptDeployment" ng-model="vm.multideploy[entity.entityId].sortTypeScript" /></td>
+                    <td class="text-center" ng-click="$event.stopPropagation()" uib-tooltip="{{entity.preventSearchOptions}}"><input type="checkbox" ng-disabled="entity.exclude || !!entity.preventSearchOptionsDeployment" ng-model="vm.multideploy[entity.entityId].searchOptions" /></td>
                 </tr>
             </tbody>
         </table>
