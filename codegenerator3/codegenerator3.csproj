@@ -580,6 +580,7 @@
     <Content Include="scripts\popper.min.js" />
     <Content Include="scripts\sb-admin-2.js" />
     <Content Include="templates\searchoptions.txt" />
+    <Content Include="templates\shared.module.txt" />
     <Content Include="templates\sort.html" />
     <Content Include="templates\sort.txt" />
     <Content Include="Web.sample.config" />
@@ -693,6 +694,10 @@
     <Compile Include="Migrations\202302060912335_SearchOptions.cs" />
     <Compile Include="Migrations\202302060912335_SearchOptions.designer.cs">
       <DependentUpon>202302060912335_SearchOptions.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202302061128394_Sortable.cs" />
+    <Compile Include="Migrations\202302061128394_Sortable.designer.cs">
+      <DependentUpon>202302061128394_Sortable.cs</DependentUpon>
     </Compile>
     <Compile Include="Models\Relationship_.cs" />
     <Compile Include="Startup.cs" />
@@ -825,6 +830,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202302060912335_SearchOptions.resx">
       <DependentUpon>202302060912335_SearchOptions.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202302061128394_Sortable.resx">
+      <DependentUpon>202302061128394_Sortable.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

@@ -158,7 +158,14 @@ namespace WEB.Models
             s.Add(t + $"            <thead class=\"thead-light\">");
             s.Add(t + $"                <tr>");
             foreach (var field in CurrentEntity.Fields.Where(f => f.ShowInSearchResults).OrderBy(f => f.FieldOrder))
-                s.Add(t + $"                    <th>{field.Label}</th>");
+                if (field.Sortable)
+                {
+                    s.Add(t + $"                    <th class='cursor-pointer' (click)=\"runSearch(headers.pageIndex, '{field.Name.ToLower()}')\">{field.Label}<app-sort-icon name=\"{field.Name.ToLower()}\" [searchOptions]=\"searchOptions\"></app-sort-icon></th>");
+                }
+                else
+                {
+                    s.Add(t + $"                    <th>{field.Label}</th>");
+                }
             s.Add(t + $"                </tr>");
             s.Add(t + $"            </thead>");
             s.Add(t + $"            <tbody class=\"list cursor-pointer\">");

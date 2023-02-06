@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
 using System.Text;
 
@@ -10,92 +11,38 @@ namespace WEB.Models
         {
             var s = new StringBuilder();
 
-            s.Add($"import {{ NgModule }} from '@angular/core';");
-            s.Add($"import {{ CommonModule }} from '@angular/common';");
-            s.Add($"import {{ RouterModule }} from '@angular/router';");
-            s.Add($"import {{ FormsModule }} from '@angular/forms';");
-            s.Add($"import {{ NgbModule }} from '@ng-bootstrap/ng-bootstrap';");
-            s.Add($"import {{ DragDropModule }} from '@angular/cdk/drag-drop';");
-            s.Add($"import {{ MainComponent }} from './main.component';");
-            s.Add($"import {{ NavMenuComponent }} from './common/components/nav-menu.component';");
-            s.Add($"import {{ HeaderComponent }} from './common/components/header.component';");
-            s.Add($"import {{ ConfirmModalComponent }} from './common/components/confirm.component';");
-            s.Add($"import {{ PagerComponent }} from './common/components/pager.component';");
-            s.Add($"import {{ FileComponent }} from './common/components/file.component';");
-            s.Add($"import {{ ColorComponent }} from './common/components/color.component';");
-            s.Add($"import {{ BreadcrumbComponent }} from './common/components/breadcrumb.component';");
-            s.Add($"import {{ PageTitleComponent }} from './common/components/pagetitle.component';");
-            s.Add($"import {{ MomentPipe }} from './common/pipes/momentpipe';");
-            s.Add($"import {{ BooleanPipe }} from './common/pipes/booleanpipe';");
-            s.Add($"import {{ AppFileInputDirective }} from './common/directives/appfileinput';");
-            s.Add($"import {{ AppHasRoleDirective }} from './common/directives/apphasrole';");
+            var file = File.ReadAllText(AppDomain.CurrentDomain.BaseDirectory + "templates/shared.module.txt");
 
-            var entitiesToBundle = AllEntities.Where(e => !e.Exclude);
-            var componentList = "";
-            foreach (var e in entitiesToBundle)
+            var entities = AllEntities.Where(e => !e.Exclude);
+
+            var component = string.Empty;
+            var imports = string.Empty;
+
+            foreach (var e in entities)
             {
                 if (string.IsNullOrWhiteSpace(e.PreventAppSelectTypeScriptDeployment))
                 {
-                    s.Add($"import {{ {e.Name}SelectComponent }} from './{e.PluralName.ToLower()}/{e.Name.ToLower()}.select.component';");
-                    componentList += "," + Environment.NewLine + $"        {e.Name}SelectComponent";
+                    imports += $"import {{ {e.Name}SelectComponent }} from './{e.PluralName.ToLower()}/{e.Name.ToLower()}.select.component';{Environment.NewLine}";
+                    component += $",{Environment.NewLine}        {e.Name}SelectComponent";
                 }
 
                 if (string.IsNullOrWhiteSpace(e.PreventSelectModalTypeScriptDeployment))
                 {
-                    s.Add($"import {{ {e.Name}ModalComponent }} from './{e.PluralName.ToLower()}/{e.Name.ToLower()}.modal.component';");
-                    componentList += "," + Environment.NewLine + $"        {e.Name}ModalComponent";
+                    imports += $"import {{ {e.Name}ModalComponent }} from './{e.PluralName.ToLower()}/{e.Name.ToLower()}.modal.component';{Environment.NewLine}";
+                    component += $",{Environment.NewLine}        {e.Name}ModalComponent";
                 }
 
                 if (e.HasASortField)
                 {
-                    s.Add($"import {{ {e.Name}SortComponent }} from './{e.PluralName.ToLower()}/{e.Name.ToLower()}.sort.component';");
-                    componentList += "," + Environment.NewLine + $"        {e.Name}SortComponent";
+                    imports += $"import {{ {e.Name}SortComponent }} from './{e.PluralName.ToLower()}/{e.Name.ToLower()}.sort.component';{Environment.NewLine}";
+                    component += $",{Environment.NewLine}        {e.Name}SortComponent";
                 }
             }
-            s.Add($"");
 
-
-            s.Add($"@NgModule({{");
-            //s.Add($"   declarations: [{componentList}],");
-            s.Add($"    imports: [");
-            s.Add($"        CommonModule,");
-            s.Add($"        RouterModule,");
-            s.Add($"        FormsModule,");
-            s.Add($"        NgbModule,");
-            s.Add($"        DragDropModule");
-            s.Add($"    ],");
-            s.Add($"    declarations: [");
-            s.Add($"        MainComponent,");
-            s.Add($"        NavMenuComponent,");
-            s.Add($"        HeaderComponent,");
-            s.Add($"        ConfirmModalComponent,");
-            s.Add($"        PagerComponent,");
-            s.Add($"        FileComponent,");
-            s.Add($"        ColorComponent,");
-            s.Add($"        BreadcrumbComponent,");
-            s.Add($"        PageTitleComponent,");
-            s.Add($"        MomentPipe,");
-            s.Add($"        BooleanPipe,");
-            s.Add($"        AppFileInputDirective,");
-            s.Add($"        AppHasRoleDirective" + componentList);
-            s.Add($"    ],");
-            s.Add($"    exports: [");
-            s.Add($"        MainComponent,");
-            s.Add($"        NavMenuComponent,");
-            s.Add($"        HeaderComponent,");
-            s.Add($"        ConfirmModalComponent,");
-            s.Add($"        PagerComponent,");
-            s.Add($"        FileComponent,");
-            s.Add($"        ColorComponent,");
-            s.Add($"        BreadcrumbComponent,");
-            s.Add($"        PageTitleComponent,");
-            s.Add($"        MomentPipe,");
-            s.Add($"        BooleanPipe,");
-            s.Add($"        AppFileInputDirective,");
-            s.Add($"        AppHasRoleDirective" + componentList);
-            s.Add($"    ]");
-            s.Add($"}})");
-            s.Add($"export class SharedModule {{ }}");
+            s.Add(RunTemplateReplacements(file)
+                .Replace("/*IMPORTS*/", imports)
+                .Replace("/*COMPONENTS*/", component)
+                );
 
             return RunCodeReplacements(s.ToString(), CodeType.SharedModule);
 

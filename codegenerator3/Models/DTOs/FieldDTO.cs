@@ -51,6 +51,8 @@ namespace WEB.Models
         [Required]
         public SearchType SearchType { get; set; }
 
+        public bool Sortable { get; set; }
+
         public int? SortPriority { get; set; }
 
         [Required]
@@ -108,6 +110,7 @@ namespace WEB.Models
             fieldDTO.IsNullable = field.IsNullable;
             fieldDTO.ShowInSearchResults = field.ShowInSearchResults;
             fieldDTO.SearchType = field.SearchType;
+            fieldDTO.Sortable = field.Sortable;
             fieldDTO.SortPriority = field.SortPriority;
             fieldDTO.SortDescending = field.SortDescending;
             fieldDTO.FieldOrder = field.FieldOrder;
@@ -140,6 +143,7 @@ namespace WEB.Models
             field.IsNullable = fieldDTO.IsNullable;
             field.ShowInSearchResults = fieldDTO.ShowInSearchResults;
             field.SearchType = fieldDTO.SearchType;
+            field.Sortable = fieldDTO.Sortable;
             field.SortPriority = fieldDTO.SortPriority;
             field.SortDescending = fieldDTO.SortDescending;
             field.FieldOrder = fieldDTO.FieldOrder;

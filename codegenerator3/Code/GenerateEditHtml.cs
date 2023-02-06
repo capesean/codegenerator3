@@ -403,7 +403,7 @@ namespace WEB.Models
                         s.Add(t + $"                            <button *ngIf=\"!show{relationship.CollectionName}Search\" type=\"button\" class=\"btn btn-outline-secondary me-2 mb-1\" (click)=\"show{relationship.CollectionName}Search=true\">Filter<i class=\"fas fa-filter ms-2\"></i></button>");
                         s.Add(t + $"                            <button *ngIf=\"show{relationship.CollectionName}Search\" form=\"form{relationship.CollectionName}\" type=\"submit\" class=\"btn btn-outline-primary me-2 mb-1\">Search<i class=\"fas fa-search ms-2\"></i></button>");
                         if (childEntity.HasASortField)
-                            s.Add(t + $"                            <button type=\"button\" class=\"btn btn-outline-secondary me-2 mb-1\" (click)=\"show{childEntity.Name}Sort()\" *ngIf=\"{childEntity.PluralName.ToCamelCase()}Headers.totalRecords > 1 && !show{relationship.CollectionName}Search\">Sort<i class=\"fas fa-sort ms-2\"></i></button>");
+                            s.Add(t + $"                            <button type=\"button\" class=\"btn btn-outline-secondary me-2 mb-1\" (click)=\"show{childEntity.Name}Sort()\" *ngIf=\"{relationship.CollectionName.ToCamelCase()}Headers.totalRecords > 1 && !show{relationship.CollectionName}Search\">Sort<i class=\"fas fa-sort ms-2\"></i></button>");
                         s.Add(t + $"                        </div>");
                         s.Add($"");
                     }

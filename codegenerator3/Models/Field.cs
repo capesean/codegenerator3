@@ -54,6 +54,8 @@ namespace WEB.Models
         [Required]
         public SearchType SearchType { get; set; }
 
+        public bool Sortable { get; set; }
+
         public int? SortPriority { get; set; }
 
         [Required]

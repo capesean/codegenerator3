@@ -400,11 +400,21 @@ namespace WEB.Models
             }
         }
 
+        [NotMapped]
         internal bool HasASortField
         {
             get
             {
                 return SortField != null;
+            }
+        }
+
+        [NotMapped]
+        internal bool HasSortableFields
+        {
+            get
+            {
+                return Fields.Any(o => o.Sortable && o.ShowInSearchResults);
             }
         }
 

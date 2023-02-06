@@ -147,8 +147,23 @@ namespace WEB.Models
                 s.Add($"");
             }
 
+            var sortableFields = CurrentEntity.Fields.Where(o => o.Sortable).OrderBy(o => o.Name).ToList();
+            if (sortableFields.Any())
+            {
+                var counter = 0;
+                foreach (var sortableField in sortableFields)
+                {
+                    counter++;
+
+                    s.Add($"            {(counter == 1 ? "" : "else ")}if (searchOptions.OrderBy == \"{sortableField.Name.ToLower()}\")");
+                    s.Add($"                results = searchOptions.OrderByAscending ? results.OrderBy(o => o.{sortableField.Name}) : results.OrderByDescending(o => o.{sortableField.Name});");
+                }
+                if (CurrentEntity.SortOrderFields.Count > 0)
+                    s.Add($"            else");
+            }
+
             if (CurrentEntity.SortOrderFields.Count > 0)
-                s.Add($"            results = results.Order{CurrentEntity.SortOrderFields.Select(f => "By" + (f.SortDescending ? "Descending" : string.Empty) + "(o => o." + f.Name + ")").Aggregate((current, next) => current + ".Then" + next)};");
+                s.Add($"            {(sortableFields.Any() ? "    " : "")}results = results.Order{CurrentEntity.SortOrderFields.Select(f => "By" + (f.SortDescending ? "Descending" : string.Empty) + "(o => o." + f.Name + ")").Aggregate((current, next) => current + ".Then" + next)};");
 
             //var counter = 0;
             //foreach (var field in CurrentEntity.SortOrderFields)

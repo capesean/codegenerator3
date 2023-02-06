@@ -184,10 +184,10 @@
             <div class="row">
                 <div class="col-sm-12">
 
-                    <div class="col-sm-4 col-md-3 col-lg-1">
+                    <div class="col-sm-4 col-md-3 col-lg-2">
                         <div class="form-group" ng-class="{ 'has-error':  mainForm.$submitted && mainForm.sortPriority.$invalid }">
                             <label for="sortPriority" class="control-label">
-                                Sort Priority:
+                                Default Sort Priority:
                             </label>
                             <input type="number" id="sortPriority" name="sortPriority" ng-model="vm.field.sortPriority" class="form-control" />
                         </div>
@@ -196,12 +196,26 @@
                     <div class="col-sm-4 col-md-3 col-lg-2">
                         <div class="form-group" ng-class="{ 'has-error':  mainForm.$submitted && mainForm.sortDescending.$invalid }">
                             <label for="sortDescending" class="control-label">
-                                Sort Descending:
+                                Default Sort Descending:
                             </label>
                             <div class="checkbox">
                                 <label>
                                     <input type="checkbox" id="sortDescending" name="sortDescending" ng-model="vm.field.sortDescending" />
                                     Sort Descending
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-4 col-md-3 col-lg-2">
+                        <div class="form-group" ng-class="{ 'has-error':  mainForm.$submitted && mainForm.sortable.$invalid }">
+                            <label for="sortable" class="control-label">
+                                Sortable:
+                            </label>
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" id="sortable" name="sortable" ng-model="vm.field.sortable" />
+                                    Sortable
                                 </label>
                             </div>
                         </div>
@@ -232,6 +246,12 @@
                             </ol>
                         </div>
                     </div>
+
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-sm-12">
 
                     <div class="col-sm-6 col-md-4 col-lg-3">
                         <div class="form-group" ng-class="{ 'has-error':  mainForm.$submitted && mainForm.controllerInsertOverride.$invalid }">

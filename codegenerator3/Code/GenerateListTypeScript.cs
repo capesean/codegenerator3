@@ -92,10 +92,24 @@ namespace WEB.Models
                 s.Add($"    }}");
                 s.Add($"");
             }
-            s.Add($"    runSearch(pageIndex = 0): Subject<{CurrentEntity.Name}SearchResponse> {{");
+            s.Add($"    runSearch(pageIndex = 0{(CurrentEntity.HasSortableFields ? ", orderBy: string = null" : "")}): Subject<{CurrentEntity.Name}SearchResponse> {{");
             s.Add($"");
             s.Add($"        this.searchOptions.pageIndex = pageIndex;");
             s.Add($"");
+
+            if (CurrentEntity.HasSortableFields)
+            {
+                s.Add($"        if (orderBy != null) {{");
+                s.Add($"            if (this.searchOptions.orderBy === orderBy)");
+                s.Add($"                this.searchOptions.orderByAscending = this.searchOptions.orderByAscending == null ? true : !this.searchOptions.orderByAscending;");
+                s.Add($"            else {{");
+                s.Add($"                this.searchOptions.orderBy = orderBy;");
+                s.Add($"                this.searchOptions.orderByAscending = true;");
+                s.Add($"            }}");
+                s.Add($"        }}");
+                s.Add($"");
+            }
+
             s.Add($"        const subject = new Subject<{CurrentEntity.Name}SearchResponse>();");
             s.Add($"");
             s.Add($"        this.{CurrentEntity.Name.ToCamelCase()}Service.search(this.searchOptions)");
@@ -121,6 +135,7 @@ namespace WEB.Models
                 s.Add($"        modalRef.result.then(");
                 s.Add($"            () => {{");
                 s.Add($"");
+                s.Add($"                this.searchOptions.orderBy = null;");
                 s.Add($"                this.runSearch(this.headers.pageIndex);");
                 s.Add($"");
                 s.Add($"            }}, () => {{ }});");
