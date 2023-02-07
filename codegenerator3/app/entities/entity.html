@@ -552,14 +552,14 @@
                 <tr>
                     <th scope="col">Purpose</th>
                     <th scope="col">Code Type</th>
-                    <th scope="col">Disabled</th>
+                    <th scope="col" style="width:40px;">Enabled</th>
                 </tr>
             </thead>
             <tbody ui-sortable="vm.codeReplacementsSortOptions" ng-model="vm.codeReplacements">
                 <tr ng-repeat="codeReplacement in (vm.codeReplacements | crFilter:vm.codeType:vm.crsearch)" ng-click="vm.goToCodeReplacement(codeReplacement.entity.project.projectId, codeReplacement.entity.entityId, codeReplacement.codeReplacementId)">
                     <td><i class="fa fa-sort sortable-handle" ng-click="$event.stopPropagation();"></i><a href="/projects/{{codeReplacement.entity.project.projectId}}/entities/{{codeReplacement.entity.entityId}}/codereplacements/{{codeReplacement.codeReplacementId}}">{{ codeReplacement.purpose }}</a></td>
                     <td>{{ vm.appSettings.find(vm.appSettings.codeType, codeReplacement.codeType).label }}</td>
-                    <td>{{ codeReplacement.disabled ? "Yes" : "No" }}</td>
+                    <td class="text-center" ng-click="vm.toggeCodeReplacement(codeReplacement, $event)"><i style="padding:5px;" class="fa" ng-class="{ 'fa-times text-danger': codeReplacement.disabled, 'fa-check text-success': !codeReplacement.disabled }"></i></td>
                 </tr>
             </tbody>
         </table>

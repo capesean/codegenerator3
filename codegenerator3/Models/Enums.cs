@@ -1,3 +1,5 @@
+using WEB.Migrations;
+
 namespace WEB.Models
 {
     public enum AuthorizationType
@@ -164,6 +166,12 @@ namespace WEB.Models
                     return "Roles";
                 case CodeType.SharedModule:
                     return "Shared Module";
+                case CodeType.SortHtml:
+                    return "Sort Html";
+                case CodeType.SortTypeScript:
+                    return "Sort TypeScript";
+                case CodeType.SearchOptions:
+                    return "Search Options";
                 default:
                     return null;
             }

@@ -20,6 +20,7 @@
         vm.relationshipsAsParentSortOptions = { stop: sortParentRelationships, handle: "i.sortable-handle" };
         vm.relationshipsAsChildSortOptions = { stop: sortChildRelationships, handle: "i.sortable-handle" };
         vm.codeReplacementsSortOptions = { stop: sortCodeReplacements, handle: "i.sortable-handle", axis: "y" };
+        vm.toggeCodeReplacement = toggeCodeReplacement;
         vm.CodeType = function (type) {
             var types = [{ id: 0, name: "Model" }, { id: 1, name: "DTO" }, { id: 2, name: "DbContext" }, { id: 3, name: "Controller" }, { id: 4, name: "GeneratedModule" }, { id: 5, name: "AppRouter" }, { id: 6, name: "ApiResource" }, { id: 7, name: "ListHtml" }, { id: 8, name: "ListTypeScript" }, { id: 9, name: "EditHtml" }, { id: 10, name: "EditTypeScript" }, { id: 22, name: "SharedModule" }];
             for (var i = 0; i < types.length; i++) {
@@ -144,6 +145,25 @@
                     .$promise.finally(function () { return vm.loading = false; });
             }
         }
+        function toggeCodeReplacement(codeReplacement, $event) {
+            $event.stopPropagation();
+            $event.preventDefault();
+            codeReplacement.disabled = !codeReplacement.disabled;
+            codeReplacement.$save(function () {
+                notifications.success("The code replacement has been saved.", "Saved");
+                codeReplacementResource.query({
+                    pageSize: 0,
+                    entityId: $stateParams.entityId
+                }, function (data) {
+                    vm.codeReplacements = data;
+                }, function (err) {
+                    notifications.error("Failed to load the codeReplacements.", "Error", err);
+                    $state.go("app.project", { projectId: $stateParams.projectId });
+                });
+            }, function (err) {
+                errorService.handleApiError(err, "code replacement");
+            }).finally(function () { return vm.loading = false; });
+        }
         function getSearchType(id) {
             return appSettings.searchType.filter(function (item) { return item.id === id; })[0].name;
         }
@@ -218,7 +238,11 @@
             var filtered = [];
             for (var i = 0; i < items.length; i++) {
                 var item = items[i];
-                if ((codeType === undefined || codeType === item.codeType) && (query === undefined || item.findCode.toLowerCase().indexOf(query.toLowerCase()) >= 0 || (item.replacementCode || "").toLowerCase().indexOf(query.toLowerCase()) >= 0)) {
+                if ((codeType === undefined || codeType === item.codeType)
+                    && (query === undefined
+                        || item.findCode.toLowerCase().indexOf(query.toLowerCase()) >= 0
+                        || (item.replacementCode || "").toLowerCase().indexOf(query.toLowerCase()) >= 0
+                        || item.purpose.toLowerCase().indexOf(query.toLowerCase()) >= 0)) {
                     filtered.push(item);
                 }
             }

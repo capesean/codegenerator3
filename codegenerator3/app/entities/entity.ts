@@ -25,6 +25,7 @@
         vm.relationshipsAsParentSortOptions = { stop: sortParentRelationships, handle: "i.sortable-handle" };
         vm.relationshipsAsChildSortOptions = { stop: sortChildRelationships, handle: "i.sortable-handle" };
         vm.codeReplacementsSortOptions = { stop: sortCodeReplacements, handle: "i.sortable-handle", axis: "y" };
+        vm.toggeCodeReplacement = toggeCodeReplacement;
         vm.CodeType = (type) => {
             var types = [{ id: 0, name: "Model" }, { id: 1, name: "DTO" }, { id: 2, name: "DbContext" }, { id: 3, name: "Controller" }, { id: 4, name: "GeneratedModule" }, { id: 5, name: "AppRouter" }, { id: 6, name: "ApiResource" }, { id: 7, name: "ListHtml" }, { id: 8, name: "ListTypeScript" }, { id: 9, name: "EditHtml" }, { id: 10, name: "EditTypeScript" }, { id: 22, name: "SharedModule" }];
             for (var i = 0; i < types.length; i++) {
@@ -224,6 +225,39 @@
             }
         }
 
+        function toggeCodeReplacement(codeReplacement, $event) {
+            $event.stopPropagation();
+            $event.preventDefault();
+            codeReplacement.disabled = !codeReplacement.disabled;
+
+            codeReplacement.$save(
+                () => {
+
+                    notifications.success("The code replacement has been saved.", "Saved");
+                    codeReplacementResource.query(
+                        {
+                            pageSize: 0,
+                            entityId: $stateParams.entityId
+                        },
+                        data => {
+                            vm.codeReplacements = data;
+                        },
+                        err => {
+
+                            notifications.error("Failed to load the codeReplacements.", "Error", err);
+                            $state.go("app.project", { projectId: $stateParams.projectId });
+
+                        })
+
+                },
+                err => {
+
+                    errorService.handleApiError(err, "code replacement");
+
+                }).finally(() => vm.loading = false);
+
+        }
+
         function getSearchType(id) {
             return appSettings.searchType.filter(item => item.id === id)[0].name;
         }
@@ -342,7 +376,13 @@
             var filtered = [];
             for (var i = 0; i < items.length; i++) {
                 var item = items[i];
-                if ((codeType === undefined || codeType === item.codeType) && (query === undefined || item.findCode.toLowerCase().indexOf(query.toLowerCase()) >= 0 || (item.replacementCode || "").toLowerCase().indexOf(query.toLowerCase()) >= 0)) {
+                if (
+                    (codeType === undefined || codeType === item.codeType)
+                    && (query === undefined
+                        || item.findCode.toLowerCase().indexOf(query.toLowerCase()) >= 0
+                        || (item.replacementCode || "").toLowerCase().indexOf(query.toLowerCase()) >= 0
+                        || item.purpose.toLowerCase().indexOf(query.toLowerCase()) >= 0)
+                ) {
                     filtered.push(item);
                 }
             }
