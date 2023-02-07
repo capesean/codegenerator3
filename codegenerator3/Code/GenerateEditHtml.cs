@@ -21,7 +21,7 @@ namespace WEB.Models
                 s.Add($"");
                 t = "    ";
             }
-            s.Add(t + $"<app-page-title title='{CurrentEntity.FriendlyName}'></app-page-title>");
+            s.Add(t + $"<app-page-title title=\"{CurrentEntity.FriendlyName}\"></app-page-title>");
             s.Add($"");
             s.Add(t + $"<form id=\"form\" name=\"form\" (submit)=\"save(form)\" novalidate #form=\"ngForm\" [ngClass]=\"{{ 'was-validated': form.submitted }}\">");
             s.Add($"");
@@ -364,27 +364,33 @@ namespace WEB.Models
                     s.Add($"");
                     s.Add(t + $"                    </div>");
                     s.Add($"");
+
                     s.Add(t + $"                    <div class=\"card-body\">");
                     s.Add($"");
-                    s.Add(t + $"                        <form id=\"formSearch{relationship.CollectionName}\" (submit)=\"search{relationship.CollectionName}(0)\" novalidate *ngIf=\"show{relationship.CollectionName}Search\" class=\"mb-5\">");
-                    s.Add($"");
-                    s.Add(t + $"                            <div class=\"row g-3\">");
-                    s.Add($"");
 
+                    // todo: non-text filter fields
                     if (entity.Fields.Any(f => f.SearchType == SearchType.Text))
                     {
-                        s.Add(t + $"                                <div class=\"col-sm-6 col-md-5 col-lg-4 col-xl-3\">");
-                        s.Add(t + $"                                    <div class=\"form-group\">");
-                        s.Add(t + $"                                        <input type=\"search\" name=\"q\" id=\"q\" [(ngModel)]=\"{relationship.CollectionName.ToCamelCase()}SearchOptions.q\" max=\"100\" class=\"form-control\" placeholder=\"Search {relationship.CollectionFriendlyName.ToLower()}\" />");
-                        s.Add(t + $"                                    </div>");
-                        s.Add(t + $"                                </div>");
+                        s.Add(t + $"                        <form id=\"formSearch{relationship.CollectionName}\" (submit)=\"search{relationship.CollectionName}(0)\" novalidate *ngIf=\"show{relationship.CollectionName}Search\" class=\"mb-5\">");
+                        s.Add($"");
+                        s.Add(t + $"                            <div class=\"row g-3\">");
+                        s.Add($"");
+
+                        if (entity.Fields.Any(f => f.SearchType == SearchType.Text))
+                        {
+                            s.Add(t + $"                                <div class=\"col-sm-6 col-md-5 col-lg-4 col-xl-3\">");
+                            s.Add(t + $"                                    <div class=\"form-group\">");
+                            s.Add(t + $"                                        <input type=\"search\" name=\"q\" id=\"q\" [(ngModel)]=\"{relationship.CollectionName.ToCamelCase()}SearchOptions.q\" max=\"100\" class=\"form-control\" placeholder=\"Search {relationship.CollectionFriendlyName.ToLower()}\" />");
+                            s.Add(t + $"                                    </div>");
+                            s.Add(t + $"                                </div>");
+                            s.Add($"");
+                        }
+
+                        s.Add(t + $"                            </div>");
+                        s.Add($"");
+                        s.Add(t + $"                        </form>");
                         s.Add($"");
                     }
-
-                    s.Add(t + $"                            </div>");
-                    s.Add($"");
-                    s.Add(t + $"                        </form>");
-                    s.Add($"");
 
                     var childEntity = relationship.ChildEntity;
 

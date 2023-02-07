@@ -26,7 +26,7 @@ namespace WEB.Controllers
             if (findCode != null) results = results.Where(o => o.FindCode == findCode);
             if (replacementCode != null) results = results.Where(o => o.ReplacementCode == replacementCode);
 
-            results = results.OrderBy(o => o.EntityId).ThenBy(o => o.SortOrder).ThenBy(o => o.CodeType);
+            results = results.OrderBy(o => o.CodeType).ThenBy(o => o.SortOrder);
 
             return Ok((await GetPaginatedResponse(results, pagingOptions)).Select(o => ModelFactory.Create(o)));
         }

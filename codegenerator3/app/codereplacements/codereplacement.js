@@ -70,7 +70,6 @@
                 vm.codeReplacement.$save(function (data) {
                     vm.codeReplacement = data;
                     notifications.success("The code replacement has been saved.", "Saved");
-                    $state.go("app.entity", { projectId: $stateParams.projectId, entityId: $stateParams.entityId });
                 }, function (err) {
                     errorService.handleApiError(err, "code replacement");
                 }).finally(function () { return vm.loading = false; });

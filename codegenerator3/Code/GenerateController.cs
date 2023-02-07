@@ -79,7 +79,8 @@ namespace WEB.Models
 
             var relAsChild = CurrentEntity.RelationshipsAsChild
                 .Where(r => r.RelationshipAncestorLimit != RelationshipAncestorLimits.Exclude)
-                .OrderBy(r => r.SortOrderOnChild).ThenBy(o => o.ParentName)
+                .OrderBy(r => r.SortOrderOnChild)
+                .ThenBy(o => o.ParentName)
                 .ToList();
             if (relAsChild.Any())
             {
@@ -96,7 +97,8 @@ namespace WEB.Models
 
             var relAsParent = CurrentEntity.RelationshipsAsParent
                 .Where(r => r.RelationshipAncestorLimit != RelationshipAncestorLimits.Exclude)
-                .OrderBy(r => r.SortOrderOnChild).ThenBy(o => o.ParentName)
+                .OrderBy(r => r.SortOrderOnChild)
+                .ThenBy(o => o.CollectionName)
                 .ToList();
             if (relAsParent.Any())
             {

@@ -20,7 +20,7 @@ namespace WEB.Models
                 s.Add($"");
                 t = "    ";
             }
-            s.Add(t + $"<app-page-title title='{CurrentEntity.PluralFriendlyName}'></app-page-title>");
+            s.Add(t + $"<app-page-title title=\"{CurrentEntity.PluralFriendlyName}\"></app-page-title>");
             s.Add($"");
             s.Add(t + $"<div class=\"card border-0\">");
             s.Add($"");

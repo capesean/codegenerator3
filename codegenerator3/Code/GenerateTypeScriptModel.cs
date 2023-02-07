@@ -15,7 +15,8 @@ namespace WEB.Models
         {
             var relAsParent = CurrentEntity.RelationshipsAsParent
                 .Where(r => r.RelationshipAncestorLimit != RelationshipAncestorLimits.Exclude)
-                .OrderBy(r => r.SortOrderOnChild).ThenBy(o => o.ParentName)
+                .OrderBy(r => r.SortOrderOnChild)
+                .ThenBy(o => o.CollectionName)
                 .ToList();
 
             var s = new StringBuilder();
@@ -43,7 +44,10 @@ namespace WEB.Models
             {
                 s.Add($"    {field.Name.ToCamelCase()}: {field.JavascriptType};");
             }
-            foreach (var relationship in CurrentEntity.RelationshipsAsChild.Where(r => !r.ParentEntity.Exclude).OrderBy(o => o.ParentEntity.Name).ThenBy(o => o.CollectionName))
+            foreach (var relationship in CurrentEntity.RelationshipsAsChild.Where(r => !r.ParentEntity.Exclude)
+                .OrderBy(o => o.ParentEntity.Name)
+                .ThenBy(o => o.ParentName)
+                )
             {
                 if (relationship.RelationshipFields.Count == 1 && relationship.RelationshipFields.Single().ChildField.EditPageType == EditPageType.Exclude) continue;
                 s.Add($"    {relationship.ParentName.ToCamelCase()}: {relationship.ParentEntity.Name};");
