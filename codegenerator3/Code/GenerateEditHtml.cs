@@ -25,6 +25,7 @@ namespace WEB.Models
             s.Add($"");
             s.Add(t + $"<form id=\"form\" name=\"form\" (submit)=\"save(form)\" novalidate #form=\"ngForm\" [ngClass]=\"{{ 'was-validated': form.submitted }}\">");
             s.Add($"");
+
             s.Add(t + $"<div class=\"card border-0\">");
             s.Add($"");
             s.Add(t + $"    <div class=\"card-body\">");
@@ -329,6 +330,7 @@ namespace WEB.Models
             s.Add(t + $"</fieldset>");
             s.Add($"");
             s.Add(t + $"</form>");
+            s.Add($"");
 
             #region child lists
             if (CurrentEntity.RelationshipsAsParent.Any(r => !r.ChildEntity.Exclude && r.DisplayListOnParent))
@@ -336,7 +338,6 @@ namespace WEB.Models
                 var relationships = CurrentEntity.RelationshipsAsParent.Where(r => !r.ChildEntity.Exclude && r.DisplayListOnParent).OrderBy(r => r.SortOrder);
                 var counter = 0;
 
-                s.Add($"");
                 s.Add(t + $"<ng-container *ngIf=\"!isNew\">");
                 s.Add($"");
                 s.Add(t + $"    <hr />");
@@ -482,13 +483,14 @@ namespace WEB.Models
                 s.Add(t + $"    <div [ngbNavOutlet]=\"nav\" class=\"mt-1\"></div>");
                 s.Add($"");
                 s.Add(t + $"</ng-container>");
+                s.Add($"");
             }
             #endregion
 
             if (hasChildRoutes)
             {
-                s.Add($"");
                 s.Add($"</ng-container>");
+                s.Add($"");
             }
 
             foreach (var rel in CurrentEntity.RelationshipsAsParent.Where(o => o.UseMultiSelect && !o.ChildEntity.Exclude))
@@ -496,14 +498,14 @@ namespace WEB.Models
                 var reverseRel = rel.ChildEntity.RelationshipsAsChild.Where(o => o.RelationshipId != rel.RelationshipId).SingleOrDefault();
 
                 //[organisation]=\"user.organisation\"   [canRemoveFilters]=\"false\"
-                s.Add($"");
                 s.Add($"<{reverseRel.ParentEntity.Name.Hyphenated()}-modal #{reverseRel.ParentEntity.Name.ToCamelCase()}Modal (changes)=\"change{reverseRel.ParentEntity.Name}($event)\" [multiple]=\"true\"></{reverseRel.ParentEntity.Name.Hyphenated()}-modal>");
+                s.Add($"");
             }
 
             if (hasChildRoutes)
             {
-                s.Add($"");
                 s.Add($"<router-outlet></router-outlet>");
+                s.Add($"");
             }
 
             return RunCodeReplacements(s.ToString(), CodeType.EditHtml);
