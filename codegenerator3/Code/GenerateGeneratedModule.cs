@@ -19,8 +19,8 @@ namespace WEB.Models
             var entitiesToBundle = AllEntities.Where(e => !e.Exclude);
             foreach (var e in entitiesToBundle)
             {
-                s.Add($"import {{ {e.Name}ListComponent }} from './{e.PluralName.ToLower()}/{e.Name.ToLower()}.list.component';");
-                s.Add($"import {{ {e.Name}EditComponent }} from './{e.PluralName.ToLower()}/{e.Name.ToLower()}.edit.component';");
+                s.Add($"import {{ {e.Name}ListComponent }} from './{e.Project.GeneratedPath ?? string.Empty}{e.PluralName.ToLower()}/{e.Name.ToLower()}.list.component';");
+                s.Add($"import {{ {e.Name}EditComponent }} from './{e.Project.GeneratedPath ?? string.Empty}{e.PluralName.ToLower()}/{e.Name.ToLower()}.edit.component';");
             }
             s.Add($"import {{ SharedModule }} from './shared.module';");
             s.Add($"import {{ GeneratedRoutes }} from './generated.routes';");

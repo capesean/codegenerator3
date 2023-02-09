@@ -9,6 +9,10 @@ namespace WEB.Models
     {
         public string GenerateSharedModule()
         {
+            var folderCount = string.IsNullOrWhiteSpace(CurrentEntity.Project.GeneratedPath) ? 0 : 1;
+            if (folderCount == 1 && CurrentEntity.Project.GeneratedPath.Contains("/")) folderCount += CurrentEntity.Project.GeneratedPath.Count(o => o == '/');
+            var folders = string.Join("", Enumerable.Repeat("../", folderCount));
+
             var s = new StringBuilder();
 
             var file = File.ReadAllText(AppDomain.CurrentDomain.BaseDirectory + "templates/shared.module.txt");
@@ -22,19 +26,19 @@ namespace WEB.Models
             {
                 if (string.IsNullOrWhiteSpace(e.PreventAppSelectTypeScriptDeployment))
                 {
-                    imports += $"import {{ {e.Name}SelectComponent }} from './{e.PluralName.ToLower()}/{e.Name.ToLower()}.select.component';{Environment.NewLine}";
+                    imports += $"import {{ {e.Name}SelectComponent }} from './{e.Project.GeneratedPath}{e.PluralName.ToLower()}/{e.Name.ToLower()}.select.component';{Environment.NewLine}";
                     component += $",{Environment.NewLine}        {e.Name}SelectComponent";
                 }
 
                 if (string.IsNullOrWhiteSpace(e.PreventSelectModalTypeScriptDeployment))
                 {
-                    imports += $"import {{ {e.Name}ModalComponent }} from './{e.PluralName.ToLower()}/{e.Name.ToLower()}.modal.component';{Environment.NewLine}";
+                    imports += $"import {{ {e.Name}ModalComponent }} from './{e.Project.GeneratedPath}{e.PluralName.ToLower()}/{e.Name.ToLower()}.modal.component';{Environment.NewLine}";
                     component += $",{Environment.NewLine}        {e.Name}ModalComponent";
                 }
 
                 if (e.HasASortField)
                 {
-                    imports += $"import {{ {e.Name}SortComponent }} from './{e.PluralName.ToLower()}/{e.Name.ToLower()}.sort.component';{Environment.NewLine}";
+                    imports += $"import {{ {e.Name}SortComponent }} from './{e.Project.GeneratedPath}{e.PluralName.ToLower()}/{e.Name.ToLower()}.sort.component';{Environment.NewLine}";
                     component += $",{Environment.NewLine}        {e.Name}SortComponent";
                 }
             }

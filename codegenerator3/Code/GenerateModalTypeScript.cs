@@ -12,6 +12,8 @@ namespace WEB.Models
     {
         public string GenerateModalTypeScript()
         {
+            var folders = string.Join("", Enumerable.Repeat("../", CurrentEntity.Project.GeneratedPath.Count(o => o == '/')));
+
             var s = new StringBuilder();
 
             var file = File.ReadAllText(AppDomain.CurrentDomain.BaseDirectory + "templates/selectmodal.ts.txt");
@@ -26,17 +28,17 @@ namespace WEB.Models
 
             if (CurrentEntity.EntityType == EntityType.User)
             {
-                if (!lookups.Any()) imports += $"import {{ Enum }} from '../common/models/enums.model';" + Environment.NewLine;
+                if (!lookups.Any()) imports += $"import {{ Enum }} from '{folders}../common/models/enums.model';" + Environment.NewLine;
                 inputs += $"    @Input() role: Enum;" + Environment.NewLine;
                 searchOptions += $"        this.searchOptions.roleName = this.role ? this.role.name : undefined;" + Environment.NewLine;
             }
 
             if (lookups.Any())
-                imports += $"import {{ Enum, Enums{(CurrentEntity.EntityType == EntityType.User ? "Role" : "")} }} from '../common/models/enums.model';" + Environment.NewLine;
+                imports += $"import {{ Enum, Enums{(CurrentEntity.EntityType == EntityType.User ? "Role" : "")} }} from '{folders}../common/models/enums.model';" + Environment.NewLine;
 
             if (!lookups.Any() && CurrentEntity.Fields.Where(o => o.ShowInSearchResults && o.FieldType == FieldType.Enum).Any())
             {
-                imports += $"import {{ Enums }} from '../common/models/enums.model';" + Environment.NewLine;
+                imports += $"import {{ Enums }} from '{folders}../common/models/enums.model';" + Environment.NewLine;
                 foreach (var lookup in CurrentEntity.Fields.Where(o => o.ShowInSearchResults && o.FieldType == FieldType.Enum).Select(o => o.Lookup).Distinct())
                     properties += $"    {lookup.PluralName.ToCamelCase()} = Enums.{lookup.PluralName};" + Environment.NewLine;
             }
@@ -72,13 +74,14 @@ namespace WEB.Models
                     if (relationship.ParentEntity != CurrentEntity && !imported.Contains(relationship.ParentEntity.Name))
                     {
                         imported.Add(relationship.ParentEntity.Name);
-                        imports += $"import {{ {relationship.ParentEntity.Name} }} from '../common/models/{relationship.ParentEntity.Name.ToLower()}.model';" + Environment.NewLine;
+                        imports += $"import {{ {relationship.ParentEntity.Name} }} from '{folders}../common/models/{relationship.ParentEntity.Name.ToLower()}.model';" + Environment.NewLine;
                     }
                 }
             }
 
             file = RunTemplateReplacements(file)
                 .Replace("/*IMPORTS*/", imports)
+                .Replace("/*FOLDERS*/", folders)
                 .Replace("/*INPUTS*/", inputs)
                 .Replace("/*PROPERTIES*/", properties)
                 .Replace("/*SEARCHOPTIONS*/", searchOptions)

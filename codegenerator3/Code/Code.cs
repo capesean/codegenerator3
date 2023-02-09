@@ -5,6 +5,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Data.Entity;
 using System.IO;
+using System.Web.UI;
 
 /*
  notes on error: Possibly unhandled rejection:
@@ -547,12 +548,11 @@ namespace WEB.Models
             #region typescript model
             if (deploymentOptions.TypeScriptModel)
             {
-                var path = Path.Combine(entity.Project.RootPathModels, "Models");
-                if (!Directory.Exists(path))
-                    return ("Models path does not exist:" + path);
+                var path = Path.Combine(entity.Project.RootPathWeb, @"ClientApp\src\app\common\models");
+                if (!Directory.Exists(path)) return "Models path does not exist:" + path;
 
-                if (!CreateAppDirectory(entity.Project, "common\\models", codeGenerator.GenerateTypeScriptModel(), entity.Name.ToLower() + ".model.ts"))
-                    return ("Failed to create the typescript model folder. Check that the app path does not exists: " + Path.Combine(entity.Project.RootPathWeb, @"ClientApp\src\app"));
+                var err = WriteFile(path, null, entity.Name.ToLower() + ".model.ts", codeGenerator.GenerateTypeScriptModel());
+                if (err != null) return err;
             }
             #endregion
 
@@ -583,6 +583,7 @@ namespace WEB.Models
             #region enums
             if (deploymentOptions.Enums)
             {
+                // generate C# enums
                 var path = Path.Combine(entity.Project.RootPathModels, "Models");
                 if (!Directory.Exists(path))
                     return ("Models path does not exist: " + path);
@@ -590,12 +591,15 @@ namespace WEB.Models
                 var code = codeGenerator.GenerateEnums();
                 if (code != string.Empty) File.WriteAllText(Path.Combine(path, "Enums.cs"), code);
 
-                // todo: move this to own deployment option
-                if (!CreateAppDirectory(entity.Project, "common\\models", codeGenerator.GenerateTypeScriptEnums(), "enums.model.ts"))
-                    return ("App path does not exist: " + path);
+                code = codeGenerator.GenerateRoles();
+                if (code != string.Empty) File.WriteAllText(Path.Combine(path, "Roles.cs"), code);
 
-                // todo: move this to own deployment option
-                File.WriteAllText(Path.Combine(entity.Project.RootPathModels, "Models", "Roles.cs"), codeGenerator.GenerateRoles());
+                // generate TypeScript enums
+                path = Path.Combine(entity.Project.RootPathWeb, @"ClientApp\src\app\common\models");
+                if (!Directory.Exists(path)) return "Models path does not exist:" + path;
+
+                var err = WriteFile(path, null, "enums.model.ts", codeGenerator.GenerateTypeScriptEnums());
+                if (err != null) return err;
 
             }
             #endregion
@@ -640,40 +644,55 @@ namespace WEB.Models
             #region list html
             if (deploymentOptions.ListHtml)
             {
-                if (!CreateAppDirectory(entity.Project, entity.PluralName, codeGenerator.GenerateListHtml(), entity.Name.ToLower() + ".list.component.html"))
-                    return ("App path does not exist: " + Path.Combine(entity.Project.RootPathWeb, @"ClientApp\src\app"));
+                var path = Path.Combine(entity.Project.RootPathWeb, @"ClientApp\src\app", entity.Project.GeneratedPath ?? string.Empty);
+                if (!Directory.Exists(path)) return "Generated path does not exist:" + path;
+
+                var err = WriteFile(path, entity.PluralName.ToLower(), entity.Name.ToLower() + ".list.component.html", codeGenerator.GenerateListHtml());
+                if (err != null) return err;
             }
             #endregion
 
             #region list typescript
             if (deploymentOptions.ListTypeScript)
             {
-                if (!CreateAppDirectory(entity.Project, entity.PluralName, codeGenerator.GenerateListTypeScript(), entity.Name.ToLower() + ".list.component.ts"))
-                    return ("App path does not exist: " + Path.Combine(entity.Project.RootPathWeb, @"ClientApp\src\app"));
+                var path = Path.Combine(entity.Project.RootPathWeb, @"ClientApp\src\app", entity.Project.GeneratedPath ?? string.Empty);
+                if (!Directory.Exists(path)) return "Generated path does not exist:" + path;
+
+                var err = WriteFile(path, entity.PluralName.ToLower(), entity.Name.ToLower() + ".list.component.ts", codeGenerator.GenerateListTypeScript());
+                if (err != null) return err;
             }
             #endregion
 
             #region edit html
             if (deploymentOptions.EditHtml)
             {
-                if (!CreateAppDirectory(entity.Project, entity.PluralName, codeGenerator.GenerateEditHtml(), entity.Name.ToLower() + ".edit.component.html"))
-                    return ("App path does not exist: " + Path.Combine(entity.Project.RootPathWeb, @"ClientApp\src\app"));
+                var path = Path.Combine(entity.Project.RootPathWeb, @"ClientApp\src\app", entity.Project.GeneratedPath ?? string.Empty);
+                if (!Directory.Exists(path)) return "Generated path does not exist:" + path;
+
+                var err = WriteFile(path, entity.PluralName.ToLower(), entity.Name.ToLower() + ".edit.component.html", codeGenerator.GenerateEditHtml());
+                if (err != null) return err;
             }
             #endregion
 
             #region edit typescript
             if (deploymentOptions.EditTypeScript)
             {
-                if (!CreateAppDirectory(entity.Project, entity.PluralName, codeGenerator.GenerateEditTypeScript(), entity.Name.ToLower() + ".edit.component.ts"))
-                    return ("App path does not exist: " + Path.Combine(entity.Project.RootPathWeb, @"ClientApp\src\app"));
+                var path = Path.Combine(entity.Project.RootPathWeb, @"ClientApp\src\app", entity.Project.GeneratedPath ?? string.Empty);
+                if (!Directory.Exists(path)) return "Generated path does not exist:" + path;
+
+                var err = WriteFile(path, entity.PluralName.ToLower(), entity.Name.ToLower() + ".edit.component.ts", codeGenerator.GenerateEditTypeScript());
+                if (err != null) return err;
             }
             #endregion
 
             #region api resource
             if (deploymentOptions.ApiResource)
             {
-                if (!CreateAppDirectory(entity.Project, "common\\services", codeGenerator.GenerateApiResource(), entity.Name.ToLower() + ".service.ts"))
-                    return ("App path does not exist: " + Path.Combine(entity.Project.RootPathWeb, @"ClientApp\src\app"));
+                var path = Path.Combine(entity.Project.RootPathWeb, @"ClientApp\src\app\common\services");
+                if (!Directory.Exists(path)) return "Services path does not exist:" + path;
+
+                var err = WriteFile(path, null, entity.Name.ToLower() + ".service.ts", codeGenerator.GenerateApiResource());
+                if (err != null) return err;
             }
             #endregion
 
@@ -710,32 +729,44 @@ namespace WEB.Models
             #region app-select html
             if (deploymentOptions.AppSelectHtml)
             {
-                if (!CreateAppDirectory(entity.Project, entity.PluralName, codeGenerator.GenerateSelectHtml(), entity.Name.ToLower() + ".select.component.html"))
-                    return ("App path does not exist: " + Path.Combine(entity.Project.RootPathWeb, @"ClientApp\src\app"));
+                var path = Path.Combine(entity.Project.RootPathWeb, @"ClientApp\src\app", entity.Project.GeneratedPath ?? string.Empty);
+                if (!Directory.Exists(path)) return "Generated path does not exist:" + path;
+
+                var err = WriteFile(path, entity.PluralName.ToLower(), entity.Name.ToLower() + ".select.component.html", codeGenerator.GenerateSelectHtml());
+                if (err != null) return err;
             }
             #endregion
 
             #region app-select typescript
             if (deploymentOptions.AppSelectTypeScript)
             {
-                if (!CreateAppDirectory(entity.Project, entity.PluralName, codeGenerator.GenerateSelectTypeScript(), entity.Name.ToLower() + ".select.component.ts"))
-                    return ("App path does not exist: " + Path.Combine(entity.Project.RootPathWeb, @"ClientApp\src\app"));
+                var path = Path.Combine(entity.Project.RootPathWeb, @"ClientApp\src\app", entity.Project.GeneratedPath ?? string.Empty);
+                if (!Directory.Exists(path)) return "Generated path does not exist:" + path;
+
+                var err = WriteFile(path, entity.PluralName.ToLower(), entity.Name.ToLower() + ".select.component.ts", codeGenerator.GenerateSelectTypeScript());
+                if (err != null) return err;
             }
             #endregion
 
             #region select modal html
             if (deploymentOptions.SelectModalHtml)
             {
-                if (!CreateAppDirectory(entity.Project, entity.PluralName, codeGenerator.GenerateModalHtml(), entity.Name.ToLower() + ".modal.component.html"))
-                    return ("App path does not exist: " + Path.Combine(entity.Project.RootPathWeb, @"ClientApp\src\app"));
+                var path = Path.Combine(entity.Project.RootPathWeb, @"ClientApp\src\app", entity.Project.GeneratedPath ?? string.Empty);
+                if (!Directory.Exists(path)) return "Generated path does not exist:" + path;
+
+                var err = WriteFile(path, entity.PluralName.ToLower(), entity.Name.ToLower() + ".modal.component.html", codeGenerator.GenerateModalHtml());
+                if (err != null) return err;
             }
             #endregion
 
             #region select modal typescript
             if (deploymentOptions.SelectModalTypeScript)
             {
-                if (!CreateAppDirectory(entity.Project, entity.PluralName, codeGenerator.GenerateModalTypeScript(), entity.Name.ToLower() + ".modal.component.ts"))
-                    return ("App path does not exist: " + Path.Combine(entity.Project.RootPathWeb, @"ClientApp\src\app"));
+                var path = Path.Combine(entity.Project.RootPathWeb, @"ClientApp\src\app", entity.Project.GeneratedPath ?? string.Empty);
+                if (!Directory.Exists(path)) return "Generated path does not exist:" + path;
+
+                var err = WriteFile(path, entity.PluralName.ToLower(), entity.Name.ToLower() + ".modal.component.ts", codeGenerator.GenerateModalTypeScript());
+                if (err != null) return err;
             }
             #endregion
 
@@ -745,8 +776,11 @@ namespace WEB.Models
                 if (!entity.HasASortField)
                     return ($"Entity {entity.FriendlyName} does not have a sort field. Either add a field with Edit Page Type: Sort, or enter a Prevent Sort Html Deployment comment");
 
-                if (!CreateAppDirectory(entity.Project, entity.PluralName, codeGenerator.GenerateSortHtml(), entity.Name.ToLower() + ".sort.component.html"))
-                    return ("App path does not exist: " + Path.Combine(entity.Project.RootPathWeb, @"ClientApp\src\app"));
+                var path = Path.Combine(entity.Project.RootPathWeb, @"ClientApp\src\app", entity.Project.GeneratedPath ?? string.Empty);
+                if (!Directory.Exists(path)) return "Generated path does not exist:" + path;
+
+                var err = WriteFile(path, entity.PluralName.ToLower(), entity.Name.ToLower() + ".sort.component.html", codeGenerator.GenerateSortHtml());
+                if (err != null) return err;
             }
             #endregion
 
@@ -756,8 +790,11 @@ namespace WEB.Models
                 if (!entity.HasASortField)
                     return ($"Entity {entity.FriendlyName} does not have a sort field. Either add a field with Edit Page Type: Sort, or enter a Prevent Sort Html Deployment comment");
 
-                if (!CreateAppDirectory(entity.Project, entity.PluralName, codeGenerator.GenerateSortTypeScript(), entity.Name.ToLower() + ".sort.component.ts"))
-                    return ("App path does not exist: " + Path.Combine(entity.Project.RootPathWeb, @"ClientApp\src\app"));
+                var path = Path.Combine(entity.Project.RootPathWeb, @"ClientApp\src\app", entity.Project.GeneratedPath ?? string.Empty);
+                if (!Directory.Exists(path)) return "Generated path does not exist:" + path;
+
+                var err = WriteFile(path, entity.PluralName.ToLower(), entity.Name.ToLower() + ".sort.component.ts", codeGenerator.GenerateSortTypeScript());
+                if (err != null) return err;
             }
             #endregion
 
@@ -776,19 +813,17 @@ namespace WEB.Models
             return null;
         }
 
-        private static bool CreateAppDirectory(Project project, string directoryName, string code, string fileName)
+        private static string WriteFile(string path, string folder, string fileName, string code)
         {
-            if (code == string.Empty) return true;
+            if (code == string.Empty) return null;
 
-            var path = Path.Combine(project.RootPathWeb, @"ClientApp\src\app");
-            if (!Directory.Exists(path))
-                return false;
-            path = Path.Combine(path, directoryName.ToLower());
-            if (!Directory.Exists(path))
-                Directory.CreateDirectory(path);
+            if (!Directory.Exists(path)) return "Path does not exist: " + path;
+
+            if (!string.IsNullOrWhiteSpace(folder)) path = Path.Combine(path, folder);
+            if (!Directory.Exists(path)) Directory.CreateDirectory(path);
 
             File.WriteAllText(Path.Combine(path, fileName), code);
-            return true;
+            return null;
         }
     }
 

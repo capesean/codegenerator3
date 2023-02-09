@@ -18,8 +18,8 @@ namespace WEB.Models
             var allEntities = AllEntities.Where(e => !e.Exclude).OrderBy(o => o.Name);
             foreach (var entity in allEntities)
             {
-                s.Add($"import {{ {entity.Name}ListComponent }} from './{entity.PluralName.ToLower()}/{entity.Name.ToLower()}.list.component';");
-                s.Add($"import {{ {entity.Name}EditComponent }} from './{entity.PluralName.ToLower()}/{entity.Name.ToLower()}.edit.component';");
+                s.Add($"import {{ {entity.Name}ListComponent }} from './{entity.Project.GeneratedPath ?? string.Empty}{entity.PluralName.ToLower()}/{entity.Name.ToLower()}.list.component';");
+                s.Add($"import {{ {entity.Name}EditComponent }} from './{entity.Project.GeneratedPath ?? string.Empty}{entity.PluralName.ToLower()}/{entity.Name.ToLower()}.edit.component';");
             }
             //s.Add($"import {{ NotFoundComponent }} from './common/notfound.component';");
             s.Add($"");

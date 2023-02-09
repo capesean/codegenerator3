@@ -12,6 +12,8 @@ namespace WEB.Models
     {
         public string GenerateSelectTypeScript()
         {
+            var folders = string.Join("", Enumerable.Repeat("../", CurrentEntity.Project.GeneratedPath.Count(o => o == '/')));
+
             var s = new StringBuilder();
 
             var file = File.ReadAllText(AppDomain.CurrentDomain.BaseDirectory + "templates/appselect.ts.txt");
@@ -49,7 +51,7 @@ namespace WEB.Models
                     if (relationship.ParentEntity != CurrentEntity && !imported.Contains(relationship.ParentEntity.Name))
                     {
                         imported.Add(relationship.ParentEntity.Name);
-                        imports += $"import {{ {relationship.ParentEntity.Name} }} from '../common/models/{relationship.ParentEntity.Name.ToLower()}.model';" + Environment.NewLine;
+                        imports += $"import {{ {relationship.ParentEntity.Name} }} from '{folders}../common/models/{relationship.ParentEntity.Name.ToLower()}.model';" + Environment.NewLine;
                     }
                 }
             }
@@ -75,6 +77,7 @@ namespace WEB.Models
             var enums = CurrentEntity.PrimaryField.FieldType == FieldType.Enum ? ", Enums" : string.Empty;
 
             file = RunTemplateReplacements(file)
+                .Replace("/*FOLDERS*/", folders)
                 .Replace("/*FILTER_ATTRIBUTES*/", filterAttributes)
                 .Replace("/*FILTER_OPTIONS*/", filterOptions)
                 .Replace("/*INPUTS*/", inputs)

@@ -699,6 +699,10 @@
     <Compile Include="Migrations\202302061128394_Sortable.designer.cs">
       <DependentUpon>202302061128394_Sortable.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202302090553293_GeneratedPath.cs" />
+    <Compile Include="Migrations\202302090553293_GeneratedPath.designer.cs">
+      <DependentUpon>202302090553293_GeneratedPath.cs</DependentUpon>
+    </Compile>
     <Compile Include="Models\Relationship_.cs" />
     <Compile Include="Startup.cs" />
     <Compile Include="Utilities\ApiException.cs" />
@@ -833,6 +837,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202302061128394_Sortable.resx">
       <DependentUpon>202302061128394_Sortable.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202302090553293_GeneratedPath.resx">
+      <DependentUpon>202302090553293_GeneratedPath.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

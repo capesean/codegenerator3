@@ -9,6 +9,8 @@ namespace WEB.Models
     {
         public string GenerateEditTypeScript()
         {
+            var folders = string.Join("", Enumerable.Repeat("../", CurrentEntity.Project.GeneratedPath.Count(o => o == '/')));
+
             var multiSelectRelationships = CurrentEntity.RelationshipsAsParent.Where(r => r.UseMultiSelect && !r.ChildEntity.Exclude).OrderBy(o => o.SortOrder);
             var relationshipsAsParent = CurrentEntity.RelationshipsAsParent.Where(r => !r.ChildEntity.Exclude && r.DisplayListOnParent).OrderBy(r => r.SortOrder);
             var relationshipsAsChildHierarchy = CurrentEntity.RelationshipsAsChild.FirstOrDefault(r => r.Hierarchy);
@@ -41,27 +43,27 @@ namespace WEB.Models
             if (relationshipsAsParent.Any())
                 s.Add($"import {{ Subject{(hasChildRoutes || CurrentEntity.EntityType == EntityType.User ? ", Subscription" : "")} }} from 'rxjs';");
             s.Add($"import {{ HttpErrorResponse }} from '@angular/common/http';");
-            s.Add($"import {{ BreadcrumbService }} from '../common/services/breadcrumb.service';");
-            s.Add($"import {{ ErrorService }} from '../common/services/error.service';");
+            s.Add($"import {{ BreadcrumbService }} from '{folders}../common/services/breadcrumb.service';");
+            s.Add($"import {{ ErrorService }} from '{folders}../common/services/error.service';");
             s.Add($"import {{ NgbModal }} from '@ng-bootstrap/ng-bootstrap';");
-            s.Add($"import {{ ConfirmModalComponent, ModalOptions }} from '../common/components/confirm.component';");
+            s.Add($"import {{ ConfirmModalComponent, ModalOptions }} from '{folders}../common/components/confirm.component';");
             if (relationshipsAsParent.Any())
-                s.Add($"import {{ PagingHeaders }} from '../common/models/http.model';");
-            s.Add($"import {{ {CurrentEntity.Name} }} from '../common/models/{CurrentEntity.Name.ToLower()}.model';");
-            s.Add($"import {{ {CurrentEntity.Name}Service }} from '../common/services/{CurrentEntity.Name.ToLower()}.service';");
+                s.Add($"import {{ PagingHeaders }} from '{folders}../common/models/http.model';");
+            s.Add($"import {{ {CurrentEntity.Name} }} from '{folders}../common/models/{CurrentEntity.Name.ToLower()}.model';");
+            s.Add($"import {{ {CurrentEntity.Name}Service }} from '{folders}../common/services/{CurrentEntity.Name.ToLower()}.service';");
             if (CurrentEntity.EntityType != EntityType.User && (enumLookups.Count > 0 || addEnum))
-                s.Add($"import {{ Enum, Enums{(CurrentEntity.PrimaryField.FieldType == FieldType.Enum ? ", " + CurrentEntity.PrimaryField.Lookup.PluralName : "")} }} from '../common/models/enums.model';");
+                s.Add($"import {{ Enum, Enums{(CurrentEntity.PrimaryField.FieldType == FieldType.Enum ? ", " + CurrentEntity.PrimaryField.Lookup.PluralName : "")} }} from '{folders}../common/models/enums.model';");
             foreach (var relChildEntity in relationshipsAsParent.Select(o => o.ChildEntity).Distinct().OrderBy(o => o.Name))
             {
-                s.Add($"import {{ {(relChildEntity.EntityId == CurrentEntity.EntityId ? "" : relChildEntity.Name + ", ")}{relChildEntity.Name}SearchOptions, {relChildEntity.Name}SearchResponse }} from '../common/models/{relChildEntity.Name.ToLower()}.model';");
+                s.Add($"import {{ {(relChildEntity.EntityId == CurrentEntity.EntityId ? "" : relChildEntity.Name + ", ")}{relChildEntity.Name}SearchOptions, {relChildEntity.Name}SearchResponse }} from '{folders}../common/models/{relChildEntity.Name.ToLower()}.model';");
                 if (relChildEntity.EntityId != CurrentEntity.EntityId)
-                    s.Add($"import {{ {relChildEntity.Name}Service }} from '../common/services/{relChildEntity.Name.ToLower()}.service';");
+                    s.Add($"import {{ {relChildEntity.Name}Service }} from '{folders}../common/services/{relChildEntity.Name.ToLower()}.service';");
             }
             if (CurrentEntity.EntityType == EntityType.User)
             {
-                s.Add($"import {{ Enum, Enums, Roles }} from '../common/models/enums.model';");
-                s.Add($"import {{ ProfileModel }} from '../common/models/profile.models';");
-                s.Add($"import {{ AuthService }} from '../common/services/auth.service';");
+                s.Add($"import {{ Enum, Enums, Roles }} from '{folders}../common/models/enums.model';");
+                s.Add($"import {{ ProfileModel }} from '{folders}../common/models/profile.models';");
+                s.Add($"import {{ AuthService }} from '{folders}../common/services/auth.service';");
             }
             var processedEntityIds = new List<Guid>();
             foreach (var rel in multiSelectRelationships)
@@ -72,7 +74,7 @@ namespace WEB.Models
                 var reverseRel = rel.ChildEntity.RelationshipsAsChild.Where(o => o.RelationshipId != rel.RelationshipId).SingleOrDefault();
 
                 s.Add($"import {{ {reverseRel.ParentEntity.Name}ModalComponent }} from '../{reverseRel.ParentEntity.PluralName.ToLower()}/{reverseRel.ParentEntity.Name.ToLower()}.modal.component';");
-                if (reverseRel.ParentEntity != CurrentEntity) s.Add($"import {{ {reverseRel.ParentEntity.Name} }} from '../common/models/{reverseRel.ParentEntity.Name.ToLower()}.model';");
+                if (reverseRel.ParentEntity != CurrentEntity) s.Add($"import {{ {reverseRel.ParentEntity.Name} }} from '{folders}../common/models/{reverseRel.ParentEntity.Name.ToLower()}.model';");
             }
             if (relationshipsAsParent.Any(o => o.Hierarchy && o.ChildEntity.HasASortField))
             {
@@ -82,7 +84,7 @@ namespace WEB.Models
             if (CurrentEntity.PrimaryField.CustomType == CustomType.Date)
                 s.Add($"import * as moment from 'moment';");
             if (hasFileContents)
-                s.Add($"import {{ DownloadService }} from '../common/services/download.service';");
+                s.Add($"import {{ DownloadService }} from '{folders}../common/services/download.service';");
 
             s.Add($"");
 

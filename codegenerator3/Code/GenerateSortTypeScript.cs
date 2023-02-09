@@ -12,6 +12,8 @@ namespace WEB.Models
     {
         public string GenerateSortTypeScript()
         {
+            var folders = string.Join("", Enumerable.Repeat("../", CurrentEntity.Project.GeneratedPath.Count(o => o == '/')));
+
             var s = new StringBuilder();
 
             var file = File.ReadAllText(AppDomain.CurrentDomain.BaseDirectory + "templates/sort.txt");
@@ -39,7 +41,8 @@ namespace WEB.Models
             }
 
             file = RunTemplateReplacements(file)
-                .Replace("ENUM_IMPORTS", enumLookups.Any() ? $"import {{ Enum, Enums }} from '../common/models/enums.model';{Environment.NewLine}" : "")
+                .Replace("/*FOLDERS*/", folders)
+                .Replace("ENUM_IMPORTS", enumLookups.Any() ? $"import {{ Enum, Enums }} from '{folders}../common/models/enums.model';{Environment.NewLine}" : "")
                 .Replace("ENUM_PROPERTIES", enumLookups.Any() ? ENUM_PROPERTIES : string.Empty)
                 .Replace("PARENTPKFIELDS", PARENTPKFIELDS)
                 .Replace("HIERARCHYFIELDS", HIERARCHYFIELDS)

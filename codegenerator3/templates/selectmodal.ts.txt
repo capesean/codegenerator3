@@ -1,10 +1,10 @@
 ﻿import { Component, OnInit, ViewChild, Output, EventEmitter, TemplateRef, Input } from '@angular/core';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { Observable } from 'rxjs';
-import { NAMESearchOptions, NAMESearchResponse, NAME } from '../common/models/NAME_TOLOWER.model';
-import { NAMEService } from '../common/services/NAME_TOLOWER.service';
-import { PagingHeaders } from '../common/models/http.model';
-import { ErrorService } from '../common/services/error.service';
+import { NAMESearchOptions, NAMESearchResponse, NAME } from '/*FOLDERS*/../common/models/NAME_TOLOWER.model';
+import { NAMEService } from '/*FOLDERS*/../common/services/NAME_TOLOWER.service';
+import { PagingHeaders } from '/*FOLDERS*/../common/models/http.model';
+import { ErrorService } from '/*FOLDERS*/../common/services/error.service';
 /*IMPORTS*/
 @Component({
     selector: 'HYPHENATEDNAME-modal',

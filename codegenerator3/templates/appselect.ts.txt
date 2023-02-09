@@ -1,8 +1,8 @@
 ﻿import { Component, OnInit, forwardRef, ViewChild, Input, EventEmitter, Output } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { NAMEModalComponent } from './NAME_TOLOWER.modal.component';
-import { NAME } from '../common/models/NAME_TOLOWER.model';
-import { Enum/*ENUMS*/ } from '../common/models/enums.model';
+import { NAME } from '/*FOLDERS*/../common/models/NAME_TOLOWER.model';
+import { Enum/*ENUMS*/ } from '/*FOLDERS*/../common/models/enums.model';
 /*IMPORTS*/
 @Component({
     selector: 'HYPHENATEDNAME-select',

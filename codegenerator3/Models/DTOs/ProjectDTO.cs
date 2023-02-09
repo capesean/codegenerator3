@@ -47,6 +47,9 @@ namespace WEB.Models
         [MaxLength(50)]
         public string ModelsPath { get; set; }
 
+        [MaxLength(50)]
+        public string GeneratedPath { get; set; }
+
         public string Notes { get; set; }
 
         [MaxLength(20)]
@@ -71,6 +74,7 @@ namespace WEB.Models
             projectDTO.UserFilterFieldName = project.UserFilterFieldName;
             projectDTO.DbContextVariable = project.DbContextVariable;
             projectDTO.ModelsPath = project.ModelsPath;
+            projectDTO.GeneratedPath = project.GeneratedPath;
             projectDTO.Notes = project.Notes;
 
             return projectDTO;
@@ -86,6 +90,7 @@ namespace WEB.Models
             project.UserFilterFieldName = projectDTO.UserFilterFieldName;
             project.DbContextVariable = projectDTO.DbContextVariable;
             project.ModelsPath = projectDTO.ModelsPath;
+            project.GeneratedPath = projectDTO.GeneratedPath;
             project.Notes = projectDTO.Notes;
         }
     }

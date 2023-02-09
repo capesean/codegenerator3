@@ -21,77 +21,86 @@
 
                     <div ng-class="{ 'hide':  !vm.isNew && !vm.showMore}">
 
-                    <div class="col-sm-6 col-md-4">
-                        <div class="form-group" ng-class="{ 'has-error':  mainForm.$submitted && mainForm.namespace.$invalid }">
-                            <label for="namespace" class="control-label">
-                                Namespace:
-                            </label>
-                            <input type="text" id="namespace" name="namespace" ng-model="vm.project.namespace" maxlength="20" class="form-control" ng-required="true" />
+                        <div class="col-sm-6 col-md-4">
+                            <div class="form-group" ng-class="{ 'has-error':  mainForm.$submitted && mainForm.namespace.$invalid }">
+                                <label for="namespace" class="control-label">
+                                    Namespace:
+                                </label>
+                                <input type="text" id="namespace" name="namespace" ng-model="vm.project.namespace" maxlength="20" class="form-control" ng-required="true" />
+                            </div>
                         </div>
-                    </div>
 
-                    <div class="col-sm-6 col-md-4 col-lg-3">
-                        <div class="form-group" ng-class="{ 'has-error':  mainForm.$submitted && mainForm.angularModuleName.$invalid }">
-                            <label for="angularModuleName" class="control-label">
-                                Angular Module Name:
-                            </label>
-                            <input type="text" id="angularModuleName" name="angularModuleName" ng-model="vm.project.angularModuleName" maxlength="20" class="form-control" ng-required="true" />
+                        <div class="col-sm-6 col-md-4 col-lg-3">
+                            <div class="form-group" ng-class="{ 'has-error':  mainForm.$submitted && mainForm.angularModuleName.$invalid }">
+                                <label for="angularModuleName" class="control-label">
+                                    Angular Module Name:
+                                </label>
+                                <input type="text" id="angularModuleName" name="angularModuleName" ng-model="vm.project.angularModuleName" maxlength="20" class="form-control" ng-required="true" />
+                            </div>
                         </div>
-                    </div>
 
-                    <div class="col-sm-6 col-md-4 col-lg-3">
-                        <div class="form-group" ng-class="{ 'has-error':  mainForm.$submitted && mainForm.angularDirectivePrefix.$invalid }">
-                            <label for="angularDirectivePrefix" class="control-label">
-                                Angular Directive Prefix:
-                            </label>
-                            <input type="text" id="angularDirectivePrefix" name="angularDirectivePrefix" ng-model="vm.project.angularDirectivePrefix" maxlength="20" class="form-control" ng-required="true" />
+                        <div class="col-sm-6 col-md-4 col-lg-3">
+                            <div class="form-group" ng-class="{ 'has-error':  mainForm.$submitted && mainForm.angularDirectivePrefix.$invalid }">
+                                <label for="angularDirectivePrefix" class="control-label">
+                                    Angular Directive Prefix:
+                                </label>
+                                <input type="text" id="angularDirectivePrefix" name="angularDirectivePrefix" ng-model="vm.project.angularDirectivePrefix" maxlength="20" class="form-control" ng-required="true" />
+                            </div>
                         </div>
-                    </div>
 
-                    <div class="col-sm-6 col-md-4 col-lg-3">
-                        <div class="form-group" ng-class="{ 'has-error':  mainForm.$submitted && mainForm.dbContextVariable.$invalid }">
-                            <label for="dbContextVariable" class="control-label">
-                                DbContext Variable:
-                            </label>
-                            <input type="text" id="dbContextVariable" name="dbContextVariable" ng-model="vm.project.dbContextVariable" maxlength="20" class="form-control" />
+                        <div class="col-sm-6 col-md-4 col-lg-3">
+                            <div class="form-group" ng-class="{ 'has-error':  mainForm.$submitted && mainForm.dbContextVariable.$invalid }">
+                                <label for="dbContextVariable" class="control-label">
+                                    DbContext Variable:
+                                </label>
+                                <input type="text" id="dbContextVariable" name="dbContextVariable" ng-model="vm.project.dbContextVariable" maxlength="20" class="form-control" />
+                            </div>
                         </div>
-                    </div>
 
-                    <div class="col-sm-6 col-md-4" uib-popover-html="'This is the <strong>relative</strong> path from the <code>RootPath</code> defined in <code>Web.config</code> to the root of your Web project. Example: If your web project is on path <code>c:\\source\\mywebsite</code>, your <code>RootPath</code> should be <code>c:\\source\\</code> and your <code>Web Path</code> should be <code>mywebsite</code>. (This allows you to have Web and Models in different projects, or they could be the same value if it is a single project.)'" popover-trigger="'mouseenter'" popover-append-to-body="true" popover-title="Web Path">
-                        <div class="form-group" ng-class="{ 'has-error':  mainForm.$submitted && mainForm.webPath.$invalid }">
-                            <label for="webPath" class="control-label">
-                                Web Path:
-                            </label>
-                            <input type="text" id="webPath" name="webPath" ng-model="vm.project.webPath" maxlength="250" class="form-control" ng-required="true" />
+                        <div class="col-sm-6 col-md-4" uib-popover-html="'This is the <strong>relative</strong> path from the <code>RootPath</code> defined in <code>Web.config</code> to the root of your Web project. Example: If your web project is on path <code>c:\\source\\mywebsite</code>, your <code>RootPath</code> should be <code>c:\\source\\</code> and your <code>Web Path</code> should be <code>mywebsite</code>. (This allows you to have Web and Models in different projects, or they could be the same value if it is a single project.)'" popover-trigger="'mouseenter'" popover-append-to-body="true" popover-title="Web Path">
+                            <div class="form-group" ng-class="{ 'has-error':  mainForm.$submitted && mainForm.webPath.$invalid }">
+                                <label for="webPath" class="control-label">
+                                    Web Path:
+                                </label>
+                                <input type="text" id="webPath" name="webPath" ng-model="vm.project.webPath" maxlength="250" class="form-control" ng-required="true" />
+                            </div>
                         </div>
-                    </div>
 
-                    <div class="col-sm-6 col-md-4 col-lg-3" uib-popover-html="'This is the <strong>relative</strong> path from the <code>RootPath</code> defined in <code>Web.config</code> to the root of your Models project. Example: If your models project is on path <code>c:\\source\\mymodels</code>, your <code>RootPath</code> should be <code>c:\\source\\</code> and your <code>Models Path</code> should be <code>mymodels</code>. (This allows you to have Web and Models in different projects, or they could be the same value if it is a single project.)'" popover-trigger="'mouseenter'" popover-append-to-body="true" popover-title="Models Path">
-                        <div class="form-group" ng-class="{ 'has-error':  mainForm.$submitted && mainForm.modelsPath.$invalid }">
-                            <label for="modelsPath" class="control-label">
-                                Models Path:
-                            </label>
-                            <input type="text" id="modelsPath" name="modelsPath" ng-model="vm.project.modelsPath" maxlength="50" class="form-control" ng-required="true" />
+                        <div class="col-sm-6 col-md-4 col-lg-3" uib-popover-html="'This is the <strong>relative</strong> path from the <code>RootPath</code> defined in <code>Web.config</code> to the root of your Models project. Example: If your models project is on path <code>c:\\source\\mymodels</code>, your <code>RootPath</code> should be <code>c:\\source\\</code> and your <code>Models Path</code> should be <code>mymodels</code>. (This allows you to have Web and Models in different projects, or they could be the same value if it is a single project.)'" popover-trigger="'mouseenter'" popover-append-to-body="true" popover-title="Models Path">
+                            <div class="form-group" ng-class="{ 'has-error':  mainForm.$submitted && mainForm.modelsPath.$invalid }">
+                                <label for="modelsPath" class="control-label">
+                                    Models Path:
+                                </label>
+                                <input type="text" id="modelsPath" name="modelsPath" ng-model="vm.project.modelsPath" maxlength="50" class="form-control" ng-required="true" />
+                            </div>
                         </div>
-                    </div>
 
-                    <div class="col-sm-6 col-md-4 col-lg-3">
-                        <div class="form-group" ng-class="{ 'has-error':  mainForm.$submitted && mainForm.userFilterFieldName.$invalid }">
-                            <label for="userFilterFieldName" class="control-label">
-                                User Filter Field Name:
-                            </label>
-                            <input type="text" id="userFilterFieldName" name="userFilterFieldName" ng-model="vm.project.userFilterFieldName" maxlength="50" class="form-control" />
+                        <div class="col-sm-6 col-md-4 col-lg-3" uib-popover-html="'This is the <strong>relative</strong> path from the <code>ClientApp\src\app</code> folder into which the generated front-end files will be placed'" popover-trigger="'mouseenter'" popover-append-to-body="true" popover-title="Generated Path">
+                            <div class="form-group" ng-class="{ 'has-error':  mainForm.$submitted && mainForm.generatedPath.$invalid }">
+                                <label for="modelsPath" class="control-label">
+                                    Generated Path:
+                                </label>
+                                <input type="text" id="generatedPath" name="generatedPath" ng-model="vm.project.generatedPath" maxlength="50" class="form-control" />
+                            </div>
                         </div>
-                    </div>
 
-                    <div class="col-sm-12">
-                        <div class="form-group" ng-class="{ 'has-error':  mainForm.$submitted && mainForm.notes.$invalid }">
-                            <label for="notes" class="control-label">
-                                Notes:
-                            </label>
-                            <textarea id="notes" name="notes" ng-model="vm.project.notes" class="form-control" rows="6"></textarea>
+                        <div class="col-sm-6 col-md-4 col-lg-3">
+                            <div class="form-group" ng-class="{ 'has-error':  mainForm.$submitted && mainForm.userFilterFieldName.$invalid }">
+                                <label for="userFilterFieldName" class="control-label">
+                                    User Filter Field Name:
+                                </label>
+                                <input type="text" id="userFilterFieldName" name="userFilterFieldName" ng-model="vm.project.userFilterFieldName" maxlength="50" class="form-control" />
+                            </div>
                         </div>
-                    </div>
+
+                        <div class="col-sm-12">
+                            <div class="form-group" ng-class="{ 'has-error':  mainForm.$submitted && mainForm.notes.$invalid }">
+                                <label for="notes" class="control-label">
+                                    Notes:
+                                </label>
+                                <textarea id="notes" name="notes" ng-model="vm.project.notes" class="form-control" rows="6"></textarea>
+                            </div>
+                        </div>
 
                     </div>
 
