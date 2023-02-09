@@ -26,13 +26,13 @@ namespace WEB.Models
             s.Add(t + $"<form id=\"form\" name=\"form\" (submit)=\"save(form)\" novalidate #form=\"ngForm\" [ngClass]=\"{{ 'was-validated': form.submitted }}\">");
             s.Add($"");
 
-            s.Add(t + $"<div class=\"card border-0\">");
+            s.Add(t + $"    <div class=\"card border-0\">");
             s.Add($"");
-            s.Add(t + $"    <div class=\"card-body\">");
+            s.Add(t + $"        <div class=\"card-body\">");
             s.Add($"");
-            s.Add(t + $"        <fieldset class=\"group\">");
+            s.Add(t + $"            <fieldset class=\"group\">");
             s.Add($"");
-            s.Add(t + $"            <div class=\"row g-3\">");
+            s.Add(t + $"                <div class=\"row g-3\">");
             s.Add($"");
 
             #region form fields
@@ -203,12 +203,12 @@ namespace WEB.Models
                     }
                 }
 
-                s.Add(t + $"                <div class=\"{controlSize}\"{ngIf}>");
-                s.Add(t + $"                    <div class=\"form-group\"{(readOnly ? "" : $" [ngClass]=\"{{ 'is-invalid': {fieldName}.invalid }}\"")}>");
+                s.Add(t + $"                    <div class=\"{controlSize}\"{ngIf}>");
+                s.Add(t + $"                        <div class=\"form-group\"{(readOnly ? "" : $" [ngClass]=\"{{ 'is-invalid': {fieldName}.invalid }}\"")}>");
                 s.Add($"");
-                s.Add(t + $"                        <label for=\"{fieldName.ToCamelCase()}\">");
-                s.Add(t + $"                            {field.Label}:");
-                s.Add(t + $"                        </label>");
+                s.Add(t + $"                            <label for=\"{fieldName.ToCamelCase()}\">");
+                s.Add(t + $"                                {field.Label}:");
+                s.Add(t + $"                            </label>");
                 s.Add($"");
 
                 var controlHtml = $"<{tagType}";
@@ -222,8 +222,8 @@ namespace WEB.Models
                 else if (tagType == "select")
                 {
                     controlHtml += $">" + Environment.NewLine;
-                    controlHtml += t + $"                        <option *ngFor=\"let {field.Lookup.Name.ToCamelCase()} of {field.Lookup.PluralName.ToCamelCase()}\" [ngValue]=\"{field.Lookup.Name.ToCamelCase()}.value\">{{{{ {field.Lookup.Name.ToCamelCase()}.label }}}}</option>" + Environment.NewLine;
-                    controlHtml += t + $"                    </{tagType}>";
+                    controlHtml += t + $"                                <option *ngFor=\"let {field.Lookup.Name.ToCamelCase()} of {field.Lookup.PluralName.ToCamelCase()}\" [ngValue]=\"{field.Lookup.Name.ToCamelCase()}.value\">{{{{ {field.Lookup.Name.ToCamelCase()}.label }}}}</option>" + Environment.NewLine;
+                    controlHtml += t + $"                            </{tagType}>";
                 }
                 //";
                 else
@@ -231,37 +231,37 @@ namespace WEB.Models
 
                 if (attributes.ContainsKey("type") && attributes["type"] == "checkbox")
                 {
-                    s.Add(t + $"                        <div class=\"form-check\">");
-                    s.Add(t + $"                            {controlHtml}");
-                    s.Add(t + $"                            <label class=\"form-check-label\" for=\"{field.Name.ToCamelCase()}\">");
-                    s.Add(t + $"                                {field.Label}");
-                    s.Add(t + $"                            </label>");
-                    s.Add(t + $"                        </div>");
+                    s.Add(t + $"                            <div class=\"form-check\">");
+                    s.Add(t + $"                                {controlHtml}");
+                    s.Add(t + $"                                <label class=\"form-check-label\" for=\"{field.Name.ToCamelCase()}\">");
+                    s.Add(t + $"                                    {field.Label}");
+                    s.Add(t + $"                                </label>");
+                    s.Add(t + $"                            </div>");
                 }
                 else if (field.CustomType == CustomType.Date && !readOnly)
                 {
-                    s.Add(t + $"                        <div class=\"input-group\">");
-                    s.Add(t + $"                            {controlHtml}");
-                    s.Add(t + $"                            <button class=\"btn btn-secondary calendar\" (click)=\"dp{field.Name}.toggle()\" type=\"button\"><i class=\"fas fa-calendar-alt\"></i></button>");
-                    s.Add(t + $"                        </div>");
+                    s.Add(t + $"                            <div class=\"input-group\">");
+                    s.Add(t + $"                                {controlHtml}");
+                    s.Add(t + $"                                <button class=\"btn btn-secondary calendar\" (click)=\"dp{field.Name}.toggle()\" type=\"button\"><i class=\"fas fa-calendar-alt\"></i></button>");
+                    s.Add(t + $"                            </div>");
                 }
                 else if (field.FieldType == FieldType.VarBinary && field.EditPageType == EditPageType.FileContents)
                 {
                     var fileNameField = CurrentEntity.Fields.FirstOrDefault(o => o.EditPageType == EditPageType.FileName);
                     if (fileNameField == null) throw new Exception(CurrentEntity.Name + ": FileContents field doesn't have a matching FileName field");
 
-                    s.Add(t + $"                        <div class=\"input-group\">");
-                    s.Add(t + $"                            <div class=\"input-group-prepend\" *ngIf=\"!isNew\">");
-                    s.Add(t + $"                                <button type=\"button\" class=\"btn btn-outline-primary\" (click)=\"download()\"><i class=\"fa fa-fw fa-cloud-download-alt\"></i></button>");
+                    s.Add(t + $"                            <div class=\"input-group\">");
+                    s.Add(t + $"                                <div class=\"input-group-prepend\" *ngIf=\"!isNew\">");
+                    s.Add(t + $"                                    <button type=\"button\" class=\"btn btn-outline-primary\" (click)=\"download()\"><i class=\"fa fa-fw fa-cloud-download-alt\"></i></button>");
+                    s.Add(t + $"                                </div>");
+                    s.Add(t + $"                                <div class=\"custom-file\">");
+                    s.Add(t + $"                                    {controlHtml}");
+                    s.Add(t + $"                                    <label class=\"custom-file-label\" for=\"{field.Name.ToCamelCase()}\">{{{{{CurrentEntity.Name.ToCamelCase()}.{fileNameField.Name.ToCamelCase()} || \"Choose file\"}}}}</label>");
+                    s.Add(t + $"                                </div>");
                     s.Add(t + $"                            </div>");
-                    s.Add(t + $"                            <div class=\"custom-file\">");
-                    s.Add(t + $"                                {controlHtml}");
-                    s.Add(t + $"                                <label class=\"custom-file-label\" for=\"{field.Name.ToCamelCase()}\">{{{{{CurrentEntity.Name.ToCamelCase()}.{fileNameField.Name.ToCamelCase()} || \"Choose file\"}}}}</label>");
-                    s.Add(t + $"                            </div>");
-                    s.Add(t + $"                        </div>");
                 }
                 else
-                    s.Add(t + $"                        {controlHtml}");
+                    s.Add(t + $"                            {controlHtml}");
 
 
                 s.Add($"");
@@ -283,15 +283,15 @@ namespace WEB.Models
 
                     foreach (var validationError in validationErrors)
                     {
-                        s.Add(t + $"                        <div *ngIf=\"{fieldName}.errors?.{validationError.Key}\" class=\"invalid-feedback\">");
-                        s.Add(t + $"                            {validationError.Value}");
-                        s.Add(t + $"                        </div>");
+                        s.Add(t + $"                            <div *ngIf=\"{fieldName}.errors?.{validationError.Key}\" class=\"invalid-feedback\">");
+                        s.Add(t + $"                                {validationError.Value}");
+                        s.Add(t + $"                            </div>");
                         s.Add($"");
                     }
                 }
 
+                s.Add(t + $"                        </div>");
                 s.Add(t + $"                    </div>");
-                s.Add(t + $"                </div>");
                 s.Add($"");
 
             }
@@ -299,36 +299,38 @@ namespace WEB.Models
 
             if (CurrentEntity.EntityType == EntityType.User)
             {
-                s.Add(t + $"                <div class=\"col-sm-6 col-md-4\">");
-                s.Add(t + $"                    <div class=\"form-group\">");
+                s.Add(t + $"                    <div class=\"col-sm-6 col-md-4\">");
+                s.Add(t + $"                        <div class=\"form-group\">");
                 s.Add($"");
-                s.Add(t + $"                        <label>");
-                s.Add(t + $"                            Roles:");
-                s.Add(t + $"                        </label>");
+                s.Add(t + $"                            <label>");
+                s.Add(t + $"                                Roles:");
+                s.Add(t + $"                            </label>");
                 s.Add($"");
-                s.Add(t + $"                        <select id=\"roles\" name=\"roles\" [multiple]=\"true\" class=\"form-control\" [(ngModel)]=\"user.roles\">");
-                s.Add(t + $"                            <option *ngFor=\"let role of roles\" [ngValue]=\"role.name\">{{{{role.label}}}}</option>");
-                s.Add(t + $"                        </select>");
+                s.Add(t + $"                            <select id=\"roles\" name=\"roles\" [multiple]=\"true\" class=\"form-control\" [(ngModel)]=\"user.roles\">");
+                s.Add(t + $"                                <option *ngFor=\"let role of roles\" [ngValue]=\"role.name\">{{{{role.label}}}}</option>");
+                s.Add(t + $"                            </select>");
                 s.Add($"");
+                s.Add(t + $"                        </div>");
                 s.Add(t + $"                    </div>");
-                s.Add(t + $"                </div>");
                 s.Add($"");
             }
 
-            s.Add(t + $"            </div>");
+            s.Add(t + $"                </div>");
             s.Add($"");
-            s.Add(t + $"        </fieldset>");
+            s.Add(t + $"            </fieldset>");
+            s.Add($"");
+
+            s.Add(t + $"            <fieldset class=\"my-3\">");
+            s.Add(t + $"                <button type=\"submit\" class=\"btn btn-outline-primary me-2 mb-1\">Save<i class=\"fas fa-check ms-2\"></i></button>");
+            s.Add(t + $"                <button type=\"button\" *ngIf=\"!isNew\" class=\"btn btn-outline-danger me-2 mb-1\" (click)=\"delete()\">Delete<i class=\"fas fa-times ms-2\"></i></button>");
+            s.Add(t + $"            </fieldset>");
+            s.Add($"");
+
+            s.Add(t + $"        </div>");
             s.Add($"");
             s.Add(t + $"    </div>");
             s.Add($"");
-            s.Add(t + $"</div>");
-            s.Add($"");
 
-            s.Add(t + $"<fieldset class=\"my-3\">");
-            s.Add(t + $"    <button type=\"submit\" class=\"btn btn-outline-primary me-2 mb-1\">Save<i class=\"fas fa-check ms-2\"></i></button>");
-            s.Add(t + $"    <button type=\"button\" *ngIf=\"!isNew\" class=\"btn btn-outline-danger me-2 mb-1\" (click)=\"delete()\">Delete<i class=\"fas fa-times ms-2\"></i></button>");
-            s.Add(t + $"</fieldset>");
-            s.Add($"");
             s.Add(t + $"</form>");
             s.Add($"");
 
