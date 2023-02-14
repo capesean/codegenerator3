@@ -47,6 +47,7 @@ namespace WEB.Models
         [MaxLength(50)]
         public string ModelsPath { get; set; }
 
+        [DisplayFormat(ConvertEmptyStringToNull = false)]
         [MaxLength(50)]
         public string GeneratedPath { get; set; }
 

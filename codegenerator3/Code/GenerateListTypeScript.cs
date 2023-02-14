@@ -30,21 +30,26 @@ namespace WEB.Models
             s.Add($"import {{ Component, OnInit{(hasChildRoutes ? ", OnDestroy" : "")} }} from '@angular/core';");
             s.Add($"import {{ Router, ActivatedRoute{(hasChildRoutes ? ", NavigationEnd" : "")} }} from '@angular/router';");
             s.Add($"import {{ Subject{(hasChildRoutes ? ", Subscription" : "")} }} from 'rxjs';");
-            s.Add($"import {{ PagingHeaders }} from '{folders}../common/models/http.model';");
-            s.Add($"import {{ ErrorService }} from '{folders}../common/services/error.service';");
-            s.Add($"import {{ {CurrentEntity.Name}SearchOptions, {CurrentEntity.Name}SearchResponse, {CurrentEntity.Name} }} from '{folders}../common/models/{CurrentEntity.Name.ToLower()}.model';");
-            s.Add($"import {{ {CurrentEntity.Name}Service }} from '{folders}../common/services/{CurrentEntity.Name.ToLower()}.service';");
-            if (enumLookups.Any())
-                s.Add($"import {{ Enum, Enums }} from '{folders}../common/models/enums.model';");
-            if (CurrentEntity.HasASortField)
-                s.Add($"import {{ ToastrService }} from 'ngx-toastr';");
-            if (CurrentEntity.EntityType == EntityType.User && !enumLookups.Any())
-                s.Add($"import {{ Enums }} from '{folders}../common/models/enums.model';");
             if (CurrentEntity.HasASortField)
             {
+                s.Add($"import {{ ToastrService }} from 'ngx-toastr';");
                 s.Add($"import {{ NgbModal }} from '@ng-bootstrap/ng-bootstrap';");
-                s.Add($"import {{ {CurrentEntity.Name}SortComponent }} from './{CurrentEntity.Name.ToLower()}.sort.component';");
             }
+
+
+            s.Add($"import {{ PagingHeaders }} from '{folders}../common/models/http.model';");
+            s.Add($"import {{ {CurrentEntity.Name}SearchOptions, {CurrentEntity.Name}SearchResponse, {CurrentEntity.Name} }} from '{folders}../common/models/{CurrentEntity.Name.ToLower()}.model';");
+            if (enumLookups.Any())
+                s.Add($"import {{ Enum, Enums }} from '{folders}../common/models/enums.model';");
+            if (CurrentEntity.EntityType == EntityType.User && !enumLookups.Any())
+                s.Add($"import {{ Enums }} from '{folders}../common/models/enums.model';");
+
+            s.Add($"import {{ ErrorService }} from '{folders}../common/services/error.service';");
+            s.Add($"import {{ {CurrentEntity.Name}Service }} from '{folders}../common/services/{CurrentEntity.Name.ToLower()}.service';");
+
+            if (CurrentEntity.HasASortField)
+                s.Add($"import {{ {CurrentEntity.Name}SortComponent }} from './{CurrentEntity.Name.ToLower()}.sort.component';");
+
             s.Add($"");
             s.Add($"@Component({{");
             s.Add($"    selector: '{CurrentEntity.Name.ToLower()}-list',");

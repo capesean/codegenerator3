@@ -13,8 +13,10 @@ namespace WEB.Models
             s.Add($"import {{ CommonModule }} from '@angular/common';");
             s.Add($"import {{ FormsModule }} from '@angular/forms';");
             s.Add($"import {{ RouterModule }} from '@angular/router';");
-            s.Add($"import {{ NgbModule }} from '@ng-bootstrap/ng-bootstrap';");
             s.Add($"import {{ DragDropModule }} from '@angular/cdk/drag-drop';");
+            s.Add($"import {{ NgbModule }} from '@ng-bootstrap/ng-bootstrap';");
+            s.Add($"import {{ SharedModule }} from './shared.module';");
+            s.Add($"import {{ GeneratedRoutes }} from './generated.routes';");
 
             var entitiesToBundle = AllEntities.Where(e => !e.Exclude);
             foreach (var e in entitiesToBundle)
@@ -22,8 +24,6 @@ namespace WEB.Models
                 s.Add($"import {{ {e.Name}ListComponent }} from './{e.Project.GeneratedPath ?? string.Empty}{e.PluralName.ToLower()}/{e.Name.ToLower()}.list.component';");
                 s.Add($"import {{ {e.Name}EditComponent }} from './{e.Project.GeneratedPath ?? string.Empty}{e.PluralName.ToLower()}/{e.Name.ToLower()}.edit.component';");
             }
-            s.Add($"import {{ SharedModule }} from './shared.module';");
-            s.Add($"import {{ GeneratedRoutes }} from './generated.routes';");
             s.Add($"");
 
 
