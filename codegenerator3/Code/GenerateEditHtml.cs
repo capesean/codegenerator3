@@ -56,7 +56,7 @@ namespace WEB.Models
                 var fieldName = field.Name.ToCamelCase();
 
                 // todo: allow an override in the user fields?
-                var controlSize = field.EditPageClasses == null ? "col-sm-6 col-md-4" : field.EditPageClasses; 
+                var controlSize = string.IsNullOrWhiteSpace(field.EditPageClasses) ? "col-sm-6 col-md-4" : field.EditPageClasses; 
                 var tagType = "input";
                 var attributes = new Dictionary<string, string>();
                 var ngIf = string.Empty;

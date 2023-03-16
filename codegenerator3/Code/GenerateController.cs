@@ -44,19 +44,10 @@ namespace WEB.Models
             #region search
             s.Add($"        [HttpGet{(CurrentEntity.AuthorizationType == AuthorizationType.ProtectAll ? ", AuthorizeRoles(Roles.Administrator)" : string.Empty)}]");
 
-            var fieldsToSearch = new List<Field>();
             var roleSearch = string.Empty;
             if (CurrentEntity.EntityType == EntityType.User)
                 roleSearch = ", [FromQuery] string roleName = null";
 
-            foreach (var relationship in CurrentEntity.RelationshipsAsChild.OrderBy(r => r.RelationshipFields.Min(f => f.ChildField.FieldOrder)))
-                foreach (var relationshipField in relationship.RelationshipFields)
-                    fieldsToSearch.Add(relationshipField.ChildField);
-            foreach (var field in CurrentEntity.ExactSearchFields)
-                if (!fieldsToSearch.Contains(field))
-                    fieldsToSearch.Add(field);
-            foreach (var field in CurrentEntity.RangeSearchFields)
-                fieldsToSearch.Add(field);
 
             s.Add($"        public async Task<IActionResult> Search([FromQuery] {CurrentEntity.Name}SearchOptions searchOptions{roleSearch})");
             s.Add($"        {{");
@@ -129,6 +120,7 @@ namespace WEB.Models
                 s.Add($"");
             }
 
+            var fieldsToSearch = CurrentEntity.AllSearchableFields;
             if (fieldsToSearch.Count > 0)
             {
                 foreach (var field in fieldsToSearch)

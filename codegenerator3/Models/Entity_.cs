@@ -19,6 +19,26 @@ namespace WEB.Models
         }
 
         [NotMapped]
+        public virtual List<Field> AllSearchableFields
+        {
+            get
+            {
+                var fieldsToSearch = new List<Field>();
+
+                foreach (var relationship in RelationshipsAsChild.Where(o => o.DisplayListOnParent).OrderBy(r => r.RelationshipFields.Min(f => f.ChildField.FieldOrder)))
+                    foreach (var relationshipField in relationship.RelationshipFields)
+                        fieldsToSearch.Add(relationshipField.ChildField);
+                foreach (var field in ExactSearchFields)
+                    if (!fieldsToSearch.Contains(field))
+                        fieldsToSearch.Add(field);
+                foreach (var field in RangeSearchFields)
+                    fieldsToSearch.Add(field);
+
+                return fieldsToSearch.Distinct().ToList();
+            }
+        }
+
+        [NotMapped]
         public virtual List<Field> TextSearchFields
         {
             get
