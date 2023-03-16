@@ -357,7 +357,7 @@ namespace WEB.Models
             if (hasFileContents)
             {
                 s.Add($"    download(fileId: string): void {{");
-                s.Add($"        this.downloadService.download{CurrentEntity.Name}File(fileId).subscribe();");
+                s.Add($"        this.downloadService.download{CurrentEntity.Name}(fileId).subscribe();");
                 s.Add($"    }}");
                 s.Add($"");
 
@@ -470,7 +470,7 @@ namespace WEB.Models
 
             foreach (var relationship in relationshipsAsParent.Where(o => o.Hierarchy && o.ChildEntity.HasASortField))
             {
-                s.Add($"    show{relationship.ChildEntity.Name}Sort() {{");
+                s.Add($"    show{relationship.ChildEntity.Name}Sort(): void {{");
                 s.Add($"        let modalRef = this.modalService.open({relationship.ChildEntity.Name}SortComponent, {{ size: 'xl', centered: true, scrollable: false }});");
                 foreach (var field in relationship.ParentEntity.KeyFields)
                 {

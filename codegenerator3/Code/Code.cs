@@ -771,10 +771,10 @@ namespace WEB.Models
             #endregion
 
             #region sort html
-            if (deploymentOptions.SortHtml)
+            if (deploymentOptions.SortHtml && entity.HasASortField)
             {
-                if (!entity.HasASortField)
-                    return ($"Entity {entity.FriendlyName} does not have a sort field. Either add a field with Edit Page Type: Sort, or enter a Prevent Sort Html Deployment comment");
+                //if (!entity.HasASortField)
+                //    return ($"Entity {entity.FriendlyName} does not have a sort field. Either add a field with Edit Page Type: Sort, or enter a Prevent Sort Html Deployment comment");
 
                 var path = Path.Combine(entity.Project.RootPathWeb, @"ClientApp\src\app", entity.Project.GeneratedPath ?? string.Empty);
                 if (!Directory.Exists(path)) return "Generated path does not exist:" + path;
@@ -785,10 +785,10 @@ namespace WEB.Models
             #endregion
 
             #region sort typescript
-            if (deploymentOptions.SortTypeScript)
+            if (deploymentOptions.SortTypeScript && entity.HasASortField)
             {
-                if (!entity.HasASortField)
-                    return ($"Entity {entity.FriendlyName} does not have a sort field. Either add a field with Edit Page Type: Sort, or enter a Prevent Sort Html Deployment comment");
+                //if (!entity.HasASortField)
+                //    return ($"Entity {entity.FriendlyName} does not have a sort field. Either add a field with Edit Page Type: Sort, or enter a Prevent Sort Html Deployment comment");
 
                 var path = Path.Combine(entity.Project.RootPathWeb, @"ClientApp\src\app", entity.Project.GeneratedPath ?? string.Empty);
                 if (!Directory.Exists(path)) return "Generated path does not exist:" + path;

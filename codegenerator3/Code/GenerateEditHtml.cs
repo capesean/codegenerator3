@@ -56,7 +56,7 @@ namespace WEB.Models
                 var fieldName = field.Name.ToCamelCase();
 
                 // todo: allow an override in the user fields?
-                var controlSize = "col-sm-6 col-md-4";
+                var controlSize = field.EditPageClasses == null ? "col-sm-6 col-md-4" : field.EditPageClasses; 
                 var tagType = "input";
                 var attributes = new Dictionary<string, string>();
                 var ngIf = string.Empty;
@@ -93,6 +93,7 @@ namespace WEB.Models
                     {
                         tagType = "select";
                         attributes.Remove("class");
+                        attributes.Remove("type");
                         attributes.Add("class", "form-select");
                     }
                     else if (field.CustomType == CustomType.Colour)
@@ -173,7 +174,7 @@ namespace WEB.Models
                     var fileContentsField = CurrentEntity.Fields.SingleOrDefault(o => o.EditPageType == EditPageType.FileContents);
                     attributes.Add("[(fileContents)]", $"{CurrentEntity.Name.ToCamelCase()}.{fileContentsField.Name.ToCamelCase()}");
                     attributes.Add("[enableDownload]", $"!isNew && !!{CurrentEntity.Name.ToCamelCase()}.{field.Name.ToCamelCase()}");
-                    attributes.Add("[fileId]", $"{CurrentEntity.KeyFields.Select(o => $"this.{CurrentEntity.Name.ToCamelCase()}.{o.Name.ToCamelCase()}").Aggregate((current, next) => { return current + "/" + next; })}");
+                    attributes.Add("[fileId]", $"{CurrentEntity.KeyFields.Select(o => $"{CurrentEntity.Name.ToCamelCase()}.{o.Name.ToCamelCase()}").Aggregate((current, next) => { return current + "/" + next; })}");
                     attributes.Add("(onDownload)", $"download($event)");
 
                 }
@@ -242,7 +243,7 @@ namespace WEB.Models
                 {
                     s.Add(t + $"                            <div class=\"input-group\">");
                     s.Add(t + $"                                {controlHtml}");
-                    s.Add(t + $"                                <button class=\"btn btn-secondary calendar\" (click)=\"dp{field.Name}.toggle()\" type=\"button\"><i class=\"fas fa-calendar-alt\"></i></button>");
+                    s.Add(t + $"                                <button class=\"btn btn-secondary calendar\" (click)=\"dp{field.Name}.toggle()\" type=\"button\"><i class=\"fas fa-fw fa-calendar-alt\"></i></button>");
                     s.Add(t + $"                            </div>");
                 }
                 else if (field.FieldType == FieldType.VarBinary && field.EditPageType == EditPageType.FileContents)
@@ -321,7 +322,7 @@ namespace WEB.Models
             s.Add($"");
 
             s.Add(t + $"            <fieldset class=\"my-3\">");
-            s.Add(t + $"                <button type=\"submit\" class=\"btn btn-outline-primary me-2 mb-1\">Save<i class=\"fas fa-check ms-2\"></i></button>");
+            s.Add(t + $"                <button type=\"submit\" class=\"btn btn-outline-success me-2 mb-1\">Save<i class=\"fas fa-check ms-2\"></i></button>");
             s.Add(t + $"                <button type=\"button\" *ngIf=\"!isNew\" class=\"btn btn-outline-danger me-2 mb-1\" (click)=\"delete()\">Delete<i class=\"fas fa-times ms-2\"></i></button>");
             s.Add(t + $"            </fieldset>");
             s.Add($"");
@@ -400,7 +401,7 @@ namespace WEB.Models
                     if (relationship.UseMultiSelect)
                     {
                         s.Add(t + $"                    <div class=\"mb-3\">");
-                        s.Add(t + $"                        <button class=\"btn btn-outline-success me-2 mb-1\" (click)=\"add{relationship.CollectionName}()\">Add {relationship.CollectionFriendlyName}<i class=\"fas fa-plus ms-2\"></i></button>");
+                        s.Add(t + $"                        <button class=\"btn btn-outline-primary me-2 mb-1\" (click)=\"add{relationship.CollectionName}()\">Add {relationship.CollectionFriendlyName}<i class=\"fas fa-plus ms-2\"></i></button>");
                         s.Add(t + $"                    </div>");
                         s.Add($"");
                     }
@@ -408,7 +409,7 @@ namespace WEB.Models
                     {
                         // trying to get this to work for instances like African POT Project->Team hierarchy, where I only want 1 add for the userId
                         s.Add(t + $"                        <div class=\"mb-3\">");
-                        s.Add(t + $"                            <a [routerLink]=\"['./{childEntity.PluralName.ToLower()}', 'add']\" class=\"btn btn-outline-success me-2 mb-1\">Add<i class=\"fas fa-plus ms-2\"></i></a>");
+                        s.Add(t + $"                            <a [routerLink]=\"['./{childEntity.PluralName.ToLower()}', 'add']\" class=\"btn btn-outline-primary me-2 mb-1\">Add<i class=\"fas fa-plus ms-2\"></i></a>");
                         s.Add(t + $"                            <button *ngIf=\"!show{relationship.CollectionName}Search\" type=\"button\" class=\"btn btn-outline-secondary me-2 mb-1\" (click)=\"show{relationship.CollectionName}Search=true\">Filter<i class=\"fas fa-filter ms-2\"></i></button>");
                         s.Add(t + $"                            <button *ngIf=\"show{relationship.CollectionName}Search\" form=\"form{relationship.CollectionName}\" type=\"submit\" class=\"btn btn-outline-primary me-2 mb-1\">Search<i class=\"fas fa-search ms-2\"></i></button>");
                         if (childEntity.HasASortField)

@@ -81,6 +81,9 @@ namespace WEB.Models
         [MaxLength(250)]
         public string RegexValidation { get; set; }
 
+        [MaxLength(50)]
+        public string EditPageClasses { get; set; }
+
         public EntityDTO Entity { get; set; }
 
         public LookupDTO Lookup { get; set; }
@@ -121,6 +124,7 @@ namespace WEB.Models
             fieldDTO.EditPageDefault = field.EditPageDefault;
             fieldDTO.CalculatedFieldDefinition = field.CalculatedFieldDefinition;
             fieldDTO.RegexValidation = field.RegexValidation;
+            fieldDTO.EditPageClasses = field.EditPageClasses;
             fieldDTO.Lookup = Create(field.Lookup);
             fieldDTO.Entity = Create(field.Entity);
 
@@ -154,6 +158,7 @@ namespace WEB.Models
             field.EditPageDefault = fieldDTO.EditPageDefault;
             field.CalculatedFieldDefinition = fieldDTO.CalculatedFieldDefinition;
             field.RegexValidation = fieldDTO.RegexValidation;
+            field.EditPageClasses = fieldDTO.EditPageClasses;
         }
     }
 }

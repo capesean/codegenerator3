@@ -64,12 +64,12 @@ namespace WEB.Models
                 if (field.FieldType == FieldType.Enum)
                 {
                     inputs += $"    @Input() {field.Name.ToCamelCase()}: Enum;" + Environment.NewLine;
-                    searchOptions += $"        this.searchOptions.{field.Name.ToCamelCase()} = this.{field.Name.ToCamelCase()} ? this.{field.Name.ToCamelCase()}.value : undefined;" + Environment.NewLine;
+                    searchOptions += $"        this.searchOptions.{field.Name.ToCamelCase()} = this.{field.Name.ToCamelCase()}?.value;" + Environment.NewLine;
                 }
                 else if (relationship != null)
                 {
                     inputs += $"    @Input() {relationship.ParentName.ToCamelCase()}: {relationship.ParentEntity.Name};" + Environment.NewLine;
-                    searchOptions += $"        this.searchOptions.{field.Name.ToCamelCase()} = this.{relationship.ParentName.ToCamelCase()} ? this.{relationship.ParentName.ToCamelCase()}.{relationship.ParentEntity.KeyFields.First().Name.ToCamelCase()} : undefined;" + Environment.NewLine;
+                    searchOptions += $"        this.searchOptions.{field.Name.ToCamelCase()} = this.{relationship.ParentName.ToCamelCase()}?.{relationship.ParentEntity.KeyFields.First().Name.ToCamelCase()};" + Environment.NewLine;
 
                     if (relationship.ParentEntity != CurrentEntity && !imported.Contains(relationship.ParentEntity.Name))
                     {

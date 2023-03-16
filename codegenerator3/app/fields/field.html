@@ -298,6 +298,16 @@
                         </div>
                     </div>
 
+                    <div class="col-sm-6 col-md-4 col-lg-3">
+                        <div class="form-group" ng-class="{ 'has-error':  mainForm.$submitted && mainForm.editPageClasses.$invalid }">
+                            <label for="editPageClasses" class="control-label">
+                                Edit Page Classes:
+                            </label>
+                            <input type="text" id="editPageClasses" name="editPageClasses" ng-model="vm.field.editPageClasses" maxlength="50" class="form-control" />
+                        </div>
+                    </div>
+
+
                 </div>
             </div>
 
