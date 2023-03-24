@@ -129,7 +129,6 @@ export class NAMEModalComponent implements OnInit {
         this.searchOptions.pageIndex = 0;
 
         this.CAMELCASENAMEService.search(this.searchOptions)
-
             .subscribe(
                 response => {
                     this.modal.close(response.PLURALNAME_TOCAMELCASE);

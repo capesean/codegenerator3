@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using System.Text;
+using WEB.Migrations;
 
 namespace WEB.Models
 {
@@ -74,30 +75,28 @@ namespace WEB.Models
                         var relationship = CurrentEntity.GetParentSearchRelationship(field);
                         var parentEntity = relationship.ParentEntity;
                         var relField = relationship.RelationshipFields.Single();
-                        if (true || relationship.UseSelectorDirective)
-                        {
-                            s.Add(t + $"                <div class=\"col-sm-6 col-md-4 col-lg-3\">");
-                            s.Add(t + $"                    <div class=\"form-group\">");
-                            s.Add(t + $"                        {relationship.AppSelector}");
-                            s.Add(t + $"                    </div>");
-                            s.Add(t + $"                </div>");
-                            s.Add($"");
-                        }
-                        else
-                        {
-                            //s.Add(t + $"        <div class=\"col-sm-6 col-md-4 col-lg-3\">");
-                            //s.Add(t + $"            <div class=\"form-group\">");
-                            //s.Add(t + $"                <ol id=\"{field.Name.ToCamelCase()}\" name=\"{field.Name.ToCamelCase()}\" title=\"{parentEntity.PluralFriendlyName}\" class=\"nya-bs-select form-control\" [(ngModel)]=\"searchOptions.{field.Name.ToCamelCase()}\" data-live-search=\"true\" data-size=\"10\">");
-                            //s.Add(t + $"                    <li nya-bs-option=\"{parentEntity.Name.ToCamelCase()} in vm.{parentEntity.PluralName.ToCamelCase()}\" class=\"nya-bs-option{(CurrentEntity.Project.Bootstrap3 ? "" : " dropdown-item")}\" data-value=\"{parentEntity.Name.ToCamelCase()}.{relField.ParentField.Name.ToCamelCase()}\">");
-                            //s.Add(t + $"                        <a>{{{{{parentEntity.Name.ToCamelCase()}.{relationship.ParentField.Name.ToCamelCase()}}}}}<span class=\"fas fa-check check-mark\"></span></a>");
-                            //s.Add(t + $"                    </li>");
-                            //s.Add(t + $"                </ol>");
-                            //s.Add(t + $"            </div>");
-                            //s.Add(t + $"        </div>");
-                            //s.Add($"");
-                        }
+                        s.Add(t + $"                <div class=\"col-sm-6 col-md-4 col-lg-3\">");
+                        s.Add(t + $"                    <div class=\"form-group\">");
+                        s.Add(t + $"                        {relationship.AppSelector}");
+                        s.Add(t + $"                    </div>");
+                        s.Add(t + $"                </div>");
+                        s.Add($"");
+                    }
+                    else if (field.CustomType == CustomType.Boolean)
+                    {
+                        s.Add(t + $"                <div class=\"col-sm-6 col-md-4 col-lg-4 col-xl-3\">");
+                        s.Add(t + $"                    <div class=\"form-group\">");
+                        s.Add(t + $"                        <select id=\"{field.Name.ToCamelCase()}\" name=\"{field.Name.ToCamelCase()}\" [(ngModel)]=\"searchOptions.{field.Name.ToCamelCase()}\" #{field.Name.ToCamelCase()}=\"ngModel\" class=\"form-select\">");
+                        s.Add(t + $"                            <option [ngValue]=\"undefined\">{field.Label}: Any</option>");
+                        s.Add(t + $"                            <option [ngValue]=\"true\">{field.Label}: Yes</option>");
+                        s.Add(t + $"                            <option [ngValue]=\"false\">{field.Label}: No</option>");
+                        s.Add(t + $"                        </select>");
+                        s.Add(t + $"                    </div>");
+                        s.Add(t + $"                </div>");
+                        s.Add($"");
                     }
                 }
+
                 foreach (var field in CurrentEntity.Fields.Where(f => f.SearchType == SearchType.Range))
                 {
                     if (field.CustomType == CustomType.Date)

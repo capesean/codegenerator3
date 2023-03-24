@@ -56,7 +56,7 @@ namespace WEB.Models
                 var fieldName = field.Name.ToCamelCase();
 
                 // todo: allow an override in the user fields?
-                var controlSize = string.IsNullOrWhiteSpace(field.EditPageClasses) ? "col-sm-6 col-md-4" : field.EditPageClasses; 
+                var controlSize = string.IsNullOrWhiteSpace(field.EditPageClasses) ? "col-sm-6 col-md-4" : field.EditPageClasses;
                 var tagType = "input";
                 var attributes = new Dictionary<string, string>();
                 var ngIf = string.Empty;
@@ -170,6 +170,9 @@ namespace WEB.Models
                     field.Label = field.Label;
                     attributes.Remove("type");
                     attributes.Remove("class");
+                    attributes.Remove("required");
+                    if (!field.IsNullable)
+                        attributes.Add("[required]", "true");
 
                     var fileContentsField = CurrentEntity.Fields.SingleOrDefault(o => o.EditPageType == EditPageType.FileContents);
                     attributes.Add("[(fileContents)]", $"{CurrentEntity.Name.ToCamelCase()}.{fileContentsField.Name.ToCamelCase()}");
@@ -372,10 +375,14 @@ namespace WEB.Models
                     s.Add(t + $"                    <div class=\"card-body\">");
                     s.Add($"");
 
-                    // todo: non-text filter fields
-                    if (entity.Fields.Any(f => f.SearchType == SearchType.Text))
+                    var nonTextSearchFields = entity.AllNonTextSearchableFields.Where(o => !relationship.RelationshipFields.Any(rf => rf.ChildFieldId == o.FieldId));
+                    var hasSearchForm = nonTextSearchFields.Any() || entity.TextSearchFields.Any();
+                    var formName = $"formSearch{relationship.CollectionName}";
+                    if (hasSearchForm)
                     {
-                        s.Add(t + $"                        <form id=\"formSearch{relationship.CollectionName}\" (submit)=\"search{relationship.CollectionName}(0)\" novalidate *ngIf=\"show{relationship.CollectionName}Search\" class=\"mb-5\">");
+                        var searchOptions = $"{relationship.CollectionName.ToCamelCase()}SearchOptions";
+
+                        s.Add(t + $"                        <form id=\"{formName}\" (submit)=\"search{relationship.CollectionName}(0)\" novalidate *ngIf=\"show{relationship.CollectionName}Search\" class=\"mb-5\">");
                         s.Add($"");
                         s.Add(t + $"                            <div class=\"row g-3\">");
                         s.Add($"");
@@ -384,10 +391,61 @@ namespace WEB.Models
                         {
                             s.Add(t + $"                                <div class=\"col-sm-6 col-md-5 col-lg-4 col-xl-3\">");
                             s.Add(t + $"                                    <div class=\"form-group\">");
-                            s.Add(t + $"                                        <input type=\"search\" name=\"q\" id=\"q\" [(ngModel)]=\"{relationship.CollectionName.ToCamelCase()}SearchOptions.q\" max=\"100\" class=\"form-control\" placeholder=\"Search {relationship.CollectionFriendlyName.ToLower()}\" />");
+                            s.Add(t + $"                                        <input type=\"search\" name=\"q\" id=\"q\" [(ngModel)]=\"{searchOptions}.q\" max=\"100\" class=\"form-control\" placeholder=\"Search {relationship.CollectionFriendlyName.ToLower()}\" />");
                             s.Add(t + $"                                    </div>");
                             s.Add(t + $"                                </div>");
                             s.Add($"");
+                        }
+
+                        foreach (var field in nonTextSearchFields.OrderBy(f => f.FieldOrder))
+                        {
+                            if (field.SearchType == SearchType.Exact)
+                            {
+                                if (field.CustomType == CustomType.Enum)
+                                {
+                                    s.Add(t + $"                                <div class=\"col-sm-6 col-md-4 col-lg-4 col-xl-3\">");
+                                    s.Add(t + $"                                    <div class=\"form-group\">");
+                                    s.Add(t + $"                                        <select id=\"{field.Name.ToCamelCase()}\" name=\"{field.Name.ToCamelCase()}\" [(ngModel)]=\"{searchOptions}.{field.Name.ToCamelCase()}\" #{field.Name.ToCamelCase()}=\"ngModel\" class=\"form-select\">");
+                                    s.Add(t + $"                                            <option *ngFor=\"let {field.Lookup.Name.ToCamelCase()} of {field.Lookup.PluralName.ToCamelCase()}\" [ngValue]=\"{field.Lookup.Name.ToCamelCase()}.value\">{{{{ {field.Lookup.Name.ToCamelCase()}.label }}}}</option>");
+                                    s.Add(t + $"                                        </select>");
+                                    s.Add(t + $"                                    </div>");
+                                    s.Add(t + $"                                </div>");
+                                    s.Add($"");
+                                }
+                                else if (entity.RelationshipsAsChild.Any(r => r.RelationshipFields.Any(f => f.ChildFieldId == field.FieldId)))
+                                {
+                                    var rel = entity.GetParentSearchRelationship(field);
+                                    var parentEntity = rel.ParentEntity;
+                                    var relField = rel.RelationshipFields.Single();
+                                    s.Add(t + $"                                <div class=\"col-sm-6 col-md-4 col-lg-4 col-xl-3\">");
+                                    s.Add(t + $"                                    <div class=\"form-group\">");
+                                    s.Add(t + $"                                        {rel.AppSelector.Replace("searchOptions", searchOptions)}");
+                                    s.Add(t + $"                                    </div>");
+                                    s.Add(t + $"                                </div>");
+                                    s.Add($"");
+                                }
+                                else if (field.CustomType == CustomType.Boolean)
+                                {
+                                    s.Add(t + $"                                <div class=\"col-sm-6 col-md-4 col-lg-4 col-xl-3\">");
+                                    s.Add(t + $"                                    <div class=\"form-group\">");
+                                    s.Add(t + $"                                        <select id=\"{field.Name.ToCamelCase()}\" name=\"{field.Name.ToCamelCase()}\" [(ngModel)]=\"{searchOptions}.{field.Name.ToCamelCase()}\" #{field.Name.ToCamelCase()}=\"ngModel\" class=\"form-select\">");
+                                    s.Add(t + $"                                            <option [ngValue]=\"undefined\">{field.Label}: Any</option>");
+                                    s.Add(t + $"                                            <option [ngValue]=\"true\">{field.Label}: Yes</option>");
+                                    s.Add(t + $"                                            <option [ngValue]=\"false\">{field.Label}: No</option>");
+                                    s.Add(t + $"                                        </select>");
+                                    s.Add(t + $"                                    </div>");
+                                    s.Add(t + $"                                </div>");
+                                    s.Add($"");
+                                }
+                                else
+                                {
+                                    s.Add(t + $"                                not implemented: {field.Name}");
+                                }
+                            }
+                            else
+                            {
+                                s.Add(t + $"                                not implemented: {field.Name}");
+                            }
                         }
 
                         s.Add(t + $"                            </div>");
@@ -398,25 +456,26 @@ namespace WEB.Models
 
                     var childEntity = relationship.ChildEntity;
 
-                    if (relationship.UseMultiSelect)
+                    if (relationship.UseMultiSelect || hasSearchForm || childEntity.HasASortField)
                     {
-                        s.Add(t + $"                    <div class=\"mb-3\">");
-                        s.Add(t + $"                        <button class=\"btn btn-outline-primary me-2 mb-1\" (click)=\"add{relationship.CollectionName}()\">Add {relationship.CollectionFriendlyName}<i class=\"fas fa-plus ms-2\"></i></button>");
-                        s.Add(t + $"                    </div>");
-                        s.Add($"");
-                    }
-                    else if (relationship.Hierarchy)
-                    {
-                        // trying to get this to work for instances like African POT Project->Team hierarchy, where I only want 1 add for the userId
                         s.Add(t + $"                        <div class=\"mb-3\">");
-                        s.Add(t + $"                            <a [routerLink]=\"['./{childEntity.PluralName.ToLower()}', 'add']\" class=\"btn btn-outline-primary me-2 mb-1\">Add<i class=\"fas fa-plus ms-2\"></i></a>");
-                        s.Add(t + $"                            <button *ngIf=\"!show{relationship.CollectionName}Search\" type=\"button\" class=\"btn btn-outline-secondary me-2 mb-1\" (click)=\"show{relationship.CollectionName}Search=true\">Filter<i class=\"fas fa-filter ms-2\"></i></button>");
-                        s.Add(t + $"                            <button *ngIf=\"show{relationship.CollectionName}Search\" form=\"form{relationship.CollectionName}\" type=\"submit\" class=\"btn btn-outline-primary me-2 mb-1\">Search<i class=\"fas fa-search ms-2\"></i></button>");
-                        if (childEntity.HasASortField)
+
+                        if (relationship.UseMultiSelect)
+                            s.Add(t + $"                        <button class=\"btn btn-outline-primary me-2 mb-1\" (click)=\"add{relationship.CollectionName}()\">Add {relationship.CollectionFriendlyName}<i class=\"fas fa-plus ms-2\"></i></button>");
+                        if (relationship.Hierarchy)
+                            s.Add(t + $"                            <a [routerLink]=\"['./{childEntity.PluralName.ToLower()}', 'add']\" class=\"btn btn-outline-primary me-2 mb-1\">Add<i class=\"fas fa-plus ms-2\"></i></a>");
+
+                        if (hasSearchForm)
+                        {
+                            s.Add(t + $"                            <button *ngIf=\"!show{relationship.CollectionName}Search\" type=\"button\" class=\"btn btn-outline-secondary me-2 mb-1\" (click)=\"show{relationship.CollectionName}Search=true\">Filter<i class=\"fas fa-filter ms-2\"></i></button>");
+                            s.Add(t + $"                            <button *ngIf=\"show{relationship.CollectionName}Search\" form=\"{formName}\" type=\"submit\" class=\"btn btn-outline-primary me-2 mb-1\">Search<i class=\"fas fa-search ms-2\"></i></button>");
+                        }
+                        if (relationship.Hierarchy && childEntity.HasASortField)
                             s.Add(t + $"                            <button type=\"button\" class=\"btn btn-outline-secondary me-2 mb-1\" (click)=\"show{childEntity.Name}Sort()\" *ngIf=\"{relationship.CollectionName.ToCamelCase()}Headers.totalRecords > 1 && !show{relationship.CollectionName}Search\">Sort<i class=\"fas fa-sort ms-2\"></i></button>");
                         s.Add(t + $"                        </div>");
                         s.Add($"");
                     }
+
                     s.Add(t + $"                    </div>");
                     s.Add($"");
 
