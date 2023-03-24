@@ -19,7 +19,7 @@ namespace WEB.Models
             if (CurrentEntity.Fields.Any(o => o.SearchType == SearchType.Text))
                 searchFields += $"        public string q {{ get; set; }}{Environment.NewLine}{Environment.NewLine}";
 
-            foreach (var field in CurrentEntity.Fields.Where(f => f.SearchType == SearchType.Exact).OrderBy(f => f.FieldOrder))
+            foreach (var field in CurrentEntity.AllNonTextSearchableFields)
                 searchFields += $"        public {Field.GetNetType(field.FieldType, true, field.Lookup)} {field.Name} {{ get; set; }}{Environment.NewLine}{Environment.NewLine}";
 
             s.Add(RunTemplateReplacements(file)

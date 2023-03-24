@@ -120,7 +120,7 @@ namespace WEB.Models
                 s.Add($"");
             }
 
-            var fieldsToSearch = CurrentEntity.AllSearchableFields;
+            var fieldsToSearch = CurrentEntity.AllNonTextSearchableFields;
             if (fieldsToSearch.Count > 0)
             {
                 foreach (var field in fieldsToSearch)

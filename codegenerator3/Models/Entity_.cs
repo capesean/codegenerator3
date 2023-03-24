@@ -19,7 +19,7 @@ namespace WEB.Models
         }
 
         [NotMapped]
-        public virtual List<Field> AllSearchableFields
+        public virtual List<Field> AllNonTextSearchableFields
         {
             get
             {
@@ -34,7 +34,7 @@ namespace WEB.Models
                 foreach (var field in RangeSearchFields)
                     fieldsToSearch.Add(field);
 
-                return fieldsToSearch.Distinct().ToList();
+                return fieldsToSearch.Distinct().OrderBy(o => o.FieldOrder).ToList();
             }
         }
 
