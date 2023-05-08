@@ -17,7 +17,7 @@ import { Enum/*ENUMS*/ } from '/*FOLDERS*/../common/models/enums.model';
 export class NAMESelectComponent implements OnInit, ControlValueAccessor {
 
     @Input() CAMELCASENAME: NAME;
-    @Input() PLURALNAME_TOCAMELCASE: NAME[];
+    @Input() PLURALNAME_TOCAMELCASE: NAME[] = [];
     @Output() CAMELCASENAMEChange = new EventEmitter<NAME>();
     @Output() PLURALNAME_TOCAMELCASEChange = new EventEmitter<NAME[]>();
     @Input() canRemoveFilters = false;

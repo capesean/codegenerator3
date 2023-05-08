@@ -103,7 +103,7 @@ namespace WEB.Models
             s.Add($"    public enum Roles");
             s.Add($"    {{");
             if (roleLookup != null)
-                s.Add($"        " + roleLookup.LookupOptions.Select(o => o.Name).OrderBy(o => o).Aggregate((current, next) => { return current + ", " + next; }));
+                s.Add($"        " + roleLookup.LookupOptions.OrderBy(o => o.SortOrder).Select(o => o.Name).Aggregate((current, next) => { return current + ", " + next; }));
             s.Add($"    }}");
             s.Add($"}}");
 

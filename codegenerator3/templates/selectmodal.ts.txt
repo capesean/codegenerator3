@@ -57,17 +57,17 @@ export class NAMEModalComponent implements OnInit {
         const observable = this.CAMELCASENAMEService
             .search(this.searchOptions);
 
-        observable.subscribe(
-            response => {
+        observable.subscribe({
+            next: response => {
                 this.PLURALNAME_TOCAMELCASE = response.PLURALNAME_TOCAMELCASE;
                 this.headers = response.headers;
             },
-            err => {
+            error: err => {
 
                 this.errorService.handleError(err, "PLURALFRIENDLYNAME", "Load");
 
             }
-        );
+        });
 
         return observable;
 
@@ -129,16 +129,16 @@ export class NAMEModalComponent implements OnInit {
         this.searchOptions.pageIndex = 0;
 
         this.CAMELCASENAMEService.search(this.searchOptions)
-            .subscribe(
-                response => {
+            .subscribe({
+                next: response => {
                     this.modal.close(response.PLURALNAME_TOCAMELCASE);
                     this.PLURALNAME_TOCAMELCASE = response.PLURALNAME_TOCAMELCASE;
                     this.searchOptions.pageSize = oldPageSize;
                 },
-                err => {
+                error: err => {
                     this.errorService.handleError(err, "PLURALFRIENDLYNAME", "Load");
                 }
-            );
+            });
 
     }
 

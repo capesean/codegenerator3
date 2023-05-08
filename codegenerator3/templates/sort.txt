@@ -27,10 +27,10 @@ ENUM_PROPERTIESPARENTPKFIELDS
 
     ngOnInit(): void {
         this.CAMELCASENAMEService.search({ SEARCH_PARAMSpageSize: 0, includeParents: true } as NAMESearchOptions)
-            .subscribe(
-                response => this.PLURALNAME_TOCAMELCASE = response.PLURALNAME_TOCAMELCASE,
-                err => this.errorService.handleError(err, "PLURALNAME", "Load")
-            );
+            .subscribe({
+                next: response => this.PLURALNAME_TOCAMELCASE = response.PLURALNAME_TOCAMELCASE,
+                error: err => this.errorService.handleError(err, "PLURALNAME", "Load")
+            });
     }
 
     dragStart(event: CdkDragStart) {
@@ -45,13 +45,15 @@ ENUM_PROPERTIESPARENTPKFIELDS
     }
 
     close() {
-        this.CAMELCASENAMEService.sort(HIERARCHYFIELDSthis.PLURALNAME_TOCAMELCASE.map(o => o.KEYFIELD)).subscribe(
-            () => {
-                this.modal.close();
-                this.toastr.success("The sort order has been updated", "Change Sort Order");
-            },
-            err => {
-                this.errorService.handleError(err, "PLURALNAME", "Sort");
+        this.CAMELCASENAMEService.sort(HIERARCHYFIELDSthis.PLURALNAME_TOCAMELCASE.map(o => o.KEYFIELD))
+            .subscribe({
+                next: () => {
+                    this.modal.close();
+                    this.toastr.success("The sort order has been updated", "Change Sort Order");
+                },
+                error: err => {
+                    this.errorService.handleError(err, "PLURALNAME", "Sort");
+                }
             });
     }
 
