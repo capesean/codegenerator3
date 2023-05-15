@@ -32,38 +32,51 @@ namespace WEB.Models
             s.Add($"    }}");
             s.Add($"");
 
-            s.Add($"    search(params: {CurrentEntity.Name}SearchOptions): Observable<{CurrentEntity.Name}SearchResponse> {{");
-            s.Add($"        const queryParams: HttpParams = this.buildQueryParams(params);");
-            s.Add($"        return this.http.get(`${{environment.baseApiUrl}}{CurrentEntity.PluralName.ToLower()}`, {{ params: queryParams, observe: 'response' }})");
-            s.Add($"            .pipe(");
-            s.Add($"                map(response => {{");
-            s.Add($"                    const headers = JSON.parse(response.headers.get(\"x-pagination\")) as PagingHeaders;");
-            s.Add($"                    const {CurrentEntity.PluralName.ToCamelCase()} = response.body as {CurrentEntity.Name}[];");
-            s.Add($"                    return {{ {CurrentEntity.PluralName.ToCamelCase()}: {CurrentEntity.PluralName.ToCamelCase()}, headers: headers }};");
-            s.Add($"                }})");
-            s.Add($"            );");
-            s.Add($"    }}");
-            s.Add($"");
+            if (CurrentEntity.EntityType != EntityType.Settings)
+            {
+                s.Add($"    search(params: {CurrentEntity.Name}SearchOptions): Observable<{CurrentEntity.Name}SearchResponse> {{");
+                s.Add($"        const queryParams: HttpParams = this.buildQueryParams(params);");
+                s.Add($"        return this.http.get(`${{environment.baseApiUrl}}{CurrentEntity.PluralName.ToLower()}`, {{ params: queryParams, observe: 'response' }})");
+                s.Add($"            .pipe(");
+                s.Add($"                map(response => {{");
+                s.Add($"                    const headers = JSON.parse(response.headers.get(\"x-pagination\")) as PagingHeaders;");
+                s.Add($"                    const {CurrentEntity.PluralName.ToCamelCase()} = response.body as {CurrentEntity.Name}[];");
+                s.Add($"                    return {{ {CurrentEntity.PluralName.ToCamelCase()}: {CurrentEntity.PluralName.ToCamelCase()}, headers: headers }};");
+                s.Add($"                }})");
+                s.Add($"            );");
+                s.Add($"    }}");
+                s.Add($"");
+            }
 
             var getParams = CurrentEntity.KeyFields.Select(o => o.Name.ToCamelCase() + ": " + o.JavascriptType).Aggregate((current, next) => current + ", " + next);
             var saveParams = CurrentEntity.Name.ToCamelCase() + ": " + CurrentEntity.Name;
-            var getUrl = CurrentEntity.KeyFields.Select(o => "${" + o.Name.ToCamelCase() + "}").Aggregate((current, next) => current + "/" + next);
-            var saveUrl = CurrentEntity.KeyFields.Select(o => "${" + CurrentEntity.Name.ToCamelCase() + "." + o.Name.ToCamelCase() + "}").Aggregate((current, next) => current + "/" + next);
+            var getUrl = "/" + CurrentEntity.KeyFields.Select(o => "${" + o.Name.ToCamelCase() + "}").Aggregate((current, next) => current + "/" + next);
+            var saveUrl = "/" + CurrentEntity.KeyFields.Select(o => "${" + CurrentEntity.Name.ToCamelCase() + "." + o.Name.ToCamelCase() + "}").Aggregate((current, next) => current + "/" + next);
+
+            if (CurrentEntity.EntityType == EntityType.Settings)
+            {
+                getParams = string.Empty;
+                getUrl = string.Empty;
+                saveUrl = string.Empty;
+            }
 
             s.Add($"    get({getParams}): Observable<{CurrentEntity.Name}> {{");
-            s.Add($"        return this.http.get<{CurrentEntity.Name}>(`${{environment.baseApiUrl}}{CurrentEntity.PluralName.ToLower()}/{getUrl}`);");
+            s.Add($"        return this.http.get<{CurrentEntity.Name}>(`${{environment.baseApiUrl}}{CurrentEntity.PluralName.ToLower()}{getUrl}`);");
             s.Add($"    }}");
             s.Add($"");
 
             s.Add($"    save({saveParams}): Observable<{CurrentEntity.Name}> {{");
-            s.Add($"        return this.http.post<{CurrentEntity.Name}>(`${{environment.baseApiUrl}}{CurrentEntity.PluralName.ToLower()}/{saveUrl}`, {CurrentEntity.Name.ToCamelCase()});");
+            s.Add($"        return this.http.post<{CurrentEntity.Name}>(`${{environment.baseApiUrl}}{CurrentEntity.PluralName.ToLower()}{saveUrl}`, {CurrentEntity.Name.ToCamelCase()});");
             s.Add($"    }}");
             s.Add($"");
 
-            s.Add($"    delete({getParams}): Observable<void> {{");
-            s.Add($"        return this.http.delete<void>(`${{environment.baseApiUrl}}{CurrentEntity.PluralName.ToLower()}/{getUrl}`);");
-            s.Add($"    }}");
-            s.Add($"");
+            if (CurrentEntity.EntityType != EntityType.Settings)
+            {
+                s.Add($"    delete({getParams}): Observable<void> {{");
+                s.Add($"        return this.http.delete<void>(`${{environment.baseApiUrl}}{CurrentEntity.PluralName.ToLower()}{getUrl}`);");
+                s.Add($"    }}");
+                s.Add($"");
+            }
 
             if (CurrentEntity.HasASortField)
             {
@@ -93,7 +106,7 @@ namespace WEB.Models
                 var reverseRel = rel.ChildEntity.RelationshipsAsChild.Where(o => o.RelationshipId != rel.RelationshipId).SingleOrDefault();
 
                 s.Add($"    save{rel.ChildEntity.PluralName}({rel.RelationshipFields.First().ParentField.Name.ToCamelCase()}: {rel.RelationshipFields.First().ParentField.JavascriptType}, {reverseRel.RelationshipFields.First().ParentField.Name.ToCamelCase()}s: {reverseRel.RelationshipFields.First().ParentField.JavascriptType}[]): Observable<void> {{");
-                s.Add($"        return this.http.post<void>(`${{environment.baseApiUrl}}{CurrentEntity.PluralName.ToLower()}/{getUrl}/{rel.ChildEntity.PluralName.ToLower()}`, {reverseRel.RelationshipFields.First().ParentField.Name.ToCamelCase()}s);");
+                s.Add($"        return this.http.post<void>(`${{environment.baseApiUrl}}{CurrentEntity.PluralName.ToLower()}{getUrl}/{rel.ChildEntity.PluralName.ToLower()}`, {reverseRel.RelationshipFields.First().ParentField.Name.ToCamelCase()}s);");
                 s.Add($"    }}");
                 s.Add($"");
             }
@@ -101,7 +114,7 @@ namespace WEB.Models
             foreach (var rel in CurrentEntity.RelationshipsAsParent.Where(r => !r.ChildEntity.Exclude && r.DisplayListOnParent).OrderBy(r => r.SortOrder))
             {
                 s.Add($"    delete{rel.CollectionName}({rel.RelationshipFields.First().ParentField.Name.ToCamelCase()}: {rel.RelationshipFields.First().ParentField.JavascriptType}): Observable<void> {{");
-                s.Add($"        return this.http.delete<void>(`${{environment.baseApiUrl}}{CurrentEntity.PluralName.ToLower()}/{getUrl}/{rel.CollectionName.ToLower()}`);");
+                s.Add($"        return this.http.delete<void>(`${{environment.baseApiUrl}}{CurrentEntity.PluralName.ToLower()}{getUrl}/{rel.CollectionName.ToLower()}`);");
                 s.Add($"    }}");
                 s.Add($"");
             }

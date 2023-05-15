@@ -19,7 +19,7 @@ namespace WEB.Models
     {
         private Entity CurrentEntity { get; set; }
         private List<Entity> _allEntities { get; set; }
-        private List<Entity> NormalEntities { get { return AllEntities.Where(e => e.EntityType == EntityType.Normal && !e.Exclude).ToList(); } }
+        private List<Entity> NormalEntities { get { return AllEntities.Where(e => (e.EntityType == EntityType.Normal || e.EntityType == EntityType.Settings) && !e.Exclude).ToList(); } }
         private List<Entity> AllEntities
         {
             get

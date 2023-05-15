@@ -18,7 +18,8 @@ namespace WEB.Models
             var allEntities = AllEntities.Where(e => !e.Exclude).OrderBy(o => o.Name);
             foreach (var entity in allEntities)
             {
-                s.Add($"import {{ {entity.Name}ListComponent }} from './{entity.Project.GeneratedPath ?? string.Empty}{entity.PluralName.ToLower()}/{entity.Name.ToLower()}.list.component';");
+                if (entity.EntityType != EntityType.Settings)
+                    s.Add($"import {{ {entity.Name}ListComponent }} from './{entity.Project.GeneratedPath ?? string.Empty}{entity.PluralName.ToLower()}/{entity.Name.ToLower()}.list.component';");
                 s.Add($"import {{ {entity.Name}EditComponent }} from './{entity.Project.GeneratedPath ?? string.Empty}{entity.PluralName.ToLower()}/{entity.Name.ToLower()}.edit.component';");
             }
             //s.Add($"import {{ NotFoundComponent }} from './common/notfound.component';");
@@ -35,13 +36,16 @@ namespace WEB.Models
                 s.Add($"        path: '{entity.PluralName.ToLower()}',");
                 s.Add($"        canActivate: [AccessGuard],");
                 s.Add($"        canActivateChild: [AccessGuard],");
-                s.Add($"        component: {entity.Name}ListComponent,");
+                if (entity.EntityType != EntityType.Settings)
+                    s.Add($"        component: {entity.Name}ListComponent,");
+                else
+                    s.Add($"        component: {entity.Name}EditComponent,");
                 s.Add($"        data: {{");
                 if (!string.IsNullOrWhiteSpace(entity.Menu))
                     s.Add($"            menu: '{entity.Menu}',");
                 s.Add($"            breadcrumb: '{entity.PluralFriendlyName}'");
                 s.Add($"        }}" + (editOnRoot ? "," : ""));
-                if (editOnRoot)
+                if (editOnRoot && entity.EntityType != EntityType.Settings)
                 {
                     s.Add($"        children: [");
                     s.Add($"            {{");

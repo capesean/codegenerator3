@@ -49,7 +49,7 @@ namespace WEB.Models
             {
                 appTextFilter += $"                    <div class=\"col-sm-6 col-md-6 col-lg-4\">" + Environment.NewLine;
                 appTextFilter += $"                        <div class=\"form-group\">" + Environment.NewLine;
-                appTextFilter += $"                            <input type=\"search\" ngbAutofocus name=\"q\" id=\"q\" [(ngModel)]=\"searchOptions.q\" max=\"100\" class=\"form-control\" placeholder=\"Search PLURALFRIENDLYNAME_TOLOWER\" />" + Environment.NewLine;
+                appTextFilter += $"                            <input type=\"search\" ngbAutofocus name=\"q\" id=\"q\" [(ngModel)]=\"searchOptions.q\" max=\"100\" class=\"form-control\" placeholder=\"Search PLURALFRIENDLYNAME_TOLOWER\" autocomplete=\"off\" />" + Environment.NewLine;
                 appTextFilter += $"                        </div>" + Environment.NewLine;
                 appTextFilter += $"                    </div>" + Environment.NewLine;
                 appTextFilter += Environment.NewLine;

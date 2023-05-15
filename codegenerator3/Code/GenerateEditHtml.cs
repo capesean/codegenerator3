@@ -326,7 +326,8 @@ namespace WEB.Models
 
             s.Add(t + $"            <fieldset class=\"my-3\">");
             s.Add(t + $"                <button type=\"submit\" class=\"btn btn-outline-success me-2 mb-1\">Save<i class=\"fas fa-check ms-2\"></i></button>");
-            s.Add(t + $"                <button type=\"button\" *ngIf=\"!isNew\" class=\"btn btn-outline-danger me-2 mb-1\" (click)=\"delete()\">Delete<i class=\"fas fa-times ms-2\"></i></button>");
+            if (CurrentEntity.EntityType != EntityType.Settings)
+                s.Add(t + $"                <button type=\"button\" *ngIf=\"!isNew\" class=\"btn btn-outline-danger me-2 mb-1\" (click)=\"delete()\">Delete<i class=\"fas fa-times ms-2\"></i></button>");
             s.Add(t + $"            </fieldset>");
             s.Add($"");
 

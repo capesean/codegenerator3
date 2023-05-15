@@ -21,7 +21,8 @@ namespace WEB.Models
             var entitiesToBundle = AllEntities.Where(e => !e.Exclude);
             foreach (var e in entitiesToBundle)
             {
-                s.Add($"import {{ {e.Name}ListComponent }} from './{e.Project.GeneratedPath ?? string.Empty}{e.PluralName.ToLower()}/{e.Name.ToLower()}.list.component';");
+                if (e.EntityType != EntityType.Settings)
+                    s.Add($"import {{ {e.Name}ListComponent }} from './{e.Project.GeneratedPath ?? string.Empty}{e.PluralName.ToLower()}/{e.Name.ToLower()}.list.component';");
                 s.Add($"import {{ {e.Name}EditComponent }} from './{e.Project.GeneratedPath ?? string.Empty}{e.PluralName.ToLower()}/{e.Name.ToLower()}.edit.component';");
             }
             s.Add($"");
@@ -31,7 +32,8 @@ namespace WEB.Models
             s.Add($"    declarations: [");
             foreach (var e in entitiesToBundle)
             {
-                s.Add($"        {e.Name}ListComponent,");
+                if (e.EntityType != EntityType.Settings)
+                    s.Add($"        {e.Name}ListComponent,");
                 s.Add($"        {e.Name}EditComponent{(e == entitiesToBundle.Last() ? "" : ",")}");
             }
             s.Add($"    ],");

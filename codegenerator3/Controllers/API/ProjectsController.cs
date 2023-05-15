@@ -195,6 +195,57 @@ namespace WEB.Controllers
 
                 DbContext.Entry(new LookupOption { LookupId = lookup.LookupId, Name = "Administrator", FriendlyName = "Administrator" }).State = EntityState.Added;
 
+                var settingsEntity = new Entity();
+                settingsEntity.ProjectId = project.ProjectId;
+                settingsEntity.Name = "Settings";
+                settingsEntity.PluralName = "Settings";
+                settingsEntity.FriendlyName = "Settings";
+                settingsEntity.PluralFriendlyName = "Settings";
+                settingsEntity.EntityType = EntityType.Settings;
+                settingsEntity.AuthorizationType = AuthorizationType.ProtectAll;
+                settingsEntity.PreventListHtmlDeployment = "N/A";
+                settingsEntity.PreventListTypeScriptDeployment = "N/A";
+                settingsEntity.PreventAppSelectHtmlDeployment= "N/A";
+                settingsEntity.PreventAppSelectTypeScriptDeployment = "N/A";
+                settingsEntity.PreventSelectModalHtmlDeployment = "N/A";
+                settingsEntity.PreventSelectModalTypeScriptDeployment = "N/A";
+                settingsEntity.PreventSortHtmlDeployment = "N/A";
+                settingsEntity.PreventSortTypeScriptDeployment = "N/A";
+                settingsEntity.PreventSearchOptionsDeployment = "N/A";
+                DbContext.Entry(settingsEntity).State = EntityState.Added;
+
+                fieldOrder = 1;
+
+                DbContext.Entry(
+                    new Field
+                    {
+                        EntityId = settingsEntity.EntityId,
+                        Name = "Id",
+                        Label = "Id",
+                        FieldType = FieldType.Guid,
+                        ShowInSearchResults = false,
+                        SearchType = SearchType.None,
+                        EditPageType = EditPageType.Normal,
+                        FieldOrder = fieldOrder++
+                    }
+                ).State = EntityState.Added;
+
+                var testSetting = new Field
+                {
+                    EntityId = settingsEntity.EntityId,
+                    Name = "TestSetting",
+                    Label = "Test Setting",
+                    FieldType = FieldType.nVarchar,
+                    Length = 100,
+                    ShowInSearchResults = true,
+                    SearchType = SearchType.Text,
+                    EditPageType = EditPageType.Normal,
+                    FieldOrder = fieldOrder++
+                };
+
+                DbContext.Entry(testSetting).State = EntityState.Added;
+
+                settingsEntity.PrimaryFieldId = testSetting.FieldId;
             }
             else
             {

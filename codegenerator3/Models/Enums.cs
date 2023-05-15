@@ -55,7 +55,8 @@ namespace WEB.Models
     public enum EntityType
     {
         Normal,
-        User
+        User,
+        Settings
     }
 
     public enum FieldType
@@ -212,6 +213,8 @@ namespace WEB.Models
                     return "Normal";
                 case EntityType.User:
                     return "User";
+                case EntityType.Settings:
+                    return "Settings";
                 default:
                     return null;
             }

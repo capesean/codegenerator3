@@ -43,9 +43,11 @@ namespace WEB.Models
             if (relationshipsAsParent.Any())
                 s.Add($"import {{ Subject{(hasChildRoutes || CurrentEntity.EntityType == EntityType.User ? ", Subscription" : "")} }} from 'rxjs';");
             s.Add($"import {{ HttpErrorResponse }} from '@angular/common/http';");
-            s.Add($"import {{ NgbModal }} from '@ng-bootstrap/ng-bootstrap';");
+            if (CurrentEntity.EntityType != EntityType.Settings)
+                s.Add($"import {{ NgbModal }} from '@ng-bootstrap/ng-bootstrap';");
 
-            s.Add($"import {{ ConfirmModalComponent, ModalOptions }} from '{folders}../common/components/confirm.component';");
+            if (CurrentEntity.EntityType != EntityType.Settings)
+                s.Add($"import {{ ConfirmModalComponent, ModalOptions }} from '{folders}../common/components/confirm.component';");
 
             if (relationshipsAsParent.Any())
                 s.Add($"import {{ PagingHeaders }} from '{folders}../common/models/http.model';");
@@ -60,7 +62,8 @@ namespace WEB.Models
                 s.Add($"import {{ AuthService }} from '{folders}../common/services/auth.service';");
             }
 
-            s.Add($"import {{ BreadcrumbService }} from '{folders}../common/services/breadcrumb.service';");
+            if (CurrentEntity.EntityType != EntityType.Settings)
+                s.Add($"import {{ BreadcrumbService }} from '{folders}../common/services/breadcrumb.service';");
             s.Add($"import {{ ErrorService }} from '{folders}../common/services/error.service';");
             s.Add($"import {{ {CurrentEntity.Name}Service }} from '{folders}../common/services/{CurrentEntity.Name.ToLower()}.service';");
 
@@ -101,7 +104,8 @@ namespace WEB.Models
             s.Add($"export class {CurrentEntity.Name}EditComponent implements OnInit{(hasChildRoutes ? ", OnDestroy" : "")} {{");
             s.Add($"");
             s.Add($"    public {CurrentEntity.Name.ToCamelCase()}: {CurrentEntity.Name} = new {CurrentEntity.Name}();");
-            s.Add($"    public isNew = true;");
+            if (CurrentEntity.EntityType != EntityType.Settings)
+                s.Add($"    public isNew = true;");
             if (hasChildRoutes)
                 s.Add($"    private routerSubscription: Subscription;");
             foreach (var enumLookup in enumLookups)
@@ -137,8 +141,11 @@ namespace WEB.Models
             s.Add($"        private router: Router,");
             s.Add($"        {(hasChildRoutes ? "public" : "private")} route: ActivatedRoute,");
             s.Add($"        private toastr: ToastrService,");
-            s.Add($"        private breadcrumbService: BreadcrumbService,");
-            s.Add($"        private modalService: NgbModal,");
+            if (CurrentEntity.EntityType != EntityType.Settings)
+            {
+                s.Add($"        private breadcrumbService: BreadcrumbService,");
+                s.Add($"        private modalService: NgbModal,");
+            }
             s.Add($"        private {CurrentEntity.Name.ToCamelCase()}Service: {CurrentEntity.Name}Service,");
             var relChildEntities = relationshipsAsParent.Where(o => o.ChildEntityId != CurrentEntity.EntityId).Select(o => o.ChildEntity).Distinct().OrderBy(o => o.Name);
             foreach (var relChildEntity in relChildEntities)
@@ -164,64 +171,74 @@ namespace WEB.Models
                 s.Add($"");
             }
 
-            // use subscribe, so that a save changes url and reloads data
-            s.Add($"        this.route.params.subscribe(params => {{");
-            s.Add($"");
-            //if (relationshipsAsChildHierarchy != null)
-            //    foreach (var rfield in relationshipsAsChildHierarchy.RelationshipFields)
-            //s.Add($"            const {rfield.ParentField.Name.ToCamelCase()} = this.route.snapshot.parent.params.{rfield.ParentField.Name.ToCamelCase()};");
-
-            foreach (var keyField in nonHKeyFields)
+            if (CurrentEntity.EntityType == EntityType.Settings)
             {
-                s.Add($"            const {keyField.Name.ToCamelCase()} = params[\"{keyField.Name.ToCamelCase()}\"];");
-            }
-            if (relationshipsAsChildHierarchy != null)
-            {
-                foreach (var rfield in relationshipsAsChildHierarchy.RelationshipFields)
-                    s.Add($"            this.{CurrentEntity.Name.ToCamelCase()}.{rfield.ChildField.Name.ToCamelCase()} = this.route.snapshot.parent.params.{rfield.ParentField.Name.ToCamelCase()};");
-            }
-            s.Add($"            this.isNew = {CurrentEntity.GetNonHierarchicalKeyFields().Select(o => o.Name.ToCamelCase() + " === \"add\"").Aggregate((current, next) => { return current + " && " + next; })};");
-
-            s.Add($"");
-
-            s.Add($"            if (!this.isNew) {{");
-            s.Add($"");
-            foreach (var keyField in nonHKeyFields)
-            {
-                s.Add($"                this.{CurrentEntity.Name.ToCamelCase()}.{keyField.Name.ToCamelCase()} = {keyField.Name.ToCamelCase()};");
-            }
-            s.Add($"                this.load{CurrentEntity.Name}();");
-            s.Add($"");
-            foreach (var rel in relationshipsAsParent)
-            {
-                foreach (var relField in rel.RelationshipFields)
-                    s.Add($"                this.{rel.CollectionName.ToCamelCase()}SearchOptions.{relField.ChildField.Name.ToCamelCase()} = {relField.ParentField.Name.ToCamelCase()};");
-                s.Add($"                this.{rel.CollectionName.ToCamelCase()}SearchOptions.includeParents = true;");
-                s.Add($"                this.search{rel.CollectionName}();");
+                s.Add($"        this.loadSettings();");
                 s.Add($"");
             }
-
-            s.Add($"            }}");
-            s.Add($"");
-            if (hasChildRoutes)
+            else
             {
-                s.Add($"            this.routerSubscription = this.router.events.subscribe(event => {{");
-                s.Add($"                if (event instanceof NavigationEnd && !this.route.firstChild) {{");
-                // this was causing a 404 error after deleting
-                //s.Add($"                  this.load{CurrentEntity.Name}();");
-                // 
-                s.Add($"                    // this will double-load on new save, as params change (above) + nav ends");
-                foreach (var rel in relationshipsAsParent.Where(o => o.Hierarchy))
+
+                // use subscribe, so that a save changes url and reloads data
+                s.Add($"        this.route.params.subscribe(params => {{");
+                s.Add($"");
+                //if (relationshipsAsChildHierarchy != null)
+                //    foreach (var rfield in relationshipsAsChildHierarchy.RelationshipFields)
+                //s.Add($"            const {rfield.ParentField.Name.ToCamelCase()} = this.route.snapshot.parent.params.{rfield.ParentField.Name.ToCamelCase()};");
+
+                foreach (var keyField in nonHKeyFields)
                 {
-                    s.Add($"                    this.search{rel.CollectionName}();");
+                    s.Add($"            const {keyField.Name.ToCamelCase()} = params[\"{keyField.Name.ToCamelCase()}\"];");
                 }
-                s.Add($"                }}");
-                s.Add($"            }});");
+                if (relationshipsAsChildHierarchy != null)
+                {
+                    foreach (var rfield in relationshipsAsChildHierarchy.RelationshipFields)
+                        s.Add($"            this.{CurrentEntity.Name.ToCamelCase()}.{rfield.ChildField.Name.ToCamelCase()} = this.route.snapshot.parent.params.{rfield.ParentField.Name.ToCamelCase()};");
+                }
+                s.Add($"            this.isNew = {CurrentEntity.GetNonHierarchicalKeyFields().Select(o => o.Name.ToCamelCase() + " === \"add\"").Aggregate((current, next) => { return current + " && " + next; })};");
+
+                s.Add($"");
+
+                s.Add($"            if (!this.isNew) {{");
+                s.Add($"");
+                foreach (var keyField in nonHKeyFields)
+                {
+                    s.Add($"                this.{CurrentEntity.Name.ToCamelCase()}.{keyField.Name.ToCamelCase()} = {keyField.Name.ToCamelCase()};");
+                }
+                s.Add($"                this.load{CurrentEntity.Name}();");
+                s.Add($"");
+                foreach (var rel in relationshipsAsParent)
+                {
+                    foreach (var relField in rel.RelationshipFields)
+                        s.Add($"                this.{rel.CollectionName.ToCamelCase()}SearchOptions.{relField.ChildField.Name.ToCamelCase()} = {relField.ParentField.Name.ToCamelCase()};");
+                    s.Add($"                this.{rel.CollectionName.ToCamelCase()}SearchOptions.includeParents = true;");
+                    s.Add($"                this.search{rel.CollectionName}();");
+                    s.Add($"");
+                }
+
+                s.Add($"            }}");
+                s.Add($"");
+                if (hasChildRoutes)
+                {
+                    s.Add($"            this.routerSubscription = this.router.events.subscribe(event => {{");
+                    s.Add($"                if (event instanceof NavigationEnd && !this.route.firstChild) {{");
+                    // this was causing a 404 error after deleting
+                    //s.Add($"                  this.load{CurrentEntity.Name}();");
+                    // 
+                    s.Add($"                    // this will double-load on new save, as params change (above) + nav ends");
+                    foreach (var rel in relationshipsAsParent.Where(o => o.Hierarchy))
+                    {
+                        s.Add($"                    this.search{rel.CollectionName}();");
+                    }
+                    s.Add($"                }}");
+                    s.Add($"            }});");
+                    s.Add($"");
+                }
+
+                s.Add($"        }});");
                 s.Add($"");
             }
 
-            s.Add($"        }});");
-            s.Add($"");
             s.Add($"    }}");
             s.Add($"");
 
@@ -235,11 +252,12 @@ namespace WEB.Models
 
             s.Add($"    private load{CurrentEntity.Name}(): void {{");
             s.Add($"");
-            s.Add($"        this.{CurrentEntity.Name.ToCamelCase()}Service.get({CurrentEntity.KeyFields.Select(o => $"this.{CurrentEntity.Name.ToCamelCase()}.{o.Name.ToCamelCase()}").Aggregate((current, next) => { return current + ", " + next; })})");
+            s.Add($"        this.{CurrentEntity.Name.ToCamelCase()}Service.get({(CurrentEntity.EntityType == EntityType.Settings ? string.Empty : CurrentEntity.KeyFields.Select(o => $"this.{CurrentEntity.Name.ToCamelCase()}.{o.Name.ToCamelCase()}").Aggregate((current, next) => { return current + ", " + next; }))})");
             s.Add($"            .subscribe({{");
             s.Add($"                next: {CurrentEntity.Name.ToCamelCase()} => {{");
             s.Add($"                    this.{CurrentEntity.Name.ToCamelCase()} = {CurrentEntity.Name.ToCamelCase()};");
-            s.Add($"                    this.changeBreadcrumb();");
+            if (CurrentEntity.EntityType != EntityType.Settings)
+                s.Add($"                    this.changeBreadcrumb();");
             s.Add($"                }},");
             s.Add($"                error: err => {{");
             s.Add($"                    this.errorService.handleError(err, \"{CurrentEntity.FriendlyName}\", \"Load\");");
@@ -264,29 +282,32 @@ namespace WEB.Models
             s.Add($"            .subscribe({{");
             s.Add($"                next: {(CurrentEntity.ReturnOnSave ? "()" : CurrentEntity.Name.ToCamelCase())} => {{");
             s.Add($"                    this.toastr.success(\"The {CurrentEntity.FriendlyName.ToLower()} has been saved\", \"Save {CurrentEntity.FriendlyName}\");");
-            if (CurrentEntity.ReturnOnSave)
-                s.Add($"                    {CurrentEntity.ReturnRoute}");
-            else
+            if (CurrentEntity.EntityType != EntityType.Settings)
             {
-                if (hasChildRoutes)
-                {
-                    s.Add($"                    if (this.isNew) {{");
-                    s.Add($"                        this.ngOnDestroy();");
-                    s.Add($"                        this.router.navigate([\"../\", {nonHKeyFields.Select(o => $"{CurrentEntity.Name.ToCamelCase()}.{o.Name.ToCamelCase()}").Aggregate((current, next) => { return current + ", " + next; })}], {{ relativeTo: this.route }});");
-                    s.Add($"                    }}");
-                }
+                if (CurrentEntity.ReturnOnSave)
+                    s.Add($"                    {CurrentEntity.ReturnRoute}");
                 else
                 {
-                    s.Add($"                    if (this.isNew) this.router.navigate([\"../\", {nonHKeyFields.Select(o => $"{CurrentEntity.Name.ToCamelCase()}.{o.Name.ToCamelCase()}").Aggregate((current, next) => { return current + ", " + next; })}], {{ relativeTo: this.route }});");
+                    if (hasChildRoutes)
+                    {
+                        s.Add($"                    if (this.isNew) {{");
+                        s.Add($"                        this.ngOnDestroy();");
+                        s.Add($"                        this.router.navigate([\"../\", {nonHKeyFields.Select(o => $"{CurrentEntity.Name.ToCamelCase()}.{o.Name.ToCamelCase()}").Aggregate((current, next) => { return current + ", " + next; })}], {{ relativeTo: this.route }});");
+                        s.Add($"                    }}");
+                    }
+                    else
+                    {
+                        s.Add($"                    if (this.isNew) this.router.navigate([\"../\", {nonHKeyFields.Select(o => $"{CurrentEntity.Name.ToCamelCase()}.{o.Name.ToCamelCase()}").Aggregate((current, next) => { return current + ", " + next; })}], {{ relativeTo: this.route }});");
+                    }
                 }
-            }
-            if (CurrentEntity.EntityType == EntityType.User)
-            {
-                s.Add($"                    else {{");
-                s.Add($"                        // reload profile if editing self");
-                s.Add($"                        if (this.user.id === this.profile.userId)");
-                s.Add($"                            this.authService.getProfile(true).subscribe();");
-                s.Add($"                    }}");
+                if (CurrentEntity.EntityType == EntityType.User)
+                {
+                    s.Add($"                    else {{");
+                    s.Add($"                        // reload profile if editing self");
+                    s.Add($"                        if (this.user.id === this.profile.userId)");
+                    s.Add($"                            this.authService.getProfile(true).subscribe();");
+                    s.Add($"                    }}");
+                }
             }
             //else if (!CurrentEntity.ReturnOnSave)
             //{
@@ -301,58 +322,61 @@ namespace WEB.Models
             s.Add($"    }}");
             s.Add($"");
 
-            s.Add($"    delete(): void {{");
-            s.Add($"");
-            s.Add($"        let modalRef = this.modalService.open(ConfirmModalComponent, {{ centered: true }});");
-            s.Add($"        (modalRef.componentInstance as ConfirmModalComponent).options = {{ title: \"Delete {CurrentEntity.FriendlyName}\", text: \"Are you sure you want to delete this {CurrentEntity.FriendlyName.ToLower()}?\", deleteStyle: true, ok: \"Delete\" }} as ModalOptions;");
-            s.Add($"        modalRef.result.then(");
-            s.Add($"            () => {{");
-            s.Add($"");
-            s.Add($"                this.{CurrentEntity.Name.ToCamelCase()}Service.delete({CurrentEntity.KeyFields.Select(o => $"this.{CurrentEntity.Name.ToCamelCase()}.{o.Name.ToCamelCase()}").Aggregate((current, next) => { return current + ", " + next; })})");
-            s.Add($"                    .subscribe({{");
-            s.Add($"                        next: () => {{");
-            s.Add($"                            this.toastr.success(\"The {CurrentEntity.FriendlyName.ToLower()} has been deleted\", \"Delete {CurrentEntity.FriendlyName}\");");
-            s.Add($"                            {CurrentEntity.ReturnRoute}");
-            s.Add($"                        }},");
-            s.Add($"                        error: err => {{");
-            s.Add($"                            this.errorService.handleError(err, \"{CurrentEntity.FriendlyName}\", \"Delete\");");
-            s.Add($"                        }}");
-            s.Add($"                    }});");
-            s.Add($"");
-            s.Add($"            }}, () => {{ }});");
-            s.Add($"    }}");
-            s.Add($"");
-
-            s.Add($"    changeBreadcrumb(): void {{");
-            // if the 'primary field' is a foreign key to another entity
-            //if()//CurrentEntity.PrimaryFieldId
-            if (CurrentEntity.RelationshipsAsChild.Any(r => r.RelationshipFields.Count == 1 && r.RelationshipFields.First()?.ChildFieldId == CurrentEntity.PrimaryField.FieldId))
+            if (CurrentEntity.EntityType != EntityType.Settings)
             {
-                var rel = CurrentEntity.RelationshipsAsChild.Single(r => r.RelationshipFields.Count == 1 && r.RelationshipFields.First().ChildFieldId == CurrentEntity.PrimaryField.FieldId);
-                var primaryField = rel.ParentEntity.PrimaryField;
-                if (primaryField.CustomType == CustomType.Enum)
+                s.Add($"    delete(): void {{");
+                s.Add($"");
+                s.Add($"        let modalRef = this.modalService.open(ConfirmModalComponent, {{ centered: true }});");
+                s.Add($"        (modalRef.componentInstance as ConfirmModalComponent).options = {{ title: \"Delete {CurrentEntity.FriendlyName}\", text: \"Are you sure you want to delete this {CurrentEntity.FriendlyName.ToLower()}?\", deleteStyle: true, ok: \"Delete\" }} as ModalOptions;");
+                s.Add($"        modalRef.result.then(");
+                s.Add($"            () => {{");
+                s.Add($"");
+                s.Add($"                this.{CurrentEntity.Name.ToCamelCase()}Service.delete({CurrentEntity.KeyFields.Select(o => $"this.{CurrentEntity.Name.ToCamelCase()}.{o.Name.ToCamelCase()}").Aggregate((current, next) => { return current + ", " + next; })})");
+                s.Add($"                    .subscribe({{");
+                s.Add($"                        next: () => {{");
+                s.Add($"                            this.toastr.success(\"The {CurrentEntity.FriendlyName.ToLower()} has been deleted\", \"Delete {CurrentEntity.FriendlyName}\");");
+                s.Add($"                            {CurrentEntity.ReturnRoute}");
+                s.Add($"                        }},");
+                s.Add($"                        error: err => {{");
+                s.Add($"                            this.errorService.handleError(err, \"{CurrentEntity.FriendlyName}\", \"Delete\");");
+                s.Add($"                        }}");
+                s.Add($"                    }});");
+                s.Add($"");
+                s.Add($"            }}, () => {{ }});");
+                s.Add($"    }}");
+                s.Add($"");
+
+                s.Add($"    changeBreadcrumb(): void {{");
+                // if the 'primary field' is a foreign key to another entity
+                //if()//CurrentEntity.PrimaryFieldId
+                if (CurrentEntity.RelationshipsAsChild.Any(r => r.RelationshipFields.Count == 1 && r.RelationshipFields.First()?.ChildFieldId == CurrentEntity.PrimaryField.FieldId))
                 {
-                    s.Add($"        this.breadcrumbService.changeBreadcrumb(this.route.snapshot, this.{CurrentEntity.Name.ToCamelCase()}.{rel.ParentEntity.Name.ToCamelCase()}.{primaryField.Name.ToCamelCase()} !== undefined ? Enums.{primaryField.Lookup.PluralName}[this.{CurrentEntity.Name.ToCamelCase()}.{rel.ParentEntity.Name.ToCamelCase()}.{primaryField.Name.ToCamelCase()}].label?.substring(0, 25) : \"(new {CurrentEntity.FriendlyName.ToLower()})\");");
+                    var rel = CurrentEntity.RelationshipsAsChild.Single(r => r.RelationshipFields.Count == 1 && r.RelationshipFields.First().ChildFieldId == CurrentEntity.PrimaryField.FieldId);
+                    var primaryField = rel.ParentEntity.PrimaryField;
+                    if (primaryField.CustomType == CustomType.Enum)
+                    {
+                        s.Add($"        this.breadcrumbService.changeBreadcrumb(this.route.snapshot, this.{CurrentEntity.Name.ToCamelCase()}.{rel.ParentEntity.Name.ToCamelCase()}.{primaryField.Name.ToCamelCase()} !== undefined ? Enums.{primaryField.Lookup.PluralName}[this.{CurrentEntity.Name.ToCamelCase()}.{rel.ParentEntity.Name.ToCamelCase()}.{primaryField.Name.ToCamelCase()}].label?.substring(0, 25) : \"(new {CurrentEntity.FriendlyName.ToLower()})\");");
+                    }
+                    else
+                    {
+                        s.Add($"        this.breadcrumbService.changeBreadcrumb(this.route.snapshot, this.{CurrentEntity.Name.ToCamelCase()}.{rel.RelationshipFields.First().ChildField.Name.ToCamelCase()} ? this.{CurrentEntity.Name.ToCamelCase()}.{rel.ParentName.ToCamelCase()}?.{primaryField.Name.ToCamelCase() + (primaryField.JavascriptType == "string" ? "" : "?.toString()")}?.substring(0, 25) : \"(new {CurrentEntity.FriendlyName.ToLower()})\");");
+                    }
+                }
+                else if (CurrentEntity.PrimaryField.CustomType == CustomType.Date)
+                {
+                    s.Add($"        this.breadcrumbService.changeBreadcrumb(this.route.snapshot, this.{CurrentEntity.Name.ToCamelCase()}.{CurrentEntity.PrimaryField.Name.ToCamelCase()} ? moment(this.{CurrentEntity.Name.ToCamelCase()}.{CurrentEntity.PrimaryField?.Name.ToCamelCase()}).format(\"LL\") : \"(new {CurrentEntity.FriendlyName.ToLower()})\");");
+                }
+                else if (CurrentEntity.PrimaryField.CustomType == CustomType.Enum)
+                {
+                    s.Add($"        this.breadcrumbService.changeBreadcrumb(this.route.snapshot, this.{CurrentEntity.Name.ToCamelCase()}.{CurrentEntity.PrimaryField.Name.ToCamelCase()} !== undefined ? Enums.{CurrentEntity.PrimaryField.Lookup.PluralName}[this.{CurrentEntity.Name.ToCamelCase()}.{CurrentEntity.PrimaryField.Name.ToCamelCase()}].label?.substring(0, 25) : \"(new {CurrentEntity.FriendlyName.ToLower()})\");");
                 }
                 else
                 {
-                    s.Add($"        this.breadcrumbService.changeBreadcrumb(this.route.snapshot, this.{CurrentEntity.Name.ToCamelCase()}.{rel.RelationshipFields.First().ChildField.Name.ToCamelCase()} ? this.{CurrentEntity.Name.ToCamelCase()}.{rel.ParentName.ToCamelCase()}?.{primaryField.Name.ToCamelCase() + (primaryField.JavascriptType == "string" ? "" : "?.toString()")}?.substring(0, 25) : \"(new {CurrentEntity.FriendlyName.ToLower()})\");");
+                    s.Add($"        this.breadcrumbService.changeBreadcrumb(this.route.snapshot, this.{CurrentEntity.Name.ToCamelCase()}.{CurrentEntity.PrimaryField.Name.ToCamelCase()} !== undefined ? this.{CurrentEntity.Name.ToCamelCase()}.{CurrentEntity.PrimaryField?.Name.ToCamelCase() + (CurrentEntity.PrimaryField?.JavascriptType == "string" ? "" : ".toString()")}.substring(0, 25) : \"(new {CurrentEntity.FriendlyName.ToLower()})\");");
                 }
+                s.Add($"    }}");
+                s.Add($"");
             }
-            else if (CurrentEntity.PrimaryField.CustomType == CustomType.Date)
-            {
-                s.Add($"        this.breadcrumbService.changeBreadcrumb(this.route.snapshot, this.{CurrentEntity.Name.ToCamelCase()}.{CurrentEntity.PrimaryField.Name.ToCamelCase()} ? moment(this.{CurrentEntity.Name.ToCamelCase()}.{CurrentEntity.PrimaryField?.Name.ToCamelCase()}).format(\"LL\") : \"(new {CurrentEntity.FriendlyName.ToLower()})\");");
-            }
-            else if (CurrentEntity.PrimaryField.CustomType == CustomType.Enum)
-            {
-                s.Add($"        this.breadcrumbService.changeBreadcrumb(this.route.snapshot, this.{CurrentEntity.Name.ToCamelCase()}.{CurrentEntity.PrimaryField.Name.ToCamelCase()} !== undefined ? Enums.{CurrentEntity.PrimaryField.Lookup.PluralName}[this.{CurrentEntity.Name.ToCamelCase()}.{CurrentEntity.PrimaryField.Name.ToCamelCase()}].label?.substring(0, 25) : \"(new {CurrentEntity.FriendlyName.ToLower()})\");");
-            }
-            else
-            {
-                s.Add($"        this.breadcrumbService.changeBreadcrumb(this.route.snapshot, this.{CurrentEntity.Name.ToCamelCase()}.{CurrentEntity.PrimaryField.Name.ToCamelCase()} !== undefined ? this.{CurrentEntity.Name.ToCamelCase()}.{CurrentEntity.PrimaryField?.Name.ToCamelCase() + (CurrentEntity.PrimaryField?.JavascriptType == "string" ? "" : ".toString()")}.substring(0, 25) : \"(new {CurrentEntity.FriendlyName.ToLower()})\");");
-            }
-            s.Add($"    }}");
-            s.Add($"");
 
             if (hasFileContents)
             {
