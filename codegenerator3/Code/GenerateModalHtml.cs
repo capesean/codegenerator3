@@ -39,10 +39,10 @@ namespace WEB.Models
                     }
                 }
 
-                fieldHeaders += (fieldHeaders == string.Empty ? string.Empty : Environment.NewLine) + $"                    <th{ngIf}>{field.Label}</th>";
+                fieldHeaders += (fieldHeaders == string.Empty ? string.Empty : Environment.NewLine) + $"                        <th{ngIf}>{field.Label}</th>";
                 fieldList += (fieldList == string.Empty ? string.Empty : Environment.NewLine);
 
-                fieldList += $"                    <td{ngIf}>{field.ListFieldHtml}</td>";
+                fieldList += $"                        <td{ngIf}>{field.ListFieldHtml}</td>";
             }
 
             if (CurrentEntity.Fields.Any(o => o.SearchType == SearchType.Text))
