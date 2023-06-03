@@ -462,7 +462,7 @@ namespace WEB.Models
                         s.Add(t + $"                        <div class=\"mb-3\">");
 
                         if (relationship.UseMultiSelect)
-                            s.Add(t + $"                        <button class=\"btn btn-outline-primary me-2 mb-1\" (click)=\"add{relationship.CollectionName}()\">Add {relationship.CollectionFriendlyName}<i class=\"fas fa-plus ms-2\"></i></button>");
+                            s.Add(t + $"                            <button class=\"btn btn-outline-primary me-2 mb-1\" (click)=\"add{relationship.CollectionName}()\">Add {relationship.CollectionFriendlyName}<i class=\"fas fa-plus ms-2\"></i></button>");
                         if (relationship.Hierarchy)
                             s.Add(t + $"                            <a [routerLink]=\"['./{childEntity.PluralName.ToLower()}', 'add']\" class=\"btn btn-outline-primary me-2 mb-1\">Add<i class=\"fas fa-plus ms-2\"></i></a>");
 

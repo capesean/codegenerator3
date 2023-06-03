@@ -55,8 +55,6 @@ namespace WEB.Models
                     }
                 }
             }
-            if (CurrentEntity.PrimaryField.CustomType == CustomType.Date)
-                imports += $"import * as moment from 'moment';" + Environment.NewLine;
 
             if (CurrentEntity.PrimaryField == null) throw new Exception("Entity " + CurrentEntity.Name + " does not have a Primary Field defined for AppSelect label");
 
@@ -65,8 +63,9 @@ namespace WEB.Models
 
             if (CurrentEntity.PrimaryField.CustomType == CustomType.Date)
             {
-                LABEL_OUTPUT_MULTI = $"moment({LABEL_OUTPUT_MULTI}).format(\"LL\")";
-                LABEL_OUTPUT_SINGLE = $"moment({LABEL_OUTPUT_SINGLE}).format(\"LL\")";
+                imports += $"import * as moment from 'moment';" + Environment.NewLine;
+                LABEL_OUTPUT_MULTI = $"({LABEL_OUTPUT_MULTI} ? moment({LABEL_OUTPUT_MULTI}).format(\"LL\") : undefined)";
+                LABEL_OUTPUT_SINGLE = $"({LABEL_OUTPUT_SINGLE} ? moment({LABEL_OUTPUT_SINGLE}).format(\"LL\") : undefined)";
             }
             else if (CurrentEntity.PrimaryField.FieldType == FieldType.Enum)
             {

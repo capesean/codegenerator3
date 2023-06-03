@@ -65,208 +65,234 @@ namespace WEB.Controllers
             var fullName = (Field)null;
 
             Project project;
-            if (isNew)
+
+            using (var dbContextTransaction = DbContext.Database.BeginTransaction())
             {
-                project = new Project();
 
-                project.DateCreated = DateTime.Today;
-
-                DbContext.Entry(project).State = EntityState.Added;
-
-                userEntity = new Entity();
-                userEntity.ProjectId = project.ProjectId;
-                userEntity.Name = "User";
-                userEntity.PluralName = "Users";
-                userEntity.FriendlyName = "User";
-                userEntity.PluralFriendlyName = "Users";
-                userEntity.EntityType = EntityType.User;
-                userEntity.PartialEntityClass = true;
-                userEntity.AuthorizationType = AuthorizationType.ProtectChanges;
-                userEntity.PreventSortHtmlDeployment = "Not applicable (no sort field)";
-                userEntity.PreventSortTypeScriptDeployment = "Not applicable (no sort field)";
-                DbContext.Entry(userEntity).State = EntityState.Added;
-
-                var fieldOrder = 0;
-
-                DbContext.Entry(
-                    new Field
-                    {
-                        EntityId = userEntity.EntityId,
-                        Name = "Id",
-                        Label = "User Id",
-                        FieldType = FieldType.Guid,
-                        KeyField = true,
-                        ShowInSearchResults = false,
-                        SearchType = SearchType.None,
-                        EditPageType = EditPageType.Normal,
-                        FieldOrder = fieldOrder++
-                    }
-                ).State = EntityState.Added;
-
-                DbContext.Entry(
-                    new Field
-                    {
-                        EntityId = userEntity.EntityId,
-                        Name = "FirstName",
-                        Label = "First Name",
-                        FieldType = FieldType.nVarchar,
-                        Length = 50,
-                        ShowInSearchResults = true,
-                        SearchType = SearchType.None,
-                        EditPageType = EditPageType.Normal,
-                        FieldOrder = fieldOrder++,
-                        SortPriority = 1,
-                        SortDescending = false
-                    }
-                ).State = EntityState.Added;
-
-                DbContext.Entry(
-                    new Field
-                    {
-                        EntityId = userEntity.EntityId,
-                        Name = "LastName",
-                        Label = "Last Name",
-                        FieldType = FieldType.nVarchar,
-                        Length = 50,
-                        ShowInSearchResults = true,
-                        SearchType = SearchType.None,
-                        EditPageType = EditPageType.Normal,
-                        FieldOrder = fieldOrder++,
-                        SortPriority = 2,
-                        SortDescending = false
-                    }
-                ).State = EntityState.Added;
-
-                fullName = new Field
+                if (isNew)
                 {
-                    EntityId = userEntity.EntityId,
-                    Name = "FullName",
-                    Label = "Full Name",
-                    FieldType = FieldType.nVarchar,
-                    Length = 250,
-                    ShowInSearchResults = false,
-                    SearchType = SearchType.Text,
-                    EditPageType = EditPageType.CalculatedField,
-                    CalculatedFieldDefinition = "FirstName + ' ' + LastName",
-                    FieldOrder = fieldOrder++
-                };
+                    project = new Project();
 
-                DbContext.Entry(fullName).State = EntityState.Added;
+                    project.DateCreated = DateTime.Today;
 
-                DbContext.Entry(
-                    new Field
+                    DbContext.Entry(project).State = EntityState.Added;
+                }
+                else
+                {
+                    project = await DbContext.Projects.SingleOrDefaultAsync(o => o.ProjectId == projectDTO.ProjectId);
+
+                    if (project == null)
+                        return NotFound();
+
+                    DbContext.Entry(project).State = EntityState.Modified;
+                }
+
+                ModelFactory.Hydrate(project, projectDTO);
+                project.WebPath = project.WebPath ?? "";
+
+                await DbContext.SaveChangesAsync();
+
+                if (isNew)
+                {
+                    userEntity = new Entity();
+                    userEntity.ProjectId = project.ProjectId;
+                    userEntity.Name = "User";
+                    userEntity.PluralName = "Users";
+                    userEntity.FriendlyName = "User";
+                    userEntity.PluralFriendlyName = "Users";
+                    userEntity.EntityType = EntityType.User;
+                    userEntity.PartialEntityClass = true;
+                    userEntity.AuthorizationType = AuthorizationType.ProtectChanges;
+                    userEntity.PreventSortHtmlDeployment = "Not applicable (no sort field)";
+                    userEntity.PreventSortTypeScriptDeployment = "Not applicable (no sort field)";
+                    DbContext.Entry(userEntity).State = EntityState.Added;
+
+                    await DbContext.SaveChangesAsync();
+
+                    var fieldOrder = 0;
+
+                    DbContext.Entry(
+                        new Field
+                        {
+                            EntityId = userEntity.EntityId,
+                            Name = "Id",
+                            Label = "User Id",
+                            FieldType = FieldType.Guid,
+                            KeyField = true,
+                            ShowInSearchResults = false,
+                            SearchType = SearchType.None,
+                            EditPageType = EditPageType.Normal,
+                            FieldOrder = fieldOrder++
+                        }
+                    ).State = EntityState.Added;
+
+                    await DbContext.SaveChangesAsync();
+
+                    DbContext.Entry(
+                        new Field
+                        {
+                            EntityId = userEntity.EntityId,
+                            Name = "FirstName",
+                            Label = "First Name",
+                            FieldType = FieldType.nVarchar,
+                            Length = 50,
+                            ShowInSearchResults = true,
+                            SearchType = SearchType.None,
+                            EditPageType = EditPageType.Normal,
+                            FieldOrder = fieldOrder++,
+                            SortPriority = 1,
+                            SortDescending = false
+                        }
+                    ).State = EntityState.Added;
+
+                    await DbContext.SaveChangesAsync();
+
+                    DbContext.Entry(
+                        new Field
+                        {
+                            EntityId = userEntity.EntityId,
+                            Name = "LastName",
+                            Label = "Last Name",
+                            FieldType = FieldType.nVarchar,
+                            Length = 50,
+                            ShowInSearchResults = true,
+                            SearchType = SearchType.None,
+                            EditPageType = EditPageType.Normal,
+                            FieldOrder = fieldOrder++,
+                            SortPriority = 2,
+                            SortDescending = false
+                        }
+                    ).State = EntityState.Added;
+
+                    await DbContext.SaveChangesAsync();
+
+                    fullName = new Field
                     {
                         EntityId = userEntity.EntityId,
-                        Name = "Email",
-                        Label = "Email",
+                        Name = "FullName",
+                        Label = "Full Name",
                         FieldType = FieldType.nVarchar,
-                        Length = 256,
+                        Length = 250,
+                        ShowInSearchResults = false,
+                        SearchType = SearchType.Text,
+                        EditPageType = EditPageType.CalculatedField,
+                        CalculatedFieldDefinition = "FirstName + ' ' + LastName",
+                        FieldOrder = fieldOrder++
+                    };
+                    userEntity.PrimaryFieldId = fullName.FieldId;
+
+                    DbContext.Entry(fullName).State = EntityState.Added;
+
+                    await DbContext.SaveChangesAsync();
+
+                    DbContext.Entry(
+                        new Field
+                        {
+                            EntityId = userEntity.EntityId,
+                            Name = "Email",
+                            Label = "Email",
+                            FieldType = FieldType.nVarchar,
+                            Length = 256,
+                            ShowInSearchResults = true,
+                            SearchType = SearchType.Text,
+                            EditPageType = EditPageType.Normal,
+                            FieldOrder = fieldOrder++,
+                            RegexValidation = @"^[^@\s]+@[^@\s]+\.[^@\s]+$"
+                        }
+                    ).State = EntityState.Added;
+
+                    await DbContext.SaveChangesAsync();
+
+                    DbContext.Entry(
+                        new Field
+                        {
+                            EntityId = userEntity.EntityId,
+                            Name = "Disabled",
+                            Label = "Disabled",
+                            FieldType = FieldType.Bit,
+                            ShowInSearchResults = true,
+                            SearchType = SearchType.Exact,
+                            EditPageType = EditPageType.Normal,
+                            FieldOrder = fieldOrder++
+                        }
+                    ).State = EntityState.Added;
+
+                    await DbContext.SaveChangesAsync();
+
+                    var lookup = new Lookup
+                    {
+                        ProjectId = project.ProjectId,
+                        Name = "Role",
+                        PluralName = "Roles",
+                        IsRoleList = true
+                    };
+
+                    DbContext.Entry(lookup).State = EntityState.Added;
+
+                    await DbContext.SaveChangesAsync();
+
+                    DbContext.Entry(new LookupOption { LookupId = lookup.LookupId, Name = "Administrator", FriendlyName = "Administrator" }).State = EntityState.Added;
+
+                    await DbContext.SaveChangesAsync();
+
+                    var settingsEntity = new Entity();
+                    settingsEntity.ProjectId = project.ProjectId;
+                    settingsEntity.Name = "Settings";
+                    settingsEntity.PluralName = "Settings";
+                    settingsEntity.FriendlyName = "Settings";
+                    settingsEntity.PluralFriendlyName = "Settings";
+                    settingsEntity.EntityType = EntityType.Settings;
+                    settingsEntity.AuthorizationType = AuthorizationType.ProtectAll;
+                    settingsEntity.PreventListHtmlDeployment = "N/A";
+                    settingsEntity.PreventListTypeScriptDeployment = "N/A";
+                    settingsEntity.PreventAppSelectHtmlDeployment = "N/A";
+                    settingsEntity.PreventAppSelectTypeScriptDeployment = "N/A";
+                    settingsEntity.PreventSelectModalHtmlDeployment = "N/A";
+                    settingsEntity.PreventSelectModalTypeScriptDeployment = "N/A";
+                    settingsEntity.PreventSortHtmlDeployment = "N/A";
+                    settingsEntity.PreventSortTypeScriptDeployment = "N/A";
+                    settingsEntity.PreventSearchOptionsDeployment = "N/A";
+                    DbContext.Entry(settingsEntity).State = EntityState.Added;
+
+                    fieldOrder = 1;
+
+                    await DbContext.SaveChangesAsync();
+
+                    DbContext.Entry(
+                        new Field
+                        {
+                            EntityId = settingsEntity.EntityId,
+                            Name = "Id",
+                            Label = "Id",
+                            FieldType = FieldType.Guid,
+                            ShowInSearchResults = false,
+                            SearchType = SearchType.None,
+                            EditPageType = EditPageType.Normal,
+                            FieldOrder = fieldOrder++
+                        }
+                    ).State = EntityState.Added;
+
+                    var testSetting = new Field
+                    {
+                        EntityId = settingsEntity.EntityId,
+                        Name = "TestSetting",
+                        Label = "Test Setting",
+                        FieldType = FieldType.nVarchar,
+                        Length = 100,
                         ShowInSearchResults = true,
                         SearchType = SearchType.Text,
                         EditPageType = EditPageType.Normal,
-                        FieldOrder = fieldOrder++,
-                        RegexValidation = @"^[^@\s]+@[^@\s]+\.[^@\s]+$"
-                    }
-                ).State = EntityState.Added;
-
-                DbContext.Entry(
-                    new Field
-                    {
-                        EntityId = userEntity.EntityId,
-                        Name = "Disabled",
-                        Label = "Disabled",
-                        FieldType = FieldType.Bit,
-                        ShowInSearchResults = true,
-                        SearchType = SearchType.Exact,
-                        EditPageType = EditPageType.Normal,
                         FieldOrder = fieldOrder++
-                    }
-                ).State = EntityState.Added;
+                    };
 
-                var lookup = new Lookup
-                {
-                    ProjectId = project.ProjectId,
-                    Name = "Role",
-                    PluralName = "Roles",
-                    IsRoleList = true
-                };
+                    DbContext.Entry(testSetting).State = EntityState.Added;
 
-                DbContext.Entry(lookup).State = EntityState.Added;
+                    settingsEntity.PrimaryFieldId = testSetting.FieldId;
 
-                DbContext.Entry(new LookupOption { LookupId = lookup.LookupId, Name = "Administrator", FriendlyName = "Administrator" }).State = EntityState.Added;
+                    await DbContext.SaveChangesAsync();
+                }
 
-                var settingsEntity = new Entity();
-                settingsEntity.ProjectId = project.ProjectId;
-                settingsEntity.Name = "Settings";
-                settingsEntity.PluralName = "Settings";
-                settingsEntity.FriendlyName = "Settings";
-                settingsEntity.PluralFriendlyName = "Settings";
-                settingsEntity.EntityType = EntityType.Settings;
-                settingsEntity.AuthorizationType = AuthorizationType.ProtectAll;
-                settingsEntity.PreventListHtmlDeployment = "N/A";
-                settingsEntity.PreventListTypeScriptDeployment = "N/A";
-                settingsEntity.PreventAppSelectHtmlDeployment= "N/A";
-                settingsEntity.PreventAppSelectTypeScriptDeployment = "N/A";
-                settingsEntity.PreventSelectModalHtmlDeployment = "N/A";
-                settingsEntity.PreventSelectModalTypeScriptDeployment = "N/A";
-                settingsEntity.PreventSortHtmlDeployment = "N/A";
-                settingsEntity.PreventSortTypeScriptDeployment = "N/A";
-                settingsEntity.PreventSearchOptionsDeployment = "N/A";
-                DbContext.Entry(settingsEntity).State = EntityState.Added;
-
-                fieldOrder = 1;
-
-                DbContext.Entry(
-                    new Field
-                    {
-                        EntityId = settingsEntity.EntityId,
-                        Name = "Id",
-                        Label = "Id",
-                        FieldType = FieldType.Guid,
-                        ShowInSearchResults = false,
-                        SearchType = SearchType.None,
-                        EditPageType = EditPageType.Normal,
-                        FieldOrder = fieldOrder++
-                    }
-                ).State = EntityState.Added;
-
-                var testSetting = new Field
-                {
-                    EntityId = settingsEntity.EntityId,
-                    Name = "TestSetting",
-                    Label = "Test Setting",
-                    FieldType = FieldType.nVarchar,
-                    Length = 100,
-                    ShowInSearchResults = true,
-                    SearchType = SearchType.Text,
-                    EditPageType = EditPageType.Normal,
-                    FieldOrder = fieldOrder++
-                };
-
-                DbContext.Entry(testSetting).State = EntityState.Added;
-
-                settingsEntity.PrimaryFieldId = testSetting.FieldId;
-            }
-            else
-            {
-                project = await DbContext.Projects.SingleOrDefaultAsync(o => o.ProjectId == projectDTO.ProjectId);
-
-                if (project == null)
-                    return NotFound();
-
-                DbContext.Entry(project).State = EntityState.Modified;
-            }
-
-            ModelFactory.Hydrate(project, projectDTO);
-            project.WebPath = project.WebPath ?? "";
-
-            await DbContext.SaveChangesAsync();
-
-            if (isNew)
-            {
-                userEntity.PrimaryFieldId = fullName.FieldId;
-                DbContext.Entry(userEntity).State = EntityState.Modified;
-                await DbContext.SaveChangesAsync();
+                dbContextTransaction.Commit();
             }
 
             return await Get(project.ProjectId);

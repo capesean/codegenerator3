@@ -138,7 +138,7 @@ namespace WEB.Models
             if (CurrentEntity.HasASortField)
             {
                 s.Add($"    showSort(): void {{");
-                s.Add($"        let modalRef = this.modalService.open({CurrentEntity.Name}SortComponent, {{ size: 'xl', centered: true, scrollable: false }});");
+                s.Add($"        let modalRef = this.modalService.open({CurrentEntity.Name}SortComponent, {{ size: 'xl', centered: true, scrollable: true }});");
                 s.Add($"        modalRef.result.then(");
                 s.Add($"            () => {{");
                 s.Add($"");

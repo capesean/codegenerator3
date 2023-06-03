@@ -74,7 +74,8 @@ export class NAMESelectComponent implements OnInit, ControlValueAccessor {
 
     click(button = false) {
         if (this.disabled) return;
-        if (button && (this.CAMELCASENAME || this.PLURALNAME_TOCAMELCASE)) this.changed(this.multiple ? [] : null);
+        // clear the selector if there is something there already
+        if (button && (this.CAMELCASENAME || this.PLURALNAME_TOCAMELCASE.length)) this.changed(this.multiple ? [] : null);
         else this.modal.open();
     }
 }
