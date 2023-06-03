@@ -268,6 +268,7 @@ namespace WEB.Controllers
                             ShowInSearchResults = false,
                             SearchType = SearchType.None,
                             EditPageType = EditPageType.Normal,
+                            KeyField = true,
                             FieldOrder = fieldOrder++
                         }
                     ).State = EntityState.Added;

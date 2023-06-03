@@ -78,7 +78,7 @@ namespace WEB.Models
                     attributes.Add("#" + fieldName, "ngModel");
                     if (!field.IsNullable)
                         attributes.Add("required", null);
-                    if (field.FieldId == CurrentEntity.PrimaryFieldId)
+                    if (field.FieldId == CurrentEntity.PrimaryFieldId && CurrentEntity.EntityType != EntityType.Settings)
                         attributes.Add("(ngModelChange)", $"changeBreadcrumb()");
                     if (field.CustomType == CustomType.Number && field.Scale > 0)
                         attributes.Add("step", "any");
