@@ -254,6 +254,20 @@ namespace WEB.Controllers
                     settingsEntity.PreventSearchOptionsDeployment = "N/A";
                     DbContext.Entry(settingsEntity).State = EntityState.Added;
 
+                    DbContext.Entry(
+                        new Field
+                        {
+                            EntityId = settingsEntity.EntityId,
+                            Name = "SetupCompleted",
+                            Label = "Setup Completed",
+                            FieldType = FieldType.Bit,
+                            ShowInSearchResults = false,
+                            SearchType = SearchType.None,
+                            EditPageType = EditPageType.ReadOnly,
+                            FieldOrder = 1
+                        }
+                    ).State = EntityState.Added;
+
                     fieldOrder = 1;
 
                     await DbContext.SaveChangesAsync();

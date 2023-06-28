@@ -17,18 +17,30 @@ namespace WEB.Models
 
             s.Add($"import {{ environment }} from '../../../environments/environment';");
             s.Add($"import {{ Injectable }} from '@angular/core';");
-            s.Add($"import {{ HttpClient, HttpParams }} from '@angular/common/http';");
-            s.Add($"import {{ Observable }} from 'rxjs';");
-            s.Add($"import {{ map }} from 'rxjs/operators';");
-            s.Add($"import {{ {CurrentEntity.Name}, {CurrentEntity.Name}SearchOptions, {CurrentEntity.Name}SearchResponse }} from '../models/{CurrentEntity.Name.ToLower()}.model';");
-            s.Add($"import {{ SearchQuery, PagingHeaders }} from '../models/http.model';");
+            s.Add($"import {{ HttpClient{(CurrentEntity.EntityType != EntityType.Settings ? ", HttpParams" : "")} }} from '@angular/common/http';");
+            s.Add($"import {{ Observable{(CurrentEntity.EntityType == EntityType.Settings ? ", of" : "")} }} from 'rxjs';");
+
+            if (CurrentEntity.EntityType == EntityType.Settings)
+                s.Add($"import {{ tap }} from 'rxjs/operators';");
+            else
+                s.Add($"import {{ map }} from 'rxjs/operators';");
+            s.Add($"import {{ {CurrentEntity.Name}{(CurrentEntity.EntityType != EntityType.Settings ? $", {CurrentEntity.Name}SearchOptions, {CurrentEntity.Name}SearchResponse" : "")} }} from '../models/{CurrentEntity.Name.ToLower()}.model';");
+            if (CurrentEntity.EntityType != EntityType.Settings)
+                s.Add($"import {{ SearchQuery, PagingHeaders }} from '../models/http.model';");
             s.Add($"");
             s.Add($"@Injectable({{ providedIn: 'root' }})");
-            s.Add($"export class {CurrentEntity.Name}Service extends SearchQuery {{");
+            s.Add($"export class {CurrentEntity.Name}Service{(CurrentEntity.EntityType != EntityType.Settings ? " extends SearchQuery" : "")} {{");
             s.Add($"");
 
+            if (CurrentEntity.EntityType == EntityType.Settings)
+            {
+                s.Add($"    private _settings: Settings;");
+                s.Add($"");
+            }
+
             s.Add($"    constructor(private http: HttpClient) {{");
-            s.Add($"        super();");
+            if (CurrentEntity.EntityType != EntityType.Settings)
+                s.Add($"        super();");
             s.Add($"    }}");
             s.Add($"");
 
@@ -61,7 +73,15 @@ namespace WEB.Models
             }
 
             s.Add($"    get({getParams}): Observable<{CurrentEntity.Name}> {{");
-            s.Add($"        return this.http.get<{CurrentEntity.Name}>(`${{environment.baseApiUrl}}{CurrentEntity.PluralName.ToLower()}{getUrl}`);");
+            if (CurrentEntity.EntityType != EntityType.Settings)
+            {
+                s.Add($"        return this.http.get<{CurrentEntity.Name}>(`${{environment.baseApiUrl}}{CurrentEntity.PluralName.ToLower()}{getUrl}`);");
+            }
+            else
+            {
+                s.Add($"        if (this._settings) return of(this._settings);");
+                s.Add($"        return this.http.get<{CurrentEntity.Name}>(`${{environment.baseApiUrl}}{CurrentEntity.PluralName.ToLower()}{getUrl}`).pipe(tap(settings => this._settings = settings));");
+            }
             s.Add($"    }}");
             s.Add($"");
 

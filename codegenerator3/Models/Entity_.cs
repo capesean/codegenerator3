@@ -212,7 +212,7 @@ namespace WEB.Models
 
                     result.Add(new SearchResultColumn
                     {
-                        Header = rel.ParentEntity.FriendlyName,
+                        Header = rel.ParentFriendlyName,
                         Value = value,
                         IsOnAnotherEntity = true
                     });
