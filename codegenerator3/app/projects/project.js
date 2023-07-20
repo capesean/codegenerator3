@@ -58,6 +58,12 @@
                     promises.push(loadEntities(0));
                     $q.all(promises).finally(function () { return vm.loading = false; });
                 }
+                $scope.$watch('vm.project.name', function (noTransition) {
+                    if (vm.isNew && vm.project.name) {
+                        vm.project.webPath = vm.project.name + "\\WEB";
+                        vm.project.modelsPath = vm.project.name + "\\WEB";
+                    }
+                });
             });
         }
         function save() {

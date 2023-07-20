@@ -75,12 +75,12 @@
                             </div>
                         </div>
 
-                        <div class="col-sm-6 col-md-4 col-lg-3" uib-popover-html="'This is the <strong>relative</strong> path from the <code>ClientApp\src\app</code> folder into which the generated front-end files will be placed'" popover-trigger="'mouseenter'" popover-append-to-body="true" popover-title="Generated Path">
+                        <div class="col-sm-6 col-md-4 col-lg-3" uib-popover-html="'This is the <strong>relative</strong> path from the <code>ClientApp\\src\\app</code> folder into which the generated front-end files will be placed. If you want your generated files places into an \'admin\' subfolder, use a value of <code>admin\\</code> here.'" popover-trigger="'mouseenter'" popover-append-to-body="true" popover-title="Generated Path">
                             <div class="form-group" ng-class="{ 'has-error':  mainForm.$submitted && mainForm.generatedPath.$invalid }">
                                 <label for="modelsPath" class="control-label">
                                     Generated Path:
                                 </label>
-                                <input type="text" id="generatedPath" name="generatedPath" ng-model="vm.project.generatedPath" maxlength="50" class="form-control" ng-required />
+                                <input type="text" id="generatedPath" name="generatedPath" ng-model="vm.project.generatedPath" maxlength="50" class="form-control" ng-required="false" />
                             </div>
                         </div>
 
@@ -139,6 +139,14 @@
                     ng-messages="mainForm.modelsPath.$error">
                     <span ng-message="required">
                         Models Path is required. Mouse over the Models Path field for more information.
+                    </span>
+                </li>
+
+                <li class="help-block has-error"
+                    ng-if="mainForm.$submitted"
+                    ng-messages="mainForm.generatedPath.$error">
+                    <span ng-message="required">
+                        Generated Path is required. Mouse over the Models Path field for more information.
                     </span>
                 </li>
 

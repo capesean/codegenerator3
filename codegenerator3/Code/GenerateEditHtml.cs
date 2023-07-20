@@ -137,6 +137,8 @@ namespace WEB.Models
                         }
                         else if (field.FieldType == FieldType.Enum)
                             attributes.Add("value", $"{{{{{field.Lookup.PluralName.ToCamelCase()}[{CurrentEntity.Name.ToCamelCase()}.{fieldName.ToCamelCase()}]?.label}}}}");
+                        else if (field.FieldType == FieldType.Bit)
+                            attributes.Add("disabled", null);
                         else if (field.CustomType == CustomType.Date)
                             attributes.Add("value", $"{{{{{CurrentEntity.Name.ToCamelCase()}.{fieldName.ToCamelCase()} | momentPipe: '{field.DateFormatString}'}}}}");
                         else if (field.FieldType == FieldType.Money)

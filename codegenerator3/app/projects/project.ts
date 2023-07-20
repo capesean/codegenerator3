@@ -45,6 +45,7 @@
                         vm.project.angularModuleName = "app";
                         vm.project.angularDirectivePrefix = "app";
                         vm.project.dbContextVariable = "db";
+                        //vm.project.generatedPath = "/";
                         vm.showMore = true;
                         vm.loading = false;
 
@@ -78,6 +79,14 @@
 
                         $q.all(promises).finally(() => vm.loading = false);
                     }
+
+                    $scope.$watch('vm.project.name', function (noTransition) {
+                        if (vm.isNew && vm.project.name) {
+                            vm.project.webPath = vm.project.name + "\\WEB";
+                            vm.project.modelsPath = vm.project.name + "\\WEB";
+                        }
+                        
+                    });
                 });
         }
 

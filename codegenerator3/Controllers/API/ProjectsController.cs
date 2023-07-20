@@ -254,20 +254,6 @@ namespace WEB.Controllers
                     settingsEntity.PreventSearchOptionsDeployment = "N/A";
                     DbContext.Entry(settingsEntity).State = EntityState.Added;
 
-                    DbContext.Entry(
-                        new Field
-                        {
-                            EntityId = settingsEntity.EntityId,
-                            Name = "SetupCompleted",
-                            Label = "Setup Completed",
-                            FieldType = FieldType.Bit,
-                            ShowInSearchResults = false,
-                            SearchType = SearchType.None,
-                            EditPageType = EditPageType.ReadOnly,
-                            FieldOrder = 1
-                        }
-                    ).State = EntityState.Added;
-
                     fieldOrder = 1;
 
                     await DbContext.SaveChangesAsync();
@@ -287,22 +273,37 @@ namespace WEB.Controllers
                         }
                     ).State = EntityState.Added;
 
-                    var testSetting = new Field
+                    var setupCompletedField = new Field
                     {
                         EntityId = settingsEntity.EntityId,
-                        Name = "TestSetting",
-                        Label = "Test Setting",
-                        FieldType = FieldType.nVarchar,
-                        Length = 100,
-                        ShowInSearchResults = true,
-                        SearchType = SearchType.Text,
-                        EditPageType = EditPageType.Normal,
+                        Name = "SetupCompleted",
+                        Label = "Setup Completed",
+                        FieldType = FieldType.Bit,
+                        ShowInSearchResults = false,
+                        SearchType = SearchType.None,
+                        EditPageType = EditPageType.Exclude,
                         FieldOrder = fieldOrder++
                     };
 
-                    DbContext.Entry(testSetting).State = EntityState.Added;
+                    DbContext.Entry(setupCompletedField).State = EntityState.Added;
 
-                    settingsEntity.PrimaryFieldId = testSetting.FieldId;
+
+                    DbContext.Entry(
+                        new Field
+                        {
+                            EntityId = settingsEntity.EntityId,
+                            Name = "TestSetting",
+                            Label = "Test Setting",
+                            FieldType = FieldType.nVarchar,
+                            Length = 100,
+                            ShowInSearchResults = true,
+                            SearchType = SearchType.Text,
+                            EditPageType = EditPageType.Normal,
+                            FieldOrder = fieldOrder++
+                        }
+                    ).State = EntityState.Added;
+
+                    settingsEntity.PrimaryFieldId = setupCompletedField.FieldId;
 
                     await DbContext.SaveChangesAsync();
                 }
