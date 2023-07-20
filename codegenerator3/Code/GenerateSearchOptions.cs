@@ -20,7 +20,17 @@ namespace WEB.Models
                 searchFields += $"        public string q {{ get; set; }}{Environment.NewLine}{Environment.NewLine}";
 
             foreach (var field in CurrentEntity.AllNonTextSearchableFields)
-                searchFields += $"        public {Field.GetNetType(field.FieldType, true, field.Lookup)} {field.Name} {{ get; set; }}{Environment.NewLine}{Environment.NewLine}";
+            {
+                if (field.SearchType != SearchType.Range)
+                {
+                    searchFields += $"        public {Field.GetNetType(field.FieldType, true, field.Lookup)} {field.Name} {{ get; set; }}{Environment.NewLine}{Environment.NewLine}";
+                }
+                else
+                {
+                    searchFields += $"        public {Field.GetNetType(field.FieldType, true, field.Lookup)} From{field.Name} {{ get; set; }}{Environment.NewLine}{Environment.NewLine}";
+                    searchFields += $"        public {Field.GetNetType(field.FieldType, true, field.Lookup)} To{field.Name} {{ get; set; }}{Environment.NewLine}{Environment.NewLine}";
+                }
+            }
 
             s.Add(RunTemplateReplacements(file)
                 .Replace("/*SEARCH-FIELDS*/", searchFields));

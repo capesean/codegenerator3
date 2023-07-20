@@ -132,8 +132,8 @@ namespace WEB.Models
                             //s.Add($"            if (from{field.Name}.HasValue) {{ var from{field.Name}Utc = from{field.Name}.Value.ToUniversalTime(); results = results.Where(o => o.{ field.Name} >= from{field.Name}Utc); }}");
                             //s.Add($"            if (to{field.Name}.HasValue) {{ var to{field.Name}Utc = to{field.Name}.Value.ToUniversalTime(); results = results.Where(o => o.{ field.Name} <= to{field.Name}Utc); }}");
                             // disabled: in covid.distribution, the date is sent as 2020-04-18, so no conversion needed, else it chops off the end date
-                            s.Add($"            if (searchOptions.from{field.Name}.HasValue) results = results.Where(o => o.{field.Name} >= searchOptions.from{field.Name}.Value.Date);");
-                            s.Add($"            if (searchOptions.to{field.Name}.HasValue) results = results.Where(o => o.{field.Name} < searchOptions.to{field.Name}.Value.Date.AddDays(1));");
+                            s.Add($"            if (searchOptions.From{field.Name}.HasValue) results = results.Where(o => o.{field.Name} >= searchOptions.From{field.Name}.Value.Date);");
+                            s.Add($"            if (searchOptions.To{field.Name}.HasValue) results = results.Where(o => o.{field.Name} < searchOptions.To{field.Name}.Value.Date.AddDays(1));");
                         }
                         else
                         {
