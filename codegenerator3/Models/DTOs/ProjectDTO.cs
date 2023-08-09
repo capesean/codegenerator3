@@ -91,7 +91,7 @@ namespace WEB.Models
             project.UserFilterFieldName = projectDTO.UserFilterFieldName;
             project.DbContextVariable = projectDTO.DbContextVariable;
             project.ModelsPath = projectDTO.ModelsPath;
-            project.GeneratedPath = projectDTO.GeneratedPath;
+            project.GeneratedPath = projectDTO.GeneratedPath ?? string.Empty;
             project.Notes = projectDTO.Notes;
         }
     }

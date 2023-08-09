@@ -64,6 +64,8 @@ namespace WEB.Models
 
             if (CurrentEntity.EntityType != EntityType.Settings)
                 s.Add($"import {{ BreadcrumbService }} from '{folders}../common/services/breadcrumb.service';");
+            else
+                s.Add($"import {{ AppService }} from '{folders}../common/services/app.service';");
             s.Add($"import {{ ErrorService }} from '{folders}../common/services/error.service';");
             s.Add($"import {{ {CurrentEntity.Name}Service }} from '{folders}../common/services/{CurrentEntity.Name.ToLower()}.service';");
 
@@ -145,6 +147,10 @@ namespace WEB.Models
             {
                 s.Add($"        private breadcrumbService: BreadcrumbService,");
                 s.Add($"        private modalService: NgbModal,");
+            }
+            else
+            {
+                s.Add($"        private appService: AppService,");
             }
             s.Add($"        private {CurrentEntity.Name.ToCamelCase()}Service: {CurrentEntity.Name}Service,");
             var relChildEntities = relationshipsAsParent.Where(o => o.ChildEntityId != CurrentEntity.EntityId).Select(o => o.ChildEntity).Distinct().OrderBy(o => o.Name);
@@ -308,6 +314,10 @@ namespace WEB.Models
                     s.Add($"                            this.authService.getProfile(true).subscribe();");
                     s.Add($"                    }}");
                 }
+            }
+            else
+            {
+                s.Add($"                    this.appService.getAppSettings(true).subscribe(); // refresh the appSettings");
             }
             //else if (!CurrentEntity.ReturnOnSave)
             //{

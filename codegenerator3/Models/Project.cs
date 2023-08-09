@@ -56,7 +56,6 @@ namespace WEB.Models
         [MaxLength(50)]
         public string ModelsPath { get; set; }
 
-        [Required(AllowEmptyStrings = true)]
         [MaxLength(50)]
         public string GeneratedPath { get; set; }
 

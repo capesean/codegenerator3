@@ -64,13 +64,23 @@ namespace WEB.Models
                 if (CurrentEntity.RelationshipsAsChild.Any(r => r.RelationshipFields.Any(rf => rf.ChildFieldId == field.FieldId) && r.UseSelectorDirective))
                     relationship = CurrentEntity.GetParentSearchRelationship(field);
 
-                if (field.FieldType == FieldType.Enum || relationship != null)
+                if (field.FieldType == FieldType.Enum || relationship != null || field.FieldType == FieldType.Bit)
                 {
                     if (field.FieldType == FieldType.Enum)
                     {
                         appSelectFilters += $"                    <div class=\"col-sm-6 col-md-6 col-lg-4\" *ngIf=\"!{field.Name.ToCamelCase()}\">" + Environment.NewLine;
                         appSelectFilters += $"                        <select id=\"{field.Name.ToCamelCase()}\" name=\"{field.Name.ToCamelCase()}\" [(ngModel)]=\"searchOptions.{field.Name.ToCamelCase()}\" #{field.Name.ToCamelCase()}=\"ngModel\" class=\"form-select\">" + Environment.NewLine;
                         appSelectFilters += $"                            <option *ngFor=\"let {field.Lookup.Name.ToCamelCase()} of {field.Lookup.PluralName.ToCamelCase()}\" [ngValue]=\"{field.Lookup.Name.ToCamelCase()}.value\">{{{{ {field.Lookup.Name.ToCamelCase()}.label }}}}</option>" + Environment.NewLine;
+                        appSelectFilters += $"                        </select>" + Environment.NewLine;
+                        appSelectFilters += $"                    </div>" + Environment.NewLine;
+                    }
+                    else if (field.FieldType == FieldType.Bit)
+                    {
+                        appSelectFilters += $"                    <div class=\"col-sm-6 col-md-4 col-lg-4 col-xl-3\">" + Environment.NewLine;
+                        appSelectFilters += $"                        <select id=\"{field.Name.ToCamelCase()}\" name=\"{field.Name.ToCamelCase()}\" [(ngModel)]=\"searchOptions.{field.Name.ToCamelCase()}\" #{field.Name.ToCamelCase()}=\"ngModel\" class=\"form-select\">" + Environment.NewLine;
+                        appSelectFilters += $"                            <option [ngValue]=\"undefined\">{field.Label}: Any</option>" + Environment.NewLine;
+                        appSelectFilters += $"                            <option [ngValue]=\"true\">{field.Label}: Yes</option>" + Environment.NewLine;
+                        appSelectFilters += $"                            <option [ngValue]=\"false\">{field.Label}: No</option>" + Environment.NewLine;
                         appSelectFilters += $"                        </select>" + Environment.NewLine;
                         appSelectFilters += $"                    </div>" + Environment.NewLine;
                     }
@@ -86,10 +96,10 @@ namespace WEB.Models
 
                     if (filterAlerts == string.Empty) filterAlerts = Environment.NewLine;
 
-                    if (field.FieldType == FieldType.Enum)
-                        filterAlerts += $"                <div class=\"alert alert-info alert-dismissible\" *ngIf=\"{field.Name.ToCamelCase()}!=undefined\">Filtered by {field.Label.ToLower()}: {{{{{field.Name.ToCamelCase()}.label}}}}<button type=\"button\" class=\"btn-close\" data-bs-dismiss=\"alert\" aria-label=\"Close\" (click)=\"searchOptions.{field.Name.ToCamelCase()}=undefined;{field.Name.ToCamelCase()}=undefined;runSearch();\" *ngIf=\"canRemoveFilters\"></button></div>" + Environment.NewLine;
-                    else
+                    if (relationship != null)
                         filterAlerts += $"                <div class=\"alert alert-info alert-dismissible\" *ngIf=\"{relationship.ParentName.ToCamelCase()}!=undefined\">Filtered by {field.Label.ToLower()}: {{{{{relationship.ParentName.ToCamelCase()}.{relationship.ParentField.Name.ToCamelCase()}}}}}<button type=\"button\" class=\"btn-close\" data-bs-dismiss=\"alert\" aria-label=\"Close\" (click)=\"searchOptions.{field.Name.ToCamelCase()}=undefined;{relationship.ParentName.ToCamelCase()}=undefined;runSearch();\" *ngIf=\"canRemoveFilters\"></button></div>" + Environment.NewLine;
+                    else if (field.FieldType != FieldType.Bit)
+                        filterAlerts += $"                <div class=\"alert alert-info alert-dismissible\" *ngIf=\"{field.Name.ToCamelCase()}!=undefined\">Filtered by {field.Label.ToLower()}: {{{{{field.Name.ToCamelCase()}.label}}}}<button type=\"button\" class=\"btn-close\" data-bs-dismiss=\"alert\" aria-label=\"Close\" (click)=\"searchOptions.{field.Name.ToCamelCase()}=undefined;{field.Name.ToCamelCase()}=undefined;runSearch();\" *ngIf=\"canRemoveFilters\"></button></div>" + Environment.NewLine;
                 }
             }
 
