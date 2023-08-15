@@ -445,20 +445,25 @@ namespace WEB.Models
                 s.Add($"            if ({CurrentEntity.CamelCaseName} == null)");
                 s.Add($"                return NotFound();");
                 s.Add($"");
-                foreach (var relationship in CurrentEntity.RelationshipsAsParent.Where(rel => !rel.ChildEntity.Exclude).OrderBy(o => o.SortOrder))
+
+                var errorOnDeleteRelationships = CurrentEntity.RelationshipsAsParent.Where(rel => !rel.ChildEntity.Exclude && !rel.CascadeDelete).OrderBy(o => o.SortOrder);
+                foreach (var relationship in errorOnDeleteRelationships)
                 {
-                    if (relationship.CascadeDelete)
-                    {
-                        var childEntityName = relationship.ChildEntity.CamelCaseName + (relationship.ChildEntity.EntityId == CurrentEntity.EntityId ? "Child" : "");
-                        s.Add($"            foreach (var {childEntityName} in {CurrentEntity.Project.DbContextVariable}.{relationship.ChildEntity.PluralName}.Where(o => {relationship.RelationshipFields.Select(rf => "o." + rf.ChildField.Name + " == " + CurrentEntity.CamelCaseName + "." + rf.ParentField.Name).Aggregate((current, next) => current + " && " + next)}))");
-                        s.Add($"                {CurrentEntity.Project.DbContextVariable}.Entry({childEntityName}).State = EntityState.Deleted;");
-                        s.Add($"");
-                    }
-                    else
+                    var joins = relationship.RelationshipFields.Select(o => $"o.{o.ChildField.Name} == {CurrentEntity.CamelCaseName}.{o.ParentField.Name}").Aggregate((current, next) => current + " && " + next);
+                    s.Add($"            if (await {CurrentEntity.Project.DbContextVariable}.{(relationship.ChildEntity.EntityType == EntityType.User ? "Users" : relationship.ChildEntity.PluralName)}.AnyAsync(o => {joins}))");
+                    s.Add($"                return BadRequest(\"Unable to delete the {CurrentEntity.FriendlyName.ToLower()} as it has related {relationship.ChildEntity.PluralFriendlyName.ToLower()}\");");
+                    s.Add($"");
+                }
+
+                var cascadeDeleteRelationships = CurrentEntity.RelationshipsAsParent.Where(rel => !rel.ChildEntity.Exclude && rel.CascadeDelete).OrderBy(o => o.SortOrder);
+                if (cascadeDeleteRelationships.Any())
+                {
+                    s.Add($"            using var transactionScope = Utilities.General.CreateTransactionScope();");
+                    s.Add($"");
+                    foreach (var relationship in cascadeDeleteRelationships)
                     {
                         var joins = relationship.RelationshipFields.Select(o => $"o.{o.ChildField.Name} == {CurrentEntity.CamelCaseName}.{o.ParentField.Name}").Aggregate((current, next) => current + " && " + next);
-                        s.Add($"            if (await {CurrentEntity.Project.DbContextVariable}.{(relationship.ChildEntity.EntityType == EntityType.User ? "Users" : relationship.ChildEntity.PluralName)}.AnyAsync(o => {joins}))");
-                        s.Add($"                return BadRequest(\"Unable to delete the {CurrentEntity.FriendlyName.ToLower()} as it has related {relationship.ChildEntity.PluralFriendlyName.ToLower()}\");");
+                        s.Add($"            await {CurrentEntity.Project.DbContextVariable}.{(relationship.ChildEntity.EntityType == EntityType.User ? "Users" : relationship.ChildEntity.PluralName)}.Where(o => {joins}).ExecuteDeleteAsync();");
                         s.Add($"");
                     }
                 }
@@ -475,6 +480,11 @@ namespace WEB.Models
                     s.Add($"            {CurrentEntity.Project.DbContextVariable}.Entry({CurrentEntity.CamelCaseName}).State = EntityState.Deleted;");
                     s.Add($"");
                     s.Add($"            await {CurrentEntity.Project.DbContextVariable}.SaveChangesAsync();");
+                }
+                if (cascadeDeleteRelationships.Any())
+                {
+                    s.Add($"");
+                    s.Add($"            transactionScope.Complete();");
                 }
                 s.Add($"");
                 s.Add($"            return Ok();");
@@ -578,11 +588,8 @@ namespace WEB.Models
                     s.Add($"        [HttpDelete(\"{CurrentEntity.RoutePath}/{rel.CollectionName.ToLower()}\"){(CurrentEntity.AuthorizationType == AuthorizationType.None ? "" : ", AuthorizeRoles(Roles.Administrator)")}]");
                     s.Add($"        public async Task<IActionResult> Delete{rel.CollectionName}({CurrentEntity.ControllerParameters})");
                     s.Add($"        {{");
-                    // might need to be fixed?
-                    s.Add($"            foreach (var {entity.Name.ToCamelCase()} in db.{entity.PluralName}.Where(o => {rel.RelationshipFields.Select(o => "o." + o.ChildField.Name + " == " + o.ParentField.Name.ToCamelCase()).Aggregate((current, next) => { return current + " && " + next; })}).ToList())");
-                    s.Add($"                db.Entry({entity.Name.ToCamelCase()}).State = EntityState.Deleted;");
-                    s.Add($"");
-                    s.Add($"            await db.SaveChangesAsync();");
+
+                    s.Add($"            await {CurrentEntity.Project.DbContextVariable}.{entity.PluralName}.Where(o => {rel.RelationshipFields.Select(o => "o." + o.ChildField.Name + " == " + o.ParentField.Name.ToCamelCase()).Aggregate((current, next) => { return current + " && " + next; })}).ExecuteDeleteAsync();");
                     s.Add($"");
                     s.Add($"            return Ok();");
                     s.Add($"        }}");
