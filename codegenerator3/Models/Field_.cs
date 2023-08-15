@@ -16,6 +16,7 @@ namespace WEB.Models
                 if (FieldType == FieldType.Guid) return "newGuid";
                 if (FieldType == FieldType.Int) return "newInt";
                 if (FieldType == FieldType.SmallInt) return "newInt";
+                if (FieldType == FieldType.BigInt) return "newInt";
                 if (FieldType == FieldType.TinyInt) return "newInt";
                 if (FieldType == FieldType.Date) return "newDate";
                 if (CustomType == CustomType.String) return "newString"; // changed from string.Empty to newString as string.Empty appears to be server side and this should be client side code?
@@ -31,6 +32,7 @@ namespace WEB.Models
                 if (FieldType == FieldType.Guid) return "Guid.Empty";
                 if (FieldType == FieldType.Int) return "0";
                 if (FieldType == FieldType.SmallInt) return "0";
+                if (FieldType == FieldType.BigInt) return "0";
                 if (FieldType == FieldType.TinyInt) return "0";
                 if (FieldType == FieldType.Date) return "DateTime.MinValue";
                 if (FieldType == FieldType.DateTime) return "DateTime.MinValue";
@@ -59,6 +61,7 @@ namespace WEB.Models
                     case FieldType.Int:
                     case FieldType.TinyInt:
                     case FieldType.SmallInt:
+                    case FieldType.BigInt:
                     case FieldType.Decimal:
                     case FieldType.Money:
                     case FieldType.Float:
@@ -97,6 +100,7 @@ namespace WEB.Models
                     case FieldType.Int:
                     case FieldType.TinyInt:
                     case FieldType.SmallInt:
+                    case FieldType.BigInt:
                     case FieldType.Decimal:
                     case FieldType.Money:
                     case FieldType.Float:
@@ -136,6 +140,7 @@ namespace WEB.Models
                     case FieldType.Int:
                     case FieldType.TinyInt:
                     case FieldType.SmallInt:
+                    case FieldType.BigInt:
                         return "int";
                     case FieldType.nVarchar:
                     case FieldType.nText:
@@ -170,6 +175,8 @@ namespace WEB.Models
                     return "byte" + (isNullable ? "?" : string.Empty);
                 case FieldType.SmallInt:
                     return "short" + (isNullable ? "?" : string.Empty);
+                case FieldType.BigInt:
+                    return "long" + (isNullable ? "?" : string.Empty);
                 case FieldType.Float:
                     return "float";
                 case FieldType.Decimal:

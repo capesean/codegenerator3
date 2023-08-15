@@ -18,8 +18,11 @@ namespace WEB.Models
             var nonHKeyFields = CurrentEntity.GetNonHierarchicalKeyFields();
             // add lookups for table/search fields on children entities
             foreach (var rel in CurrentEntity.RelationshipsAsParent.Where(r => !r.ChildEntity.Exclude && r.DisplayListOnParent).OrderBy(r => r.SortOrder))
-                foreach (var field in rel.ChildEntity.Fields.Where(o => o.ShowInSearchResults))
-                    if (field.FieldType == FieldType.Enum && !enumLookups.Contains(field.Lookup))
+                foreach (var field in rel.ChildEntity.Fields.Where(o =>
+                    o.FieldType == FieldType.Enum           // field is an enum
+                    && !enumLookups.Contains(o.Lookup)      // enum hasn't already been added
+                    && (o.ShowInSearchResults || o.SearchType == SearchType.Exact)
+                    ))
                         enumLookups.Add(field.Lookup);
             // this is for the breadcrumb being on the parent entity which has a primary field of type enum
             var addEnum = CurrentEntity.RelationshipsAsChild.SingleOrDefault(r => r.RelationshipFields.Count == 1 && r.RelationshipFields.First().ChildFieldId == CurrentEntity.PrimaryField.FieldId)?.ParentEntity?.PrimaryField?.FieldType == FieldType.Enum;

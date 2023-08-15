@@ -104,7 +104,8 @@ namespace WEB.Models
                     }
                     else if (field.FieldType == FieldType.Date || field.FieldType == FieldType.SmallDateTime || field.FieldType == FieldType.DateTime)
                     {
-                        attributes.Add("readonly", null);
+                        // disabling this otherwise it shows as bg-grey when it is editable
+                        //attributes.Add("readonly", null);
                         //if (field.EditPageType == EditPageType.ReadOnly) attributes.Add("disabled", null);
                         attributes.Add("placeholder", "yyyy-mm-dd");
                         attributes.Add("ngbDatepicker", null);

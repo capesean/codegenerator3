@@ -29,6 +29,8 @@ namespace WEB.Models
 
             foreach (var entity in allEntities.Where(o => !o.Exclude).OrderBy(o => o.Name))
             {
+                if (!entity.KeyFields.Any()) throw new Exception($"Entity {entity.Name} does not have any key fields defined");
+
                 var editOnRoot = !entity.RelationshipsAsChild.Any(r => r.Hierarchy);
                 var childRelationships = entity.RelationshipsAsParent.Where(r => r.Hierarchy);
 
