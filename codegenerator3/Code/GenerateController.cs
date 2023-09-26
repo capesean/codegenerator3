@@ -11,6 +11,10 @@ namespace WEB.Models
         {
             var s = new StringBuilder();
 
+            var fileContentsFields = CurrentEntity.Fields.Where(o => o.EditPageType == EditPageType.FileContents).ToList();
+            if (fileContentsFields.Count > 1) throw new NotImplementedException("More than one File Contents field per entity");
+            var fileContentsField = fileContentsFields.FirstOrDefault();
+
             s.Add($"using System;");
             s.Add($"using System.Linq;");
             s.Add($"using System.Threading.Tasks;");
@@ -362,10 +366,28 @@ namespace WEB.Models
                     }
                     else
                     {
-                        s.Add($"                {CurrentEntity.CamelCaseName} = await {CurrentEntity.Project.DbContextVariable}.{CurrentEntity.PluralName}");
-                        if (CurrentEntity.HasUserFilterField)
-                            s.Add($"                    .Where(o => o.{CurrentEntity.UserFilterFieldPath} == CurrentUser.{CurrentEntity.Project.UserFilterFieldName})");
-                        s.Add($"                    .FirstOrDefaultAsync(o => {GetKeyFieldLinq("o", CurrentEntity.DTOName.ToCamelCase())});");
+                        if (fileContentsFields.Any())
+                        {
+                            s.Add($"                if ({CurrentEntity.DTOName.ToCamelCase()}.{fileContentsField.Name} != null)");
+                            s.Add($"                    {CurrentEntity.CamelCaseName} = await {CurrentEntity.Project.DbContextVariable}.{CurrentEntity.PluralName}");
+                            if (CurrentEntity.HasUserFilterField)
+                                s.Add($"                        .Where(o => o.{CurrentEntity.UserFilterFieldPath} == CurrentUser.{CurrentEntity.Project.UserFilterFieldName})");
+                            s.Add($"                        .Include(o => o.{CurrentEntity.Name}Content)");
+                            s.Add($"                        .FirstOrDefaultAsync(o => {GetKeyFieldLinq("o", CurrentEntity.DTOName.ToCamelCase())});");
+                            s.Add($"                    else");
+                            s.Add($"                        {CurrentEntity.CamelCaseName} = await {CurrentEntity.Project.DbContextVariable}.{CurrentEntity.PluralName}");
+                            if (CurrentEntity.HasUserFilterField)
+                                s.Add($"                            .Where(o => o.{CurrentEntity.UserFilterFieldPath} == CurrentUser.{CurrentEntity.Project.UserFilterFieldName})");
+                            s.Add($"                            .FirstOrDefaultAsync(o => {GetKeyFieldLinq("o", CurrentEntity.DTOName.ToCamelCase())});");
+
+                        }
+                        else
+                        {
+                            s.Add($"                {CurrentEntity.CamelCaseName} = await {CurrentEntity.Project.DbContextVariable}.{CurrentEntity.PluralName}");
+                            if (CurrentEntity.HasUserFilterField)
+                                s.Add($"                    .Where(o => o.{CurrentEntity.UserFilterFieldPath} == CurrentUser.{CurrentEntity.Project.UserFilterFieldName})");
+                            s.Add($"                    .FirstOrDefaultAsync(o => {GetKeyFieldLinq("o", CurrentEntity.DTOName.ToCamelCase())});");
+                        }
                     }
                     s.Add($"");
                     s.Add($"                if ({CurrentEntity.CamelCaseName} == null)");
@@ -394,6 +416,19 @@ namespace WEB.Models
 
             s.Add($"            ModelFactory.Hydrate({CurrentEntity.CamelCaseName}, {CurrentEntity.DTOName.ToCamelCase()});");
             s.Add($"");
+
+            if (fileContentsFields.Any())
+            {
+                s.Add($"            if ({CurrentEntity.DTOName.ToCamelCase()}.{fileContentsField.Name} != null)");
+                s.Add($"            {{");
+                s.Add($"                if (isNew)");
+                s.Add($"                    db.Entry({CurrentEntity.Name.ToCamelCase()}.{CurrentEntity.Name}Content).State = EntityState.Added;");
+                s.Add($"                else");
+                s.Add($"                    db.Entry({CurrentEntity.Name.ToCamelCase()}.{CurrentEntity.Name}Content).State = EntityState.Modified;");
+                s.Add($"            }}");
+                s.Add($"");
+            }
+
             if (CurrentEntity.EntityType == EntityType.User)
             {
                 s.Add($"            var saveResult = (isNew ? await userManager.CreateAsync(user, password) : await userManager.UpdateAsync(user));");

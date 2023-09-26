@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -16,6 +17,10 @@ namespace WEB.Models
         {
             var relationshipsAsChild = CurrentEntity.RelationshipsAsChild.OrderBy(o => o.ParentFriendlyName);
             var relationshipsAsParent = CurrentEntity.RelationshipsAsParent.OrderBy(o => o.CollectionName);
+
+            var fileContentsFields = CurrentEntity.Fields.Where(o => o.EditPageType == EditPageType.FileContents).ToList();
+            if (fileContentsFields.Count > 1) throw new NotImplementedException("More than one File Contents field per entity");
+            var fileContentsField = fileContentsFields.FirstOrDefault();
 
             var s = new StringBuilder();
 
@@ -163,8 +168,18 @@ namespace WEB.Models
             {
                 if (field.KeyField || field.EditPageType == EditPageType.ReadOnly) continue;
                 if (field.EditPageType == EditPageType.Exclude || field.EditPageType == EditPageType.CalculatedField) continue;
+
                 if (field.EditPageType == EditPageType.FileContents)
-                    s.Add($"            if ({CurrentEntity.DTOName.ToCamelCase()}.{field.Name} != null) {CurrentEntity.CamelCaseName}.{field.Name} = Convert.FromBase64String({CurrentEntity.DTOName.ToCamelCase()}.{field.Name});");
+                {
+                    s.Add($"            if ({CurrentEntity.DTOName.ToCamelCase()}.{field.Name} != null)");
+                    s.Add($"            {{");
+                    s.Add($"                var {CurrentEntity.Name.ToCamelCase()}Content = new {CurrentEntity.Name}Content();");
+                    foreach(var keyField in CurrentEntity.KeyFields)
+                        s.Add($"                {CurrentEntity.Name.ToCamelCase()}Content.{keyField.Name} = {CurrentEntity.Name.ToCamelCase()}.{keyField.Name};");
+                    s.Add($"                {CurrentEntity.Name.ToCamelCase()}Content.{fileContentsField.Name} = Convert.FromBase64String({CurrentEntity.DTOName.ToCamelCase()}.{field.Name});");
+                    s.Add($"                {CurrentEntity.Name.ToCamelCase()}.{CurrentEntity.Name}Content = {CurrentEntity.Name.ToCamelCase()}Content;");
+                    s.Add($"            }}");
+                }
                 else
                     s.Add($"            {CurrentEntity.CamelCaseName}.{field.Name} = {CurrentEntity.DTOName.ToCamelCase()}.{field.Name};");
             }

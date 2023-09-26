@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 
 /*
@@ -22,6 +23,9 @@ namespace WEB.Models
                 if (!CurrentEntity.Fields.Any(o => o.Name == "Email")) throw new Exception("An entity of Type: User must have a field named Email");
             }
 
+            var fileContentsFields = CurrentEntity.Fields.Where(o => o.EditPageType == EditPageType.FileContents).ToList();
+            if (fileContentsFields.Count > 1) throw new NotImplementedException("More than one File Contents field per entity");
+            var fileContentsField = fileContentsFields.FirstOrDefault();
 
             var s = new StringBuilder();
             s.Add($"using System;");
@@ -58,6 +62,12 @@ namespace WEB.Models
 
                 if (field.EditPageType == EditPageType.CalculatedField)
                     attributes.Add("DatabaseGenerated(DatabaseGeneratedOption.Computed)");
+                else if (field.EditPageType == EditPageType.FileContents)
+                {
+                    s.Add($"        public {CurrentEntity.Name}Content {CurrentEntity.Name}Content {{ get; set; }}");
+                    s.Add($"");
+                    continue;
+                }
                 else
                 {
                     if (!field.IsNullable)
@@ -94,11 +104,11 @@ namespace WEB.Models
 
                 if (field.EditPageType == EditPageType.CalculatedField)
                 {
-                    s.Add($"        public {field.NetType.ToString()} {field.Name} {{ get; private set; }}");
+                    s.Add($"        public {field.NetType} {field.Name} {{ get; private set; }}");
                 }
                 else
                 {
-                    s.Add($"        public {field.NetType.ToString()} {field.Name} {{ get; set; }}");
+                    s.Add($"        public {field.NetType} {field.Name} {{ get; set; }}");
                 }
                 s.Add($"");
             }
@@ -152,6 +162,42 @@ namespace WEB.Models
             }
 
             s.Add($"    }}");
+
+            if (fileContentsField != null)
+            {
+                s.Add($"");
+                s.Add($"    public class {CurrentEntity.Name}Content");
+                s.Add($"    {{");
+                keyCounter = 0;
+                foreach (var keyField in CurrentEntity.KeyFields)
+                {
+                    var attributes = new List<string>();
+
+                    attributes.Add("Key");
+                    attributes.Add("Required");
+                    if (CurrentEntity.KeyFields.Count > 1)
+                        attributes.Add($"Column(Order = {keyCounter})");
+
+                    keyCounter++;
+
+                    
+
+                    if (attributes.Count > 0)
+                        s.Add($"        [" + string.Join(", ", attributes) + "]");
+
+                    s.Add($"        public {keyField.NetType} {keyField.Name} {{ get; set; }}");
+                }
+
+                s.Add($"");
+                if (!fileContentsField.IsNullable)
+                    s.Add($"        [Required]");
+                s.Add($"        public byte[] {fileContentsField.Name} {{ get; set; }}");
+
+
+                s.Add($"    }}");
+                s.Add($"");
+            }
+
             s.Add($"}}");
 
             return RunCodeReplacements(s.ToString(), CodeType.Model);

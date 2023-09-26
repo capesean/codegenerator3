@@ -29,7 +29,14 @@ namespace WEB.Models
             s.Add($"    public partial class ApplicationDbContext");
             s.Add($"    {{");
             foreach (var e in NormalEntities)
+            {
                 s.Add($"        public DbSet<{e.Name}> {e.PluralName} {{ get; set; }}");
+
+                var fileContentsField = e.Fields.FirstOrDefault(o => o.EditPageType == EditPageType.FileContents);
+                if (fileContentsField != null)
+                    s.Add($"        public DbSet<{e.Name}Content> {e.Name}Contents {{ get; set; }}");
+
+            }
             s.Add($"");
             s.Add($"        public void ConfigureModelBuilder(ModelBuilder modelBuilder)");
             s.Add($"        {{");
@@ -63,6 +70,7 @@ namespace WEB.Models
                     s.Add($"                .HasName(\"PK_{entity.Name}\");");
                     needsBreak = true;
                 }
+                
                 foreach (var field in entity.Fields.Where(o => !o.IsNullable && o.IsUnique).OrderBy(f => f.FieldOrder))
                 {
                     if (field.IsUniqueOnHierarchy)
@@ -84,7 +92,22 @@ namespace WEB.Models
                         needsBreak = true;
                     }
                 }
+                
                 if (needsBreak) s.Add($"");
+
+                var fileContentsField = entity.Fields.FirstOrDefault(o => o.EditPageType == EditPageType.FileContents);
+                if (fileContentsField != null)
+                {
+                    s.Add($"");
+                    s.Add($"            modelBuilder.Entity<{entity.Name}Content>(o => o.ToTable(\"{entity.PluralName}\"));");
+                    s.Add($"");
+                    s.Add($"            modelBuilder.Entity<{entity.Name}>({entity.Name.ToCamelCase()} =>");
+                    s.Add($"            {{");
+                    s.Add($"                {entity.Name.ToCamelCase()}.HasOne(o => o.{entity.Name}Content).WithOne().HasForeignKey<{entity.Name}>(o => o.{entity.KeyFields.Single().Name});");
+                    s.Add($"                {entity.Name.ToCamelCase()}.Navigation(o => o.{entity.Name}Content).IsRequired();");
+                    s.Add($"            }});");
+                    s.Add($"");
+                }
             }
 
             foreach (var entity in AllEntities.OrderBy(o => o.Name))
