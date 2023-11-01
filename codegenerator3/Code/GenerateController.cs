@@ -473,8 +473,10 @@ namespace WEB.Models
                 s.Add($"        public async Task<IActionResult> Delete({CurrentEntity.ControllerParameters})");
                 s.Add($"        {{");
                 s.Add($"            var {CurrentEntity.CamelCaseName} = await {(CurrentEntity.EntityType == EntityType.User ? "userManager" : CurrentEntity.Project.DbContextVariable)}.{CurrentEntity.PluralName}");
+                foreach (var field in CurrentEntity.Fields.Where(o => o.EditPageType == EditPageType.FileContents))
+                        s.Add($"                .Include(o => o.{CurrentEntity.Name}Content)");
                 if (CurrentEntity.HasUserFilterField)
-                    s.Add($"                .Where(o => o.{CurrentEntity.UserFilterFieldPath} == CurrentUser.{CurrentEntity.Project.UserFilterFieldName})");
+                        s.Add($"                .Where(o => o.{CurrentEntity.UserFilterFieldPath} == CurrentUser.{CurrentEntity.Project.UserFilterFieldName})");
                 s.Add($"                .FirstOrDefaultAsync(o => {GetKeyFieldLinq("o")});");
                 s.Add($"");
                 s.Add($"            if ({CurrentEntity.CamelCaseName} == null)");
@@ -513,6 +515,8 @@ namespace WEB.Models
                 else
                 {
                     s.Add($"            {CurrentEntity.Project.DbContextVariable}.Entry({CurrentEntity.CamelCaseName}).State = EntityState.Deleted;");
+                    foreach (var field in CurrentEntity.Fields.Where(o => o.EditPageType == EditPageType.FileContents))
+                        s.Add($"            {CurrentEntity.Project.DbContextVariable}.Entry({CurrentEntity.CamelCaseName}.{CurrentEntity.Name}Content).State = EntityState.Deleted;");
                     s.Add($"");
                     s.Add($"            await {CurrentEntity.Project.DbContextVariable}.SaveChangesAsync();");
                 }

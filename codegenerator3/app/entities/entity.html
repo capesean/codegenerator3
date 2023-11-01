@@ -462,7 +462,7 @@
                 <tr ng-repeat="field in vm.fields" ng-click="vm.goToField(field.entity.project.projectId, field.entity.entityId, field.fieldId)">
                     <td><i class="fa fa-bars sortable-handle"></i>{{ field.name }}</td>
                     <td>{{ field.keyField ? "Yes" : "No" }}</td>
-                    <td>{{ vm.appSettings.find(vm.appSettings.fieldType, field.fieldType).label }}</td>
+                    <td>{{ vm.appSettings.find(vm.appSettings.fieldType, field.fieldType).label }}<span ng-if="field.fieldType==10"> ({{field.length}})</span></td>
                     <td>{{ field.showInSearchResults ? "Yes" : "No" }}</td>
                     <td>{{ vm.appSettings.find(vm.appSettings.searchType, field.searchType).label }}</td>
                     <td>{{ field.isUnique ? "Yes" : "No" }}</td>

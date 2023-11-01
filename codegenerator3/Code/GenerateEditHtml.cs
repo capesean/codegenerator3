@@ -446,6 +446,36 @@ namespace WEB.Models
                                     s.Add(t + $"                                not implemented: {field.Name}");
                                 }
                             }
+                            else if (field.SearchType == SearchType.Range)
+                            {
+
+                                if (field.CustomType == CustomType.Date)
+                                {
+                                    s.Add(t + $"                                <div class=\"col-sm-6 col-md-3 col-lg-2\">");
+                                    s.Add(t + $"                                    <div class=\"form-group\" ngbTooltip=\"From Date\" container=\"body\" placement=\"top\">");
+                                    s.Add(t + $"                                        <div class=\"input-group\">");
+                                    s.Add(t + $"                                            <input type=\"text\" id=\"from{field.Name}\" name=\"from{field.Name}\" [(ngModel)]=\"{searchOptions}.from{field.Name}\" #from{field.Name}=\"ngModel\" class=\"form-control\" readonly placeholder=\"yyyy-mm-dd\" ngbDatepicker #dpFrom{field.Name}=\"ngbDatepicker\" tabindex=\"-1\" (click)=\"dpFrom{field.Name}.toggle()\" container=\"body\" />");
+                                    s.Add(t + $"                                            <button class=\"btn btn-secondary calendar\" (click)=\"dpFrom{field.Name}.toggle()\" type=\"button\"><i class=\"fas fa-fw fa-calendar-alt\"></i></button>");
+                                    s.Add(t + $"                                        </div>");
+                                    s.Add(t + $"                                    </div>");
+                                    s.Add(t + $"                                </div>");
+                                    s.Add($"");
+                                    s.Add(t + $"                                <div class=\"col-sm-6 col-md-3 col-lg-2\">");
+                                    s.Add(t + $"                                    <div class=\"form-group\" ngbTooltip=\"To Date\" container=\"body\" placement=\"top\">");
+                                    s.Add(t + $"                                        <div class=\"input-group\">");
+                                    s.Add(t + $"                                            <input type=\"text\" id=\"to{field.Name}\" name=\"to{field.Name}\" [(ngModel)]=\"{searchOptions}.to{field.Name}\" #to{field.Name}=\"ngModel\" class=\"form-control\" readonly placeholder=\"yyyy-mm-dd\" ngbDatepicker #dpTo{field.Name}=\"ngbDatepicker\" tabindex=\"-1\" (click)=\"dpTo{field.Name}.toggle()\" container=\"body\" />");
+                                    s.Add(t + $"                                            <button class=\"btn btn-secondary calendar\" (click)=\"dpTo{field.Name}.toggle()\" type=\"button\"><i class=\"fas fa-fw fa-calendar-alt\"></i></button>");
+                                    s.Add(t + $"                                        </div>");
+                                    s.Add(t + $"                                    </div>");
+                                    s.Add(t + $"                                </div>");
+                                    s.Add($"");
+                                }
+                                else
+                                {
+                                    s.Add(t + $"                                                not implemented: {field.Name}");
+                                }
+
+                            }
                             else
                             {
                                 s.Add(t + $"                                not implemented: {field.Name}");
@@ -464,10 +494,11 @@ namespace WEB.Models
                     {
                         s.Add(t + $"                        <div class=\"mb-3\">");
 
-                        if (relationship.UseMultiSelect)
-                            s.Add(t + $"                            <button class=\"btn btn-outline-primary me-2 mb-1\" (click)=\"add{relationship.CollectionName}()\">Add {relationship.CollectionFriendlyName}<i class=\"fas fa-plus ms-2\"></i></button>");
                         if (relationship.Hierarchy)
-                            s.Add(t + $"                            <a [routerLink]=\"['./{childEntity.PluralName.ToLower()}', 'add']\" class=\"btn btn-outline-primary me-2 mb-1\">Add<i class=\"fas fa-plus ms-2\"></i></a>");
+                            if (relationship.UseMultiSelect)
+                                s.Add(t + $"                            <button class=\"btn btn-outline-primary me-2 mb-1\" (click)=\"add{relationship.CollectionName}()\">Add {relationship.CollectionFriendlyName}<i class=\"fas fa-plus ms-2\"></i></button>");
+                            else
+                                s.Add(t + $"                            <a [routerLink]=\"['./{childEntity.PluralName.ToLower()}', 'add']\" class=\"btn btn-outline-primary me-2 mb-1\">Add<i class=\"fas fa-plus ms-2\"></i></a>");
 
                         if (hasSearchForm)
                         {
