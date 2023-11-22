@@ -374,11 +374,11 @@ namespace WEB.Models
                                 s.Add($"                        .Where(o => o.{CurrentEntity.UserFilterFieldPath} == CurrentUser.{CurrentEntity.Project.UserFilterFieldName})");
                             s.Add($"                        .Include(o => o.{CurrentEntity.Name}Content)");
                             s.Add($"                        .FirstOrDefaultAsync(o => {GetKeyFieldLinq("o", CurrentEntity.DTOName.ToCamelCase())});");
-                            s.Add($"                    else");
-                            s.Add($"                        {CurrentEntity.CamelCaseName} = await {CurrentEntity.Project.DbContextVariable}.{CurrentEntity.PluralName}");
+                            s.Add($"                else");
+                            s.Add($"                    {CurrentEntity.CamelCaseName} = await {CurrentEntity.Project.DbContextVariable}.{CurrentEntity.PluralName}");
                             if (CurrentEntity.HasUserFilterField)
-                                s.Add($"                            .Where(o => o.{CurrentEntity.UserFilterFieldPath} == CurrentUser.{CurrentEntity.Project.UserFilterFieldName})");
-                            s.Add($"                            .FirstOrDefaultAsync(o => {GetKeyFieldLinq("o", CurrentEntity.DTOName.ToCamelCase())});");
+                                s.Add($"                        .Where(o => o.{CurrentEntity.UserFilterFieldPath} == CurrentUser.{CurrentEntity.Project.UserFilterFieldName})");
+                            s.Add($"                        .FirstOrDefaultAsync(o => {GetKeyFieldLinq("o", CurrentEntity.DTOName.ToCamelCase())});");
 
                         }
                         else

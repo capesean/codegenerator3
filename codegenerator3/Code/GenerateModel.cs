@@ -161,6 +161,32 @@ namespace WEB.Models
                 s.Add($"        }}");
             }
 
+            s.Add($"");
+            s.Add($"        public override bool Equals(object obj)");
+            s.Add($"        {{");
+            s.Add($"            if (obj == null || GetType() != obj.GetType()) return false;");
+            s.Add($"");
+            s.Add($"            {CurrentEntity.Name} other = ({CurrentEntity.Name})obj;");
+            s.Add($"");
+            s.Add($"            return {string.Join(" && ", CurrentEntity.KeyFields.Select(o => $"{o.Name} == other.{o.Name}"))};");
+            s.Add($"        }}");
+
+            s.Add($"");
+            s.Add($"        public override int GetHashCode()");
+            s.Add($"        {{");
+            if (CurrentEntity.KeyFields.Count() == 1)
+            {
+                s.Add($"            return {CurrentEntity.KeyFields.First().Name}.GetHashCode();");
+            }
+            else
+            {
+                s.Add($"            int hash = 17;");
+                foreach (var field in CurrentEntity.KeyFields)
+                    s.Add($"            hash = hash * 23 + {field.Name}.GetHashCode();");
+                s.Add($"            return hash;");
+            }
+            s.Add($"        }}");
+
             s.Add($"    }}");
 
             if (fileContentsField != null)
@@ -180,7 +206,7 @@ namespace WEB.Models
 
                     keyCounter++;
 
-                    
+
 
                     if (attributes.Count > 0)
                         s.Add($"        [" + string.Join(", ", attributes) + "]");
