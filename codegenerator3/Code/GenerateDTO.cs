@@ -15,8 +15,8 @@ namespace WEB.Models
     {
         public string GenerateDTO()
         {
-            var relationshipsAsChild = CurrentEntity.RelationshipsAsChild.OrderBy(o => o.ParentFriendlyName);
-            var relationshipsAsParent = CurrentEntity.RelationshipsAsParent.OrderBy(o => o.CollectionName);
+            var relationshipsAsChild = CurrentEntity.RelationshipsAsChild.Where(o => !o.ParentEntity.Exclude).OrderBy(o => o.ParentFriendlyName);
+            var relationshipsAsParent = CurrentEntity.RelationshipsAsParent.Where(o => !o.ChildEntity.Exclude).OrderBy(o => o.CollectionName);
 
             var fileContentsFields = CurrentEntity.Fields.Where(o => o.EditPageType == EditPageType.FileContents).ToList();
             if (fileContentsFields.Count > 1) throw new NotImplementedException("More than one File Contents field per entity");
@@ -85,7 +85,7 @@ namespace WEB.Models
                 s.Add($"");
             }
 
-            foreach (var relationship in CurrentEntity.RelationshipsAsParent.Where(o => !o.ParentEntity.Exclude).OrderBy(r => r.ChildEntity.Name).ThenBy(o => o.CollectionName).ThenBy(o => o.RelationshipId))
+            foreach (var relationship in CurrentEntity.RelationshipsAsParent.Where(o => !o.ChildEntity.Exclude).OrderBy(r => r.ChildEntity.Name).ThenBy(o => o.CollectionName).ThenBy(o => o.RelationshipId))
             {
                 s.Add($"        public virtual List<{relationship.ChildEntity.Name}DTO> {relationship.CollectionName} {{ get; set; }} = new List<{relationship.ChildEntity.Name}DTO>();");
                 s.Add($"");

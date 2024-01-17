@@ -73,6 +73,8 @@ namespace WEB.Models
             foreach (var field in CurrentEntity.Fields.OrderBy(o => o.FieldOrder))
                 if (!string.IsNullOrWhiteSpace(field.EditPageDefault))
                     s.Add($"        this.{field.Name.ToCamelCase()} = {field.EditPageDefault};");
+            foreach (var relationship in relAsParent)
+                s.Add($"        this.{relationship.CollectionName.ToCamelCase()} = [];");
             s.Add($"    }}");
             s.Add($"}}");
             s.Add($"");

@@ -94,6 +94,7 @@ namespace WEB.Models
 
                 var relAsParent = CurrentEntity.RelationshipsAsParent
                     .Where(r => r.RelationshipAncestorLimit != RelationshipAncestorLimits.Exclude)
+                    .Where(r => !r.ChildEntity.Exclude)
                     .OrderBy(r => r.SortOrderOnChild)
                     .ThenBy(o => o.CollectionName)
                     .ToList();

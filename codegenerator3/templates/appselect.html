@@ -1,5 +1,5 @@
 ﻿<div class="input-group" [ngClass]="{ 'disabled': disabled }">
-    ICONLINK<input placeholder="{{placeholder}}" (click)="click()" type="text" tabindex="-1" class="form-control cursor-pointer app-select-input" readonly value="{{getLabel()}}" [disabled]="disabled" />
+    ICONLINK<input name="CAMELCASENAME" placeholder="{{placeholder}}" (click)="click()" type="text" tabindex="-1" class="form-control cursor-pointer app-select-input" readonly value="{{getLabel()}}" [disabled]="disabled" />
     <button type="button" class="btn btn-secondary" (click)="click(true)" [ngClass]="{ 'disabled': disabled}">
         <i class="fas fa-fw" [ngClass]="{ 'fa-search': !CAMELCASENAME && !PLURALNAME_TOCAMELCASE?.length, 'fa-times': !!CAMELCASENAME || !!PLURALNAME_TOCAMELCASE?.length }"></i>
     </button>
