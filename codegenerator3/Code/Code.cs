@@ -536,12 +536,11 @@ namespace WEB.Models
             #region model
             if (deploymentOptions.Model)
             {
-                var path = Path.Combine(entity.Project.RootPathModels, "Models");
-                if (!Directory.Exists(path))
-                    return ("Models path does not exist: " + path);
+                if (!Directory.Exists(entity.Project.RootPathModels))
+                    return ("Models path does not exist: " + entity.Project.RootPathModels);
 
                 var code = codeGenerator.GenerateModel();
-                if (code != string.Empty) File.WriteAllText(Path.Combine(path, entity.Name + ".cs"), code);
+                if (code != string.Empty) File.WriteAllText(Path.Combine(entity.Project.RootPathModels, entity.Name + ".cs"), code);
             }
             #endregion
 
@@ -549,7 +548,7 @@ namespace WEB.Models
             if (deploymentOptions.TypeScriptModel)
             {
                 var path = Path.Combine(entity.Project.RootPathWeb, @"ClientApp\src\app\common\models");
-                if (!Directory.Exists(path)) return "Models path does not exist:" + path;
+                if (!Directory.Exists(path)) return "ClientApp models path does not exist:" + path;
 
                 var err = WriteFile(path, null, entity.Name.ToLower() + ".model.ts", codeGenerator.GenerateTypeScriptModel());
                 if (err != null) return err;
@@ -559,19 +558,18 @@ namespace WEB.Models
             #region dbcontext
             if (deploymentOptions.DbContext)
             {
-                var path = Path.Combine(entity.Project.RootPathModels, "Models");
-                if (!Directory.Exists(path))
-                    return ("Models path does not exist: " + path);
+                if (!Directory.Exists(entity.Project.RootPathModels))
+                    return ("Models path does not exist: " + entity.Project.RootPathModels);
 
                 var code = codeGenerator.GenerateDbContext();
-                if (code != string.Empty) File.WriteAllText(Path.Combine(path, "ApplicationDBContext_.cs"), code);
+                if (code != string.Empty) File.WriteAllText(Path.Combine(entity.Project.RootPathModels, "ApplicationDBContext_.cs"), code);
             }
             #endregion
 
             #region dto
             if (deploymentOptions.DTO)
             {
-                var path = Path.Combine(entity.Project.RootPathModels, "Models\\DTOs");
+                var path = Path.Combine(entity.Project.RootPathModels, "DTOs");
                 if (!Directory.Exists(path))
                     return ("DTOs path does not exist: " + path);
 
@@ -584,19 +582,18 @@ namespace WEB.Models
             if (deploymentOptions.Enums)
             {
                 // generate C# enums
-                var path = Path.Combine(entity.Project.RootPathModels, "Models");
-                if (!Directory.Exists(path))
-                    return ("Models path does not exist: " + path);
+                if (!Directory.Exists(entity.Project.RootPathModels))
+                    return ("Models path does not exist: " + entity.Project.RootPathModels);
 
                 var code = codeGenerator.GenerateEnums();
-                if (code != string.Empty) File.WriteAllText(Path.Combine(path, "Enums.cs"), code);
+                if (code != string.Empty) File.WriteAllText(Path.Combine(entity.Project.RootPathModels, "Enums.cs"), code);
 
                 code = codeGenerator.GenerateRoles();
-                if (code != string.Empty) File.WriteAllText(Path.Combine(path, "Roles.cs"), code);
+                if (code != string.Empty) File.WriteAllText(Path.Combine(entity.Project.RootPathModels, "Roles.cs"), code);
 
                 // generate TypeScript enums
-                path = Path.Combine(entity.Project.RootPathWeb, @"ClientApp\src\app\common\models");
-                if (!Directory.Exists(path)) return "Models path does not exist:" + path;
+                var path = Path.Combine(entity.Project.RootPathWeb, @"ClientApp\src\app\common\models");
+                if (!Directory.Exists(path)) return "ClientApp Models path does not exist:" + path;
 
                 var err = WriteFile(path, null, "enums.model.ts", codeGenerator.GenerateTypeScriptEnums());
                 if (err != null) return err;
@@ -607,7 +604,7 @@ namespace WEB.Models
             #region settings
             if (deploymentOptions.SettingsDTO)
             {
-                var path = Path.Combine(entity.Project.RootPathModels, "Models\\DTOs");
+                var path = Path.Combine(entity.Project.RootPathModels, "DTOs");
                 if (!Directory.Exists(path))
                     return ("DTOs path does not exist: " + path);
 
@@ -620,7 +617,7 @@ namespace WEB.Models
             #region settings dto
             if (deploymentOptions.SettingsDTO)
             {
-                var path = Path.Combine(entity.Project.RootPathModels, "Models\\DTOs");
+                var path = Path.Combine(entity.Project.RootPathModels, "DTOs");
                 if (!Directory.Exists(path))
                     return ("DTOs path does not exist: " + path);
 
@@ -801,7 +798,7 @@ namespace WEB.Models
             #region search options
             if (deploymentOptions.SearchOptions)
             {
-                var path = Path.Combine(entity.Project.RootPathModels, "Models\\SearchOptions");
+                var path = Path.Combine(entity.Project.RootPathModels, "SearchOptions");
                 if (!Directory.Exists(path))
                     return ("SearchOptions path does not exist: " + path);
 
