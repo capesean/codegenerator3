@@ -29,7 +29,7 @@ namespace WEB.Models
             }
 
             var imported = new List<string>();
-            foreach (var field in CurrentEntity.Fields.Where(o => o.SearchType == SearchType.Exact && (o.FieldType == FieldType.Enum || CurrentEntity.RelationshipsAsChild.Any(r => r.RelationshipFields.Any(f => f.ChildFieldId == o.FieldId)))).OrderBy(f => f.FieldOrder))
+            foreach (var field in CurrentEntity.Fields.Where(o => o.SearchType == SearchType.Exact && (o.FieldType == FieldType.Enum || o.FieldType == FieldType.Bit || CurrentEntity.RelationshipsAsChild.Any(r => r.RelationshipFields.Any(f => f.ChildFieldId == o.FieldId)))).OrderBy(f => f.FieldOrder))
             {
                 var name = field.Name.ToCamelCase();
 
@@ -45,6 +45,8 @@ namespace WEB.Models
 
                 if (field.FieldType == FieldType.Enum)
                     inputs += $"    @Input() {field.Name.ToCamelCase()}: Enum;" + Environment.NewLine;
+                else if (field.FieldType == FieldType.Bit)
+                    inputs += $"    @Input() {field.Name.ToCamelCase()}: boolean;" + Environment.NewLine;
                 else if (relationship != null)
                 {
                     inputs += $"    @Input() {relationship.ParentName.ToCamelCase()}: {relationship.ParentEntity.Name};" + Environment.NewLine;

@@ -36,12 +36,12 @@ namespace WEB.Models
                 s.Add($"        private RoleManager<Role> rm;");
                 s.Add($"        private IOptions<IdentityOptions> opts;");
                 s.Add($"");
-                s.Add($"        public UsersController(ApplicationDbContext db, UserManager<User> um, AppSettings appSettings, RoleManager<Role> rm, IOptions<IdentityOptions> opts)");
-                s.Add($"            : base(db, um, appSettings) {{ this.rm = rm; this.opts = opts; }}");
+                s.Add($"        public UsersController(IDbContextFactory<ApplicationDbContext> dbFactory, UserManager<User> um, AppSettings appSettings, RoleManager<Role> rm, IOptions<IdentityOptions> opts)");
+                s.Add($"            : base(dbFactory, um, appSettings) {{ this.rm = rm; this.opts = opts; }}");
             }
             else
             {
-                s.Add($"        public {CurrentEntity.PluralName}Controller(ApplicationDbContext db, UserManager<User> um, AppSettings appSettings) : base(db, um, appSettings) {{ }}");
+                s.Add($"        public {CurrentEntity.PluralName}Controller(IDbContextFactory<ApplicationDbContext> dbFactory, UserManager<User> um, AppSettings appSettings) : base(dbFactory, um, appSettings) {{ }}");
             }
             s.Add($"");
 
@@ -475,9 +475,9 @@ namespace WEB.Models
                 s.Add($"        {{");
                 s.Add($"            var {CurrentEntity.CamelCaseName} = await {(CurrentEntity.EntityType == EntityType.User ? "userManager" : CurrentEntity.Project.DbContextVariable)}.{CurrentEntity.PluralName}");
                 foreach (var field in CurrentEntity.Fields.Where(o => o.EditPageType == EditPageType.FileContents))
-                        s.Add($"                .Include(o => o.{CurrentEntity.Name}Content)");
+                    s.Add($"                .Include(o => o.{CurrentEntity.Name}Content)");
                 if (CurrentEntity.HasUserFilterField)
-                        s.Add($"                .Where(o => o.{CurrentEntity.UserFilterFieldPath} == CurrentUser.{CurrentEntity.Project.UserFilterFieldName})");
+                    s.Add($"                .Where(o => o.{CurrentEntity.UserFilterFieldPath} == CurrentUser.{CurrentEntity.Project.UserFilterFieldName})");
                 s.Add($"                .FirstOrDefaultAsync(o => {GetKeyFieldLinq("o")});");
                 s.Add($"");
                 s.Add($"            if ({CurrentEntity.CamelCaseName} == null)");

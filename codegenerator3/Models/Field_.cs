@@ -34,6 +34,7 @@ namespace WEB.Models
                 if (FieldType == FieldType.SmallInt) return "0";
                 if (FieldType == FieldType.BigInt) return "0";
                 if (FieldType == FieldType.TinyInt) return "0";
+                if (FieldType == FieldType.Enum) return "0";
                 if (FieldType == FieldType.Date) return "DateTime.MinValue";
                 if (FieldType == FieldType.DateTime) return "DateTime.MinValue";
                 if (CustomType == CustomType.String) return "string.Empty";
@@ -141,6 +142,7 @@ namespace WEB.Models
                     case FieldType.TinyInt:
                     case FieldType.SmallInt:
                     case FieldType.BigInt:
+                    case FieldType.Enum:
                         return "int";
                     case FieldType.nVarchar:
                     case FieldType.nText:

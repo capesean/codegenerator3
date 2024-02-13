@@ -31,6 +31,10 @@ namespace WEB.Models
                     else
                         filterFields += $" [{relationship.ParentName.ToCamelCase()}]=\"{relationship.ParentName.ToCamelCase()}\"";
                 }
+                else if (field.FieldType == FieldType.Bit)
+                {
+                    filterFields += $" [{field.Name.ToCamelCase()}]=\"{field.Name.ToCamelCase()}\"";
+                }
             }
             s.Add(RunTemplateReplacements(file)
                 .Replace("/*FILTER-FIELDS*/", filterFields));

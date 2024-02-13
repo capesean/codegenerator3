@@ -70,7 +70,7 @@ namespace WEB.Models
                     s.Add($"                .HasName(\"PK_{entity.Name}\");");
                     needsBreak = true;
                 }
-                
+
                 foreach (var field in entity.Fields.Where(o => !o.IsNullable && o.IsUnique).OrderBy(f => f.FieldOrder))
                 {
                     if (field.IsUniqueOnHierarchy)
@@ -92,7 +92,7 @@ namespace WEB.Models
                         needsBreak = true;
                     }
                 }
-                
+
                 if (needsBreak) s.Add($"");
 
                 var fileContentsField = entity.Fields.FirstOrDefault(o => o.EditPageType == EditPageType.FileContents);
@@ -103,7 +103,7 @@ namespace WEB.Models
                     s.Add($"");
                     s.Add($"            modelBuilder.Entity<{entity.Name}>({entity.Name.ToCamelCase()} =>");
                     s.Add($"            {{");
-                    s.Add($"                {entity.Name.ToCamelCase()}.HasOne(o => o.{entity.Name}Content).WithOne().HasForeignKey<{entity.Name}>(o => o.{entity.KeyFields.Single().Name});");
+                    s.Add($"                {entity.Name.ToCamelCase()}.HasOne(o => o.{entity.Name}Content).WithOne(o => o.{entity.Name}).HasForeignKey<{entity.Name}>(o => o.{entity.KeyFields.Single().Name});");
                     s.Add($"                {entity.Name.ToCamelCase()}.Navigation(o => o.{entity.Name}Content).IsRequired();");
                     s.Add($"            }});");
                     s.Add($"");
@@ -130,20 +130,30 @@ namespace WEB.Models
             {
                 if (field.EditPageType == EditPageType.CalculatedField) continue;
                 s.Add($"            modelBuilder.Entity<{field.Entity.Name}>().Property(o => o.{field.Name}).HasColumnType(\"smalldatetime\");");
+                s.Add($"");
             }
+
+            foreach (var field in calculatedFields.OrderBy(o => o.Entity.Name).ThenBy(o => o.Name))
+            {
+                s.Add($"            modelBuilder.Entity<{field.Entity.Name}>()");
+                s.Add($"                .Property(o => o.{field.Name})");
+                s.Add($"                .HasComputedColumnSql(\"{field.CalculatedFieldDefinition}\");");
+                s.Add($"");
+            }
+
             s.Add($"        }}");
 
-            if (calculatedFields.Count() > 0)
-            {
-                s.Add($"");
-                s.Add($"        public void AddComputedColumns()");
-                s.Add($"        {{");
-                foreach (var field in calculatedFields)
-                {
-                    s.Add($"            CreateComputedColumn(\"{(field.Entity.EntityType == EntityType.User ? "AspNetUsers" : field.Entity.PluralName)}\", \"{field.Name}\", \"{field.CalculatedFieldDefinition.Replace("\"", "'")}\");");
-                }
-                s.Add($"        }}");
-            }
+            //if (calculatedFields.Count() > 0)
+            //{
+            //    s.Add($"");
+            //    s.Add($"        public void AddComputedColumns()");
+            //    s.Add($"        {{");
+            //    foreach (var field in calculatedFields)
+            //    {
+            //        //s.Add($"            CreateComputedColumn(\"{(field.Entity.EntityType == EntityType.User ? "AspNetUsers" : field.Entity.PluralName)}\", \"{field.Name}\", \"{field.CalculatedFieldDefinition.Replace("\"", "'")}\");");
+            //    }
+            //    s.Add($"        }}");
+            //}
             var nullableUniques = DbContext.Fields.Where(o => o.IsUnique && o.IsNullable && o.Entity.ProjectId == CurrentEntity.ProjectId).ToList();
             s.Add($"");
             s.Add($"        public void AddNullableUniqueIndexes()");

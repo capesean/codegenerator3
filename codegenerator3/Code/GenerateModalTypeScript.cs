@@ -66,6 +66,11 @@ namespace WEB.Models
                     inputs += $"    @Input() {field.Name.ToCamelCase()}: Enum;" + Environment.NewLine;
                     searchOptions += $"        this.searchOptions.{field.Name.ToCamelCase()} = this.{field.Name.ToCamelCase()}?.value;" + Environment.NewLine;
                 }
+                else if (field.FieldType == FieldType.Bit)
+                {
+                    inputs += $"    @Input() {field.Name.ToCamelCase()}: boolean;" + Environment.NewLine;
+                    searchOptions += $"        this.searchOptions.{field.Name.ToCamelCase()} = this.{field.Name.ToCamelCase()};" + Environment.NewLine;
+                }
                 else if (relationship != null)
                 {
                     inputs += $"    @Input() {relationship.ParentName.ToCamelCase()}: {relationship.ParentEntity.Name};" + Environment.NewLine;

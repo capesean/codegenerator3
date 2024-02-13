@@ -62,9 +62,12 @@ namespace WEB.Models
 
                 if (field.EditPageType == EditPageType.CalculatedField)
                     attributes.Add("DatabaseGenerated(DatabaseGeneratedOption.Computed)");
+                if (field.EditPageType == EditPageType.CalculatedField && field.FieldType == FieldType.Decimal)
+                    attributes.Add($"Column(TypeName=\"decimal({field.Precision},{field.Scale})\")");
                 else if (field.EditPageType == EditPageType.FileContents)
                 {
-                    s.Add($"        public {CurrentEntity.Name}Content {CurrentEntity.Name}Content {{ get; set; }}");
+                    s.Add($"        [Required]");
+                    s.Add($"        public virtual {CurrentEntity.Name}Content {CurrentEntity.Name}Content {{ get; set; }}");
                     s.Add($"");
                     continue;
                 }
@@ -219,6 +222,9 @@ namespace WEB.Models
                     s.Add($"        [Required]");
                 s.Add($"        public byte[] {fileContentsField.Name} {{ get; set; }}");
 
+                s.Add($"");
+                s.Add($"        [Required]");
+                s.Add($"        public virtual {CurrentEntity.Name} {CurrentEntity.Name} {{ get; set; }}");
 
                 s.Add($"    }}");
                 s.Add($"");
