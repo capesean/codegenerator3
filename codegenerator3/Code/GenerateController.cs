@@ -501,7 +501,11 @@ namespace WEB.Models
                     foreach (var relationship in cascadeDeleteRelationships)
                     {
                         var joins = relationship.RelationshipFields.Select(o => $"o.{o.ChildField.Name} == {CurrentEntity.CamelCaseName}.{o.ParentField.Name}").Aggregate((current, next) => current + " && " + next);
-                        s.Add($"            await {CurrentEntity.Project.DbContextVariable}.{(relationship.ChildEntity.EntityType == EntityType.User ? "Users" : relationship.ChildEntity.PluralName)}.Where(o => {joins}).ExecuteDeleteAsync();");
+
+                        if (relationship.ChildEntity.Fields.Any(o => o.EditPageType == EditPageType.FileContents))
+                            s.Add($"            await db.Database.ExecuteSqlRawAsync($\"DELETE FROM {relationship.ChildEntity.PluralName} WHERE {relationship.RelationshipFields.Select(o => o.ChildField.Name + " = '{" + o.ParentField.Name.ToCamelCase() + "}'").Aggregate((current, next) => { return current + " AND " + next; })}\");");
+                        else
+                            s.Add($"            await {CurrentEntity.Project.DbContextVariable}.{(relationship.ChildEntity.EntityType == EntityType.User ? "Users" : relationship.ChildEntity.PluralName)}.Where(o => {joins}).ExecuteDeleteAsync();");
                         s.Add($"");
                     }
                 }
@@ -629,7 +633,10 @@ namespace WEB.Models
                     s.Add($"        public async Task<IActionResult> Delete{rel.CollectionName}({CurrentEntity.ControllerParameters})");
                     s.Add($"        {{");
 
-                    s.Add($"            await {CurrentEntity.Project.DbContextVariable}.{entity.PluralName}.Where(o => {rel.RelationshipFields.Select(o => "o." + o.ChildField.Name + " == " + o.ParentField.Name.ToCamelCase()).Aggregate((current, next) => { return current + " && " + next; })}).ExecuteDeleteAsync();");
+                    if (entity.Fields.Any(o => o.EditPageType == EditPageType.FileContents))
+                        s.Add($"            await db.Database.ExecuteSqlRawAsync($\"DELETE FROM {entity.PluralName} WHERE {rel.RelationshipFields.Select(o => o.ChildField.Name + " = '{" + o.ParentField.Name.ToCamelCase() + "}'").Aggregate((current, next) => { return current + " AND " + next; })}\");");
+                    else
+                        s.Add($"            await {CurrentEntity.Project.DbContextVariable}.{entity.PluralName}.Where(o => {rel.RelationshipFields.Select(o => "o." + o.ChildField.Name + " == " + o.ParentField.Name.ToCamelCase()).Aggregate((current, next) => { return current + " && " + next; })}).ExecuteDeleteAsync();");
                     s.Add($"");
                     s.Add($"            return Ok();");
                     s.Add($"        }}");
