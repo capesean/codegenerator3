@@ -78,4 +78,8 @@ export class NAMESelectComponent implements OnInit, ControlValueAccessor {
         if (button && (this.CAMELCASENAME || this.PLURALNAME_TOCAMELCASE.length)) this.changed(this.multiple ? [] : null);
         else this.modal.open();
     }
+
+    clear() {
+        this.changed(this.multiple ? [] : null);
+    }
 }

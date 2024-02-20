@@ -45,7 +45,7 @@ namespace WEB.Models
 
                 if (field.FieldType == FieldType.Enum)
                     inputs += $"    @Input() {field.Name.ToCamelCase()}: Enum;" + Environment.NewLine;
-                else if (field.FieldType == FieldType.Bit)
+                else if (field.FieldType == FieldType.Bit && (CurrentEntity.EntityType != EntityType.User || field.Name != "Disabled"))
                     inputs += $"    @Input() {field.Name.ToCamelCase()}: boolean;" + Environment.NewLine;
                 else if (relationship != null)
                 {
