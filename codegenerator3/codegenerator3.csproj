@@ -715,6 +715,10 @@
     <Compile Include="Migrations\202307251225339_NullGeneratedPath.designer.cs">
       <DependentUpon>202307251225339_NullGeneratedPath.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202402291412591_RelationshipDisableDelete.cs" />
+    <Compile Include="Migrations\202402291412591_RelationshipDisableDelete.designer.cs">
+      <DependentUpon>202402291412591_RelationshipDisableDelete.cs</DependentUpon>
+    </Compile>
     <Compile Include="Models\Relationship_.cs" />
     <Compile Include="Startup.cs" />
     <Compile Include="Utilities\ApiException.cs" />
@@ -861,6 +865,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202307251225339_NullGeneratedPath.resx">
       <DependentUpon>202307251225339_NullGeneratedPath.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202402291412591_RelationshipDisableDelete.resx">
+      <DependentUpon>202402291412591_RelationshipDisableDelete.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

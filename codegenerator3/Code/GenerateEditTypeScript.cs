@@ -23,7 +23,7 @@ namespace WEB.Models
                     && !enumLookups.Contains(o.Lookup)      // enum hasn't already been added
                     && (o.ShowInSearchResults || o.SearchType == SearchType.Exact)
                     ))
-                        enumLookups.Add(field.Lookup);
+                    enumLookups.Add(field.Lookup);
             // this is for the breadcrumb being on the parent entity which has a primary field of type enum
             var addEnum = CurrentEntity.RelationshipsAsChild.SingleOrDefault(r => r.RelationshipFields.Count == 1 && r.RelationshipFields.First().ChildFieldId == CurrentEntity.PrimaryField.FieldId)?.ParentEntity?.PrimaryField?.FieldType == FieldType.Enum;
             if (!addEnum)
@@ -461,48 +461,52 @@ namespace WEB.Models
                     s.Add($"    }}");
                     s.Add($"");
                 }
-                s.Add($"    delete{rel.CollectionSingular}({rel.ChildEntity.Name.ToCamelCase()}: {rel.ChildEntity.Name}, event: MouseEvent): void {{");
-                s.Add($"        event.stopPropagation();");
-                s.Add($"");
-                s.Add($"        let modalRef = this.modalService.open(ConfirmModalComponent, {{ centered: true }});");
-                s.Add($"        (modalRef.componentInstance as ConfirmModalComponent).options = {{ title: \"Delete {rel.ChildEntity.FriendlyName}\", text: \"Are you sure you want to delete this {rel.ChildEntity.FriendlyName.ToLower()}?\", deleteStyle: true, ok: \"Delete\" }} as ModalOptions;");
-                s.Add($"        modalRef.result.then(");
-                s.Add($"            () => {{");
-                s.Add($"");
-                s.Add($"                this.{rel.ChildEntity.Name.ToCamelCase()}Service.delete({rel.ChildEntity.KeyFields.Select(o => $"{rel.ChildEntity.Name.ToCamelCase()}.{o.Name.ToCamelCase()}").Aggregate((current, next) => { return current + ", " + next; })})");
-                s.Add($"                    .subscribe({{");
-                s.Add($"                        next: () => {{");
-                s.Add($"                            this.toastr.success(\"The {rel.ChildEntity.FriendlyName.ToLower()} has been deleted\", \"Delete {rel.ChildEntity.FriendlyName}\");");
-                s.Add($"                            this.search{rel.CollectionName}(this.{rel.CollectionName.ToCamelCase()}Headers.pageIndex);");
-                s.Add($"                        }},");
-                s.Add($"                        error: err => {{");
-                s.Add($"                            this.errorService.handleError(err, \"{rel.ChildEntity.FriendlyName}\", \"Delete\");");
-                s.Add($"                        }}");
-                s.Add($"                    }});");
-                s.Add($"");
-                s.Add($"            }}, () => {{ }});");
-                s.Add($"    }}");
-                s.Add($"");
-                s.Add($"    delete{rel.CollectionName}(): void {{");
-                s.Add($"        let modalRef = this.modalService.open(ConfirmModalComponent, {{ centered: true }});");
-                s.Add($"        (modalRef.componentInstance as ConfirmModalComponent).options = {{ title: \"Delete {rel.ChildEntity.PluralFriendlyName}\", text: \"Are you sure you want to delete all the {rel.CollectionFriendlyName.ToLower()}?\", deleteStyle: true, ok: \"Delete\" }} as ModalOptions;");
-                s.Add($"        modalRef.result.then(");
-                s.Add($"            () => {{");
-                s.Add($"");
-                s.Add($"                this.{CurrentEntity.Name.ToCamelCase()}Service.delete{rel.CollectionName}({CurrentEntity.KeyFields.Select(o => $"this.{CurrentEntity.Name.ToCamelCase()}.{o.Name.ToCamelCase()}").Aggregate((current, next) => { return current + ", " + next; })})");
-                s.Add($"                    .subscribe({{");
-                s.Add($"                        next: () => {{");
-                s.Add($"                            this.toastr.success(\"The {rel.CollectionFriendlyName.ToLower()} have been deleted\", \"Delete {rel.CollectionFriendlyName}\");");
-                s.Add($"                            this.search{rel.CollectionName}();");
-                s.Add($"                        }},");
-                s.Add($"                        error: err => {{");
-                s.Add($"                            this.errorService.handleError(err, \"{rel.CollectionFriendlyName}\", \"Delete\");");
-                s.Add($"                        }}");
-                s.Add($"                    }});");
-                s.Add($"            }}, () => {{ }});");
-                s.Add($"");
-                s.Add($"    }}");
-                s.Add($"");
+
+                if (!rel.DisableDelete)
+                {
+                    s.Add($"    delete{rel.CollectionSingular}({rel.ChildEntity.Name.ToCamelCase()}: {rel.ChildEntity.Name}, event: MouseEvent): void {{");
+                    s.Add($"        event.stopPropagation();");
+                    s.Add($"");
+                    s.Add($"        let modalRef = this.modalService.open(ConfirmModalComponent, {{ centered: true }});");
+                    s.Add($"        (modalRef.componentInstance as ConfirmModalComponent).options = {{ title: \"Delete {rel.ChildEntity.FriendlyName}\", text: \"Are you sure you want to delete this {rel.ChildEntity.FriendlyName.ToLower()}?\", deleteStyle: true, ok: \"Delete\" }} as ModalOptions;");
+                    s.Add($"        modalRef.result.then(");
+                    s.Add($"            () => {{");
+                    s.Add($"");
+                    s.Add($"                this.{rel.ChildEntity.Name.ToCamelCase()}Service.delete({rel.ChildEntity.KeyFields.Select(o => $"{rel.ChildEntity.Name.ToCamelCase()}.{o.Name.ToCamelCase()}").Aggregate((current, next) => { return current + ", " + next; })})");
+                    s.Add($"                    .subscribe({{");
+                    s.Add($"                        next: () => {{");
+                    s.Add($"                            this.toastr.success(\"The {rel.ChildEntity.FriendlyName.ToLower()} has been deleted\", \"Delete {rel.ChildEntity.FriendlyName}\");");
+                    s.Add($"                            this.search{rel.CollectionName}(this.{rel.CollectionName.ToCamelCase()}Headers.pageIndex);");
+                    s.Add($"                        }},");
+                    s.Add($"                        error: err => {{");
+                    s.Add($"                            this.errorService.handleError(err, \"{rel.ChildEntity.FriendlyName}\", \"Delete\");");
+                    s.Add($"                        }}");
+                    s.Add($"                    }});");
+                    s.Add($"");
+                    s.Add($"            }}, () => {{ }});");
+                    s.Add($"    }}");
+                    s.Add($"");
+                    s.Add($"    delete{rel.CollectionName}(): void {{");
+                    s.Add($"        let modalRef = this.modalService.open(ConfirmModalComponent, {{ centered: true }});");
+                    s.Add($"        (modalRef.componentInstance as ConfirmModalComponent).options = {{ title: \"Delete {rel.ChildEntity.PluralFriendlyName}\", text: \"Are you sure you want to delete all the {rel.CollectionFriendlyName.ToLower()}?\", deleteStyle: true, ok: \"Delete\" }} as ModalOptions;");
+                    s.Add($"        modalRef.result.then(");
+                    s.Add($"            () => {{");
+                    s.Add($"");
+                    s.Add($"                this.{CurrentEntity.Name.ToCamelCase()}Service.delete{rel.CollectionName}({CurrentEntity.KeyFields.Select(o => $"this.{CurrentEntity.Name.ToCamelCase()}.{o.Name.ToCamelCase()}").Aggregate((current, next) => { return current + ", " + next; })})");
+                    s.Add($"                    .subscribe({{");
+                    s.Add($"                        next: () => {{");
+                    s.Add($"                            this.toastr.success(\"The {rel.CollectionFriendlyName.ToLower()} have been deleted\", \"Delete {rel.CollectionFriendlyName}\");");
+                    s.Add($"                            this.search{rel.CollectionName}();");
+                    s.Add($"                        }},");
+                    s.Add($"                        error: err => {{");
+                    s.Add($"                            this.errorService.handleError(err, \"{rel.CollectionFriendlyName}\", \"Delete\");");
+                    s.Add($"                        }}");
+                    s.Add($"                    }});");
+                    s.Add($"            }}, () => {{ }});");
+                    s.Add($"");
+                    s.Add($"    }}");
+                    s.Add($"");
+                }
             }
 
             foreach (var relationship in relationshipsAsParent.Where(o => o.Hierarchy && o.ChildEntity.HasASortField))

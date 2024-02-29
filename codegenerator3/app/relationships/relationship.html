@@ -1,5 +1,5 @@
 <div>
-
+    
     <form name="mainForm" ng-submit="vm.save()" novalidate>
 
         <fieldset class="group" ng-disabled="vm.loading">
@@ -132,6 +132,20 @@
                     </div>
 
                     <div class="col-sm-4 col-md-3 col-lg-2">
+                        <div class="form-group" ng-class="{ 'has-error':  mainForm.$submitted && mainForm.disableDelete.$invalid }">
+                            <label for="disableDelete" class="control-label">
+                                Disable Delete:
+                            </label>
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" id="disableDelete" name="disableDelete" ng-model="vm.relationship.disableDelete" />
+                                    Disable List Deletes
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-4 col-md-3 col-lg-2" ng-if="!vm.relationship.disableDelete">
                         <div class="form-group" ng-class="{ 'has-error':  mainForm.$submitted && mainForm.cascadeDelete.$invalid }">
                             <label for="cascadeDelete" class="control-label">
                                 Cascade Delete:

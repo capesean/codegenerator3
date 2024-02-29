@@ -620,7 +620,7 @@ namespace WEB.Models
                 #endregion
 
                 #region deletes
-                foreach (var rel in CurrentEntity.RelationshipsAsParent.Where(r => !r.ChildEntity.Exclude && r.DisplayListOnParent).OrderBy(r => r.SortOrder))
+                foreach (var rel in CurrentEntity.RelationshipsAsParent.Where(r => !r.DisableDelete && !r.ChildEntity.Exclude && r.DisplayListOnParent).OrderBy(r => r.SortOrder))
                 {
                     var entity = rel.ChildEntity;
                     if (rel.UseMultiSelect)
