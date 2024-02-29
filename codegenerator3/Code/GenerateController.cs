@@ -633,11 +633,47 @@ namespace WEB.Models
                     s.Add($"        public async Task<IActionResult> Delete{rel.CollectionName}({CurrentEntity.ControllerParameters})");
                     s.Add($"        {{");
 
+                    var errorOnParentDeleteRelationships = entity.RelationshipsAsParent.Where(r => !r.ChildEntity.Exclude && !r.CascadeDelete).OrderBy(o => o.SortOrder);
+                    foreach (var relationship in errorOnParentDeleteRelationships)
+                    {
+                        var joins = CurrentEntity.KeyFields.Select(o => $"o.{relationship.ParentEntity.Name}.{o.Name} == {o.Name.ToCamelCase()}").Aggregate((current, next) => current + " && " + next);
+                        s.Add($"            if (await {CurrentEntity.Project.DbContextVariable}.{(relationship.ChildEntity.EntityType == EntityType.User ? "Users" : relationship.ChildEntity.PluralName)}.AnyAsync(o => {joins}))");
+                        s.Add($"                return BadRequest(\"Unable to delete the {rel.CollectionFriendlyName.ToLower()} as there are related {relationship.ChildEntity.PluralFriendlyName.ToLower()}\");");
+                        s.Add($"");
+                    }
+
+                    var cascadeOnParentDeleteRelationships = entity.RelationshipsAsParent.Where(r => !r.ChildEntity.Exclude && r.CascadeDelete).OrderBy(o => o.SortOrder);
+                    if (cascadeOnParentDeleteRelationships.Any())
+                    {
+                        s.Add($"            using var transactionScope = Utilities.General.CreateTransactionScope();");
+                        s.Add($"");
+                        foreach (var relationship in cascadeOnParentDeleteRelationships)
+                        {
+                            var joins = CurrentEntity.KeyFields.Select(o => $"o.{relationship.ParentEntity.Name}.{o.Name} == {o.Name.ToCamelCase()}").Aggregate((current, next) => current + " && " + next);
+
+                            if (relationship.ChildEntity.Fields.Any(o => o.EditPageType == EditPageType.FileContents))
+                                throw new Exception("to check & implement!");
+                            //s.Add($"            await db.Database.ExecuteSqlRawAsync($\"DELETE FROM {relationship.ChildEntity.PluralName} WHERE {relationship.RelationshipFields.Select(o => o.ChildField.Name + " = '{" + o.ParentField.Name.ToCamelCase() + "}'").Aggregate((current, next) => { return current + " AND " + next; })}\");");
+                            else
+                                s.Add($"            await {CurrentEntity.Project.DbContextVariable}.{(relationship.ChildEntity.EntityType == EntityType.User ? "Users" : relationship.ChildEntity.PluralName)}.Where(o => {joins}).ExecuteDeleteAsync();");
+                            s.Add($"");
+                        }
+                    }
+
+
                     if (entity.Fields.Any(o => o.EditPageType == EditPageType.FileContents))
                         s.Add($"            await db.Database.ExecuteSqlRawAsync($\"DELETE FROM {entity.PluralName} WHERE {rel.RelationshipFields.Select(o => o.ChildField.Name + " = '{" + o.ParentField.Name.ToCamelCase() + "}'").Aggregate((current, next) => { return current + " AND " + next; })}\");");
                     else
                         s.Add($"            await {CurrentEntity.Project.DbContextVariable}.{entity.PluralName}.Where(o => {rel.RelationshipFields.Select(o => "o." + o.ChildField.Name + " == " + o.ParentField.Name.ToCamelCase()).Aggregate((current, next) => { return current + " && " + next; })}).ExecuteDeleteAsync();");
                     s.Add($"");
+
+
+                    if (cascadeOnParentDeleteRelationships.Any())
+                    {
+                        s.Add($"            transactionScope.Complete();");
+                        s.Add($"");
+                    }
+
                     s.Add($"            return Ok();");
                     s.Add($"        }}");
                     s.Add($"");

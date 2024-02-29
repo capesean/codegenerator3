@@ -64,6 +64,7 @@ namespace WEB.Models
                         s.Add(t + $"                <div class=\"col-sm-6 col-md-4 col-lg-3\">");
                         s.Add(t + $"                    <div class=\"form-group\">");
                         s.Add(t + $"                        <select id=\"{field.Name.ToCamelCase()}\" name=\"{field.Name.ToCamelCase()}\" [(ngModel)]=\"searchOptions.{field.Name.ToCamelCase()}\" #{field.Name.ToCamelCase()}=\"ngModel\" class=\"form-select\">");
+                        s.Add(t + $"                            <option [ngValue]=\"undefined\" disabled>{field.Label}</option>");
                         s.Add(t + $"                            <option *ngFor=\"let {field.Lookup.Name.ToCamelCase()} of {field.Lookup.PluralName.ToCamelCase()}\" [ngValue]=\"{field.Lookup.Name.ToCamelCase()}.value\">{{{{ {field.Lookup.Name.ToCamelCase()}.label }}}}</option>");
                         s.Add(t + $"                        </select>");
                         s.Add(t + $"                    </div>");
@@ -178,15 +179,15 @@ namespace WEB.Models
             s.Add(t + $"        </table>");
             s.Add($"");
 
-            s.Add($"        </div>");
+            s.Add(t + $"    </div>");
             s.Add($"");
 
-            s.Add($"        <div class=\"card-footer\">");
-            s.Add($"            <pager [headers]=\"headers\" (pageChanged)=\"runSearch($event)\"></pager>");
-            s.Add($"        </div>");
+            s.Add(t + $"    <div class=\"card-footer\">");
+            s.Add(t + $"        <pager [headers]=\"headers\" (pageChanged)=\"runSearch($event)\"></pager>");
+            s.Add(t + $"    </div>");
             s.Add($"");
 
-            s.Add($"    </div>");
+            s.Add(t + $"</div>");
             s.Add($"");
 
 

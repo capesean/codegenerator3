@@ -410,6 +410,7 @@ namespace WEB.Models
                                     s.Add(t + $"                                <div class=\"col-sm-6 col-md-4 col-lg-4 col-xl-3\">");
                                     s.Add(t + $"                                    <div class=\"form-group\">");
                                     s.Add(t + $"                                        <select id=\"{field.Name.ToCamelCase()}\" name=\"{field.Name.ToCamelCase()}\" [(ngModel)]=\"{searchOptions}.{field.Name.ToCamelCase()}\" #{field.Name.ToCamelCase()}=\"ngModel\" class=\"form-select\">");
+                                    s.Add(t + $"                                            <option [ngValue]=\"undefined\" disabled>{field.Label}</option>");
                                     s.Add(t + $"                                            <option *ngFor=\"let {field.Lookup.Name.ToCamelCase()} of {field.Lookup.PluralName.ToCamelCase()}\" [ngValue]=\"{field.Lookup.Name.ToCamelCase()}.value\">{{{{ {field.Lookup.Name.ToCamelCase()}.label }}}}</option>");
                                     s.Add(t + $"                                        </select>");
                                     s.Add(t + $"                                    </div>");
@@ -490,7 +491,7 @@ namespace WEB.Models
 
                     var childEntity = relationship.ChildEntity;
 
-                    if (relationship.UseMultiSelect || hasSearchForm || childEntity.HasASortField)
+                    if (relationship.UseMultiSelect || hasSearchForm || childEntity.HasASortField || relationship.Hierarchy)
                     {
                         s.Add(t + $"                        <div class=\"mb-3\">");
 

@@ -56,7 +56,7 @@ namespace WEB.Models
             }
 
             if (CurrentEntity.EntityType == EntityType.User)
-                filterAlerts += Environment.NewLine + $"                <div class=\"alert alert-info alert-dismissible\" *ngIf=\"role!=undefined\">Filtered by role: {{{{role.label}}}}<button type=\"button\" class=\"btn-close\" data-bs-dismiss=\"alert\" aria-label=\"Close\" (click)=\"searchOptions.roleName=undefined;role=undefined;runSearch();\" *ngIf=\"canRemoveFilters\"></button></div>" + Environment.NewLine;
+                filterAlerts += Environment.NewLine + $"                <div class=\"alert alert-info alert-dismissible\" *ngIf=\"role!=undefined\">Filtered by role: {{{{role.label}}}}<button type=\"button\" class=\"btn-close\" data-bs-dismiss=\"alert\" (click)=\"searchOptions.roleName=undefined;role=undefined;runSearch();\" *ngIf=\"canRemoveFilters\"></button></div>" + Environment.NewLine;
 
             foreach (var field in CurrentEntity.Fields.Where(f => f.SearchType == SearchType.Exact).OrderBy(f => f.FieldOrder))
             {
@@ -97,9 +97,9 @@ namespace WEB.Models
                     if (filterAlerts == string.Empty) filterAlerts = Environment.NewLine;
 
                     if (relationship != null)
-                        filterAlerts += $"                <div class=\"alert alert-info alert-dismissible\" *ngIf=\"{relationship.ParentName.ToCamelCase()}!=undefined\">Filtered by {field.Label.ToLower()}: {{{{{relationship.ParentName.ToCamelCase()}.{relationship.ParentField.Name.ToCamelCase()}}}}}<button type=\"button\" class=\"btn-close\" data-bs-dismiss=\"alert\" aria-label=\"Close\" (click)=\"searchOptions.{field.Name.ToCamelCase()}=undefined;{relationship.ParentName.ToCamelCase()}=undefined;runSearch();\" *ngIf=\"canRemoveFilters\"></button></div>" + Environment.NewLine;
+                        filterAlerts += $"                <div class=\"alert alert-info alert-dismissible\" *ngIf=\"{relationship.ParentName.ToCamelCase()}!=undefined\">Filtered by {field.Label.ToLower()}: {{{{{relationship.ParentName.ToCamelCase()}.{relationship.ParentField.Name.ToCamelCase()}}}}}<button type=\"button\" class=\"btn-close\" data-bs-dismiss=\"alert\" (click)=\"searchOptions.{field.Name.ToCamelCase()}=undefined;{relationship.ParentName.ToCamelCase()}=undefined;runSearch();\" *ngIf=\"canRemoveFilters\"></button></div>" + Environment.NewLine;
                     else if (field.FieldType != FieldType.Bit)
-                        filterAlerts += $"                <div class=\"alert alert-info alert-dismissible\" *ngIf=\"{field.Name.ToCamelCase()}!=undefined\">Filtered by {field.Label.ToLower()}: {{{{{field.Name.ToCamelCase()}.label}}}}<button type=\"button\" class=\"btn-close\" data-bs-dismiss=\"alert\" aria-label=\"Close\" (click)=\"searchOptions.{field.Name.ToCamelCase()}=undefined;{field.Name.ToCamelCase()}=undefined;runSearch();\" *ngIf=\"canRemoveFilters\"></button></div>" + Environment.NewLine;
+                        filterAlerts += $"                <div class=\"alert alert-info alert-dismissible\" *ngIf=\"{field.Name.ToCamelCase()}!=undefined\">Filtered by {field.Label.ToLower()}: {{{{{field.Name.ToCamelCase()}.label}}}}<button type=\"button\" class=\"btn-close\" data-bs-dismiss=\"alert\" (click)=\"searchOptions.{field.Name.ToCamelCase()}=undefined;{field.Name.ToCamelCase()}=undefined;runSearch();\" *ngIf=\"canRemoveFilters\"></button></div>" + Environment.NewLine;
                 }
             }
 
