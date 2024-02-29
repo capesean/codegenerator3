@@ -307,6 +307,23 @@
                         </div>
                     </div>
 
+                    <div class="col-sm-6 col-md-4 col-lg-3">
+                        <div class="form-group" ng-class="{ 'has-error':  mainForm.$submitted && mainForm.displayPipe.$invalid }">
+                            <label for="displayPipe" class="control-label">
+                                Display Pipe:
+                            </label>
+                            <input type="text" id="displayPipe" name="displayPipe" ng-model="vm.field.displayPipe" maxlength="50" class="form-control" />
+                        </div>
+                    </div>
+
+                    <div class="col-sm-6 col-md-4 col-lg-3">
+                        <div class="form-group" ng-class="{ 'has-error':  mainForm.$submitted && mainForm.displayClasses.$invalid }">
+                            <label for="displayClasses" class="control-label">
+                                Display Classes:
+                            </label>
+                            <input type="text" id="displayClasses" name="displayClasses" ng-model="vm.field.displayClasses" maxlength="50" class="form-control" />
+                        </div>
+                    </div>
 
                 </div>
             </div>

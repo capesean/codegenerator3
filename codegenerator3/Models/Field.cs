@@ -87,6 +87,12 @@ namespace WEB.Models
         [MaxLength(50)]
         public string EditPageClasses { get; set; }
 
+        [MaxLength(50)]
+        public string DisplayPipe { get; set; }
+
+        [MaxLength(50)]
+        public string DisplayClasses { get; set; }
+
         public virtual ICollection<RelationshipField> RelationshipFieldsAsChild { get; set; } = new List<RelationshipField>();
 
         public virtual ICollection<RelationshipField> RelationshipFieldsAsParent { get; set; } = new List<RelationshipField>();

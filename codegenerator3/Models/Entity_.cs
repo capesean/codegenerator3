@@ -176,6 +176,7 @@ namespace WEB.Models
             public string Header { get; set; }
             public string Value { get; set; }
             public bool IsOnAnotherEntity { get; set; }
+            public Field Field { get; set; }
         }
 
         internal Relationship GetParentSearchRelationship(Field field)
@@ -214,12 +215,13 @@ namespace WEB.Models
                     {
                         Header = rel.ParentFriendlyName,
                         Value = value,
-                        IsOnAnotherEntity = true
+                        IsOnAnotherEntity = true,
+                        Field = field
                     });
                 }
                 else
                 {
-                    var column = new SearchResultColumn { Header = field.Label, IsOnAnotherEntity = false };
+                    var column = new SearchResultColumn { Header = field.Label, IsOnAnotherEntity = false, Field = field };
                     // these should use local formats?
                     if (field.FieldType == FieldType.Enum)
                         column.Value = $"{{{{ {field.Lookup.PluralName.ToCamelCase()}[{field.Entity.Name.ToCamelCase()}.{ field.Name.ToCamelCase() }].label }}}}";
@@ -232,7 +234,7 @@ namespace WEB.Models
                     else if (field.FieldType == FieldType.DateTime || field.FieldType == FieldType.SmallDateTime)
                         column.Value = $"{{{{ { field.Entity.Name.ToCamelCase()}.{ field.Name.ToCamelCase() } | momentPipe: 'DD MMM YYYY HH:mm' }}}}";
                     else
-                        column.Value = $"{{{{ { field.Entity.Name.ToCamelCase()}.{ field.Name.ToCamelCase() } }}}}";
+                        column.Value = $"{{{{ { field.Entity.Name.ToCamelCase()}.{ field.Name.ToCamelCase() }{(string.IsNullOrWhiteSpace(field.DisplayPipe) ? string.Empty : field.DisplayPipe)} }}}}";
                     result.Add(column);
                 }
             }

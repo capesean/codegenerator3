@@ -719,6 +719,14 @@
     <Compile Include="Migrations\202402291412591_RelationshipDisableDelete.designer.cs">
       <DependentUpon>202402291412591_RelationshipDisableDelete.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202402291503131_displayPipe.cs" />
+    <Compile Include="Migrations\202402291503131_displayPipe.designer.cs">
+      <DependentUpon>202402291503131_displayPipe.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202402291504343_displayClasses.cs" />
+    <Compile Include="Migrations\202402291504343_displayClasses.designer.cs">
+      <DependentUpon>202402291504343_displayClasses.cs</DependentUpon>
+    </Compile>
     <Compile Include="Models\Relationship_.cs" />
     <Compile Include="Startup.cs" />
     <Compile Include="Utilities\ApiException.cs" />
@@ -868,6 +876,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202402291412591_RelationshipDisableDelete.resx">
       <DependentUpon>202402291412591_RelationshipDisableDelete.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202402291503131_displayPipe.resx">
+      <DependentUpon>202402291503131_displayPipe.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202402291504343_displayClasses.resx">
+      <DependentUpon>202402291504343_displayClasses.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

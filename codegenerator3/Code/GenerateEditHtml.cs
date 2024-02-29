@@ -38,7 +38,10 @@ namespace WEB.Models
             #region form fields
             foreach (var field in CurrentEntity.Fields.OrderBy(o => o.FieldOrder))
             {
-                if (field.KeyField && field.CustomType != CustomType.String && !CurrentEntity.HasCompositePrimaryKey) continue;
+                // changed: credit timing (in ixesha) has key: projectid, year, month - last 2 should show
+                //if (field.KeyField && field.CustomType != CustomType.String && !CurrentEntity.HasCompositePrimaryKey) continue;
+                if (field.KeyField && (field.CustomType == CustomType.Guid) && !CurrentEntity.HasCompositePrimaryKey) continue;
+
                 if (field.EditPageType == EditPageType.Exclude) continue;
                 if (field.EditPageType == EditPageType.SortField) continue;
                 if (field.EditPageType == EditPageType.CalculatedField) continue;
@@ -531,7 +534,7 @@ namespace WEB.Models
                     {
                         foreach (var column in childEntity.GetSearchResultsFields(CurrentEntity))
                         {
-                            s.Add(t + $"                                    <th>{column.Header}</th>");
+                            s.Add(t + $"                                    <th{(string.IsNullOrWhiteSpace(column.Field.DisplayClasses) ? "" : $" class=\"{column.Field.DisplayClasses}\"")}>{column.Header}</th>");
                         }
                     }
                     if (!relationship.DisableDelete)
@@ -551,7 +554,7 @@ namespace WEB.Models
                     {
                         foreach (var column in childEntity.GetSearchResultsFields(CurrentEntity))
                         {
-                            s.Add(t + $"                                    <td>{column.Value}</td>");
+                            s.Add(t + $"                                    <td{(string.IsNullOrWhiteSpace(column.Field.DisplayClasses) ? "" : $" class=\"{column.Field.DisplayClasses}\"")}>{column.Value}</td>");
                         }
                     }
                     if (!relationship.DisableDelete)

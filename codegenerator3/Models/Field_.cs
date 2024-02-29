@@ -247,7 +247,7 @@ namespace WEB.Models
                     else if (FieldType == FieldType.Bit)
                         return $"{{{{ { Entity.Name.ToCamelCase()}.{ Name.ToCamelCase() } | booleanPipe }}}}";
                     else
-                        return $"{{{{ { Entity.CamelCaseName}.{ Name.ToCamelCase()} }}}}";
+                        return $"{{{{ { Entity.CamelCaseName}.{ Name.ToCamelCase()}{(string.IsNullOrWhiteSpace(DisplayPipe) ? string.Empty : DisplayPipe)} }}}}";
                 }
             }
         }

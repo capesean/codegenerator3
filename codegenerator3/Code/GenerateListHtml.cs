@@ -164,7 +164,7 @@ namespace WEB.Models
                 }
                 else
                 {
-                    s.Add(t + $"                    <th>{field.Label}</th>");
+                    s.Add(t + $"                    <th{(string.IsNullOrWhiteSpace(field.DisplayClasses) ? "" : $" class=\"{field.DisplayClasses}\"")}>{field.Label}</th>");
                 }
             s.Add(t + $"                </tr>");
             s.Add(t + $"            </thead>");
@@ -172,7 +172,7 @@ namespace WEB.Models
             s.Add(t + $"                <tr *ngFor=\"let {CurrentEntity.CamelCaseName} of {CurrentEntity.PluralName.ToCamelCase()}\" (click)=\"goTo{CurrentEntity.Name}({CurrentEntity.CamelCaseName})\">");
             foreach (var field in CurrentEntity.Fields.Where(f => f.ShowInSearchResults).OrderBy(f => f.FieldOrder))
             {
-                s.Add(t + $"                    <td>{field.ListFieldHtml}</td>");
+                s.Add(t + $"                    <td{(string.IsNullOrWhiteSpace(field.DisplayClasses) ? "" : $" class=\"{field.DisplayClasses}\"")}>{field.ListFieldHtml}</td>");
             }
             s.Add(t + $"                </tr>");
             s.Add(t + $"            </tbody>");
