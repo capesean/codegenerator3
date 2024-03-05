@@ -652,8 +652,11 @@ namespace WEB.Models
                             var joins = CurrentEntity.KeyFields.Select(o => $"o.{relationship.ParentEntity.Name}.{o.Name} == {o.Name.ToCamelCase()}").Aggregate((current, next) => current + " && " + next);
 
                             if (relationship.ChildEntity.Fields.Any(o => o.EditPageType == EditPageType.FileContents))
-                                throw new Exception("to check & implement!");
-                            //s.Add($"            await db.Database.ExecuteSqlRawAsync($\"DELETE FROM {relationship.ChildEntity.PluralName} WHERE {relationship.RelationshipFields.Select(o => o.ChildField.Name + " = '{" + o.ParentField.Name.ToCamelCase() + "}'").Aggregate((current, next) => { return current + " AND " + next; })}\");");
+                            {
+                                // this may not be right?
+                                s.Add($"            await {CurrentEntity.Project.DbContextVariable}.{(relationship.ChildEntity.EntityType == EntityType.User ? "Users" : relationship.ChildEntity.PluralName)}.Where(o => {joins}).ExecuteDeleteAsync();");
+                                //s.Add($"            await db.Database.ExecuteSqlRawAsync($\"DELETE FROM {relationship.ChildEntity.PluralName} WHERE {relationship.RelationshipFields.Select(o => o.ChildField.Name + " = '{" + o.ParentField.Name.ToCamelCase() + "}'").Aggregate((current, next) => { return current + " AND " + next; })}\");");
+                            }
                             else
                                 s.Add($"            await {CurrentEntity.Project.DbContextVariable}.{(relationship.ChildEntity.EntityType == EntityType.User ? "Users" : relationship.ChildEntity.PluralName)}.Where(o => {joins}).ExecuteDeleteAsync();");
                             s.Add($"");

@@ -303,13 +303,11 @@ namespace WEB.Models
 
         private string GetIconLink(Entity entity)
         {
-            if (String.IsNullOrWhiteSpace(entity.IconClass)) return string.Empty;
+            if (string.IsNullOrWhiteSpace(entity.IconClass)) return string.Empty;
 
-            string html = $@"<span class=""input-group-prepend"" *ngIf=""!multiple && !!{entity.Name.ToCamelCase()}"">
-        <a routerLink=""{GetHierarchyString(entity)}"" class=""btn btn-secondary"" [ngClass]=""{{ 'disabled': disabled }}"">
-            <i class=""fas {entity.IconClass}""></i>
-        </a>
-    </span>
+            string html = $@"<a routerLink=""{GetHierarchyString(entity)}"" class=""btn btn-secondary"" *ngIf=""!multiple && !!{entity.Name.ToCamelCase()}"" [ngClass]=""{{ 'disabled': disabled }}"">
+        <i class=""fas {entity.IconClass}""></i>
+    </a>
     ";
             return html;
         }
