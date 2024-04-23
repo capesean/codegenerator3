@@ -444,20 +444,22 @@ namespace WEB.Models
         {
             get
             {
-                // checks for composite primary key, i.e. a key made up of foreign keys to other entities,
-                // like a fact key being the combination of the munic, year, & indicator entities.
-                var returnVal = true;
+                return KeyFields.Count > 1;
 
-                if (KeyFields.Count <= 1) return false;
+                //// checks for composite primary key, i.e. a key made up of foreign keys to other entities,
+                //// like a fact key being the combination of the munic, year, & indicator entities.
+                //var returnVal = true;
 
-                foreach (var field in KeyFields)
-                {
-                    if (!RelationshipsAsChild.Any(r => r.RelationshipFields.Any(f => f.ChildFieldId == field.FieldId)))
-                        returnVal = false;
-                }
+                //if (KeyFields.Count <= 1) return false;
+
+                //foreach (var field in KeyFields)
+                //{
+                //    if (!RelationshipsAsChild.Any(r => r.RelationshipFields.Any(f => f.ChildFieldId == field.FieldId)))
+                //        returnVal = false;
+                //}
 
 
-                return returnVal;
+                //return returnVal;
             }
         }
 

@@ -159,7 +159,8 @@ namespace WEB.Models
                 s.Add(tabs + $"                        canActivateChild: [AccessGuard],");
                 s.Add(tabs + $"                        data: {{");
                 if (!string.IsNullOrWhiteSpace(menu))
-                    s.Add($"                            menu: '{menu}',");
+                    s.Add(tabs + $"                            menu: '{menu}',");
+                s.Add(tabs + $"                            submenu: '{(string.IsNullOrWhiteSpace(entity.Submenu) ? entity.PluralName.ToCamelCase() : entity.Submenu)}',");
                 s.Add(tabs + $"                            breadcrumb: 'Add {entity.FriendlyName}'");
                 s.Add(tabs + $"                        }}" + (childRelationships.Any() ? "," : ""));
                 if (childRelationships.Any())

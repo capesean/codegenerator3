@@ -45,6 +45,9 @@ namespace WEB.Models
         [MaxLength(50)]
         public string Menu { get; set; }
 
+        [MaxLength(50)]
+        public string Submenu { get; set; }
+
         [MaxLength(100)]
         public string PreventModelDeployment { get; set; }
 

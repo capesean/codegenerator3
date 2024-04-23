@@ -41,6 +41,8 @@ namespace WEB.Models
                 // changed: credit timing (in ixesha) has key: projectid, year, month - last 2 should show
                 //if (field.KeyField && field.CustomType != CustomType.String && !CurrentEntity.HasCompositePrimaryKey) continue;
                 if (field.KeyField && (field.CustomType == CustomType.Guid) && !CurrentEntity.HasCompositePrimaryKey) continue;
+                // identity fields
+                if (field.KeyField && (field.CustomType == CustomType.Number) && !CurrentEntity.HasCompositePrimaryKey) continue;
 
                 if (field.EditPageType == EditPageType.Exclude) continue;
                 if (field.EditPageType == EditPageType.SortField) continue;

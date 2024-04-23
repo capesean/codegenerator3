@@ -45,6 +45,7 @@ namespace WEB.Models
                 s.Add($"        data: {{");
                 if (!string.IsNullOrWhiteSpace(entity.Menu))
                     s.Add($"            menu: '{entity.Menu}',");
+                s.Add($"            submenu: '{(string.IsNullOrWhiteSpace(entity.Submenu) ? entity.PluralName.ToCamelCase() : entity.Submenu)}',");
                 s.Add($"            breadcrumb: '{entity.PluralFriendlyName}'");
                 s.Add($"        }}" + (editOnRoot ? "," : ""));
                 if (editOnRoot && entity.EntityType != EntityType.Settings)
@@ -57,6 +58,7 @@ namespace WEB.Models
                     s.Add($"                canActivateChild: [AccessGuard],");
                     s.Add($"                data: {{");
                     s.Add($"                    menu: '{entity.Menu}',");
+                    s.Add($"                    submenu: '{(string.IsNullOrWhiteSpace(entity.Submenu) ? entity.PluralName.ToCamelCase() : entity.Submenu)}',");
                     s.Add($"                    breadcrumb: 'Add {entity.FriendlyName}'");
                     s.Add($"                }}" + (childRelationships.Any() ? "," : ""));
                     WriteChildRoutes(childRelationships, s, 0, entity.Menu);

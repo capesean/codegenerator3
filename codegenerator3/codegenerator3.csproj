@@ -727,6 +727,10 @@
     <Compile Include="Migrations\202402291504343_displayClasses.designer.cs">
       <DependentUpon>202402291504343_displayClasses.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202404231351379_Submenu.cs" />
+    <Compile Include="Migrations\202404231351379_Submenu.designer.cs">
+      <DependentUpon>202404231351379_Submenu.cs</DependentUpon>
+    </Compile>
     <Compile Include="Models\Relationship_.cs" />
     <Compile Include="Startup.cs" />
     <Compile Include="Utilities\ApiException.cs" />
@@ -882,6 +886,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202402291504343_displayClasses.resx">
       <DependentUpon>202402291504343_displayClasses.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202404231351379_Submenu.resx">
+      <DependentUpon>202404231351379_Submenu.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

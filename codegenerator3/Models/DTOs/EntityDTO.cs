@@ -42,6 +42,9 @@ namespace WEB.Models
         [MaxLength(50)]
         public string Menu { get; set; }
 
+        [MaxLength(50)]
+        public string Submenu { get; set; }
+
         [MaxLength(100)]
         public string PreventModelDeployment { get; set; }
 
@@ -144,6 +147,7 @@ namespace WEB.Models
             entityDTO.PartialControllerClass = entity.PartialControllerClass;
             entityDTO.Breadcrumb = entity.Breadcrumb;
             entityDTO.Menu = entity.Menu;
+            entityDTO.Submenu = entity.Submenu;
             entityDTO.PreventModelDeployment = entity.PreventModelDeployment;
             entityDTO.PreventDTODeployment = entity.PreventDTODeployment;
             entityDTO.PreventDbContextDeployment = entity.PreventDbContextDeployment;
@@ -188,6 +192,7 @@ namespace WEB.Models
             entity.PartialControllerClass = entityDTO.PartialControllerClass;
             entity.Breadcrumb = entityDTO.Breadcrumb;
             entity.Menu = entityDTO.Menu;
+            entity.Submenu = entityDTO.Submenu;
             entity.PreventModelDeployment = entityDTO.PreventModelDeployment;
             entity.PreventDTODeployment = entityDTO.PreventDTODeployment;
             entity.PreventDbContextDeployment = entityDTO.PreventDbContextDeployment;

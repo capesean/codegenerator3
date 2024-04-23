@@ -270,18 +270,20 @@ namespace WEB.Models
                 }
                 if (CurrentEntity.HasCompositePrimaryKey)
                 {
-                    // composite keys don't use the insert method, they use the update for both inserts & updates
                     s.Add($"            var {CurrentEntity.CamelCaseName} = await {CurrentEntity.Project.DbContextVariable}.{CurrentEntity.PluralName}");
                     if (CurrentEntity.HasUserFilterField)
                         s.Add($"                .Where(o => o.{CurrentEntity.UserFilterFieldPath} == CurrentUser.{CurrentEntity.Project.UserFilterFieldName})");
                     s.Add($"                .FirstOrDefaultAsync(o => {GetKeyFieldLinq("o", CurrentEntity.DTOName.ToCamelCase())});");
+                    s.Add($"");
                     s.Add($"            var isNew = {CurrentEntity.CamelCaseName} == null;");
                     s.Add($"");
                     s.Add($"            if (isNew)");
                     s.Add($"            {{");
                     s.Add($"                {CurrentEntity.CamelCaseName} = new {CurrentEntity.Name}();");
                     s.Add($"");
-                    foreach (var field in CurrentEntity.Fields.Where(f => f.KeyField && f.Entity.RelationshipsAsChild.Any(r => r.RelationshipFields.Any(rf => rf.ChildFieldId == f.FieldId))).OrderBy(f => f.FieldOrder))
+                    //foreach (var field in CurrentEntity.Fields.Where(f => f.KeyField && f.Entity.RelationshipsAsChild.Any(r => r.RelationshipFields.Any(rf => rf.ChildFieldId == f.FieldId))).OrderBy(f => f.FieldOrder))
+                    // on insert, all primary key fields (in composite keyed entities) come from the dto
+                    foreach (var field in CurrentEntity.Fields.Where(f => f.KeyField).OrderBy(f => f.FieldOrder))
                     {
                         s.Add($"                {CurrentEntity.CamelCaseName}.{field.Name} = {CurrentEntity.DTOName.ToCamelCase() + "." + field.Name};");
                     }
@@ -289,7 +291,7 @@ namespace WEB.Models
                     {
                         s.Add($"                {CurrentEntity.CamelCaseName}.{field.Name} = {field.ControllerInsertOverride};");
                     }
-                    if (CurrentEntity.Fields.Any(f => !string.IsNullOrWhiteSpace(f.ControllerInsertOverride)) || CurrentEntity.Fields.Any(f => f.KeyField && f.Entity.RelationshipsAsChild.Any(r => r.RelationshipFields.Any(rf => rf.ChildFieldId == f.FieldId))))
+                    if (CurrentEntity.Fields.Any(f => !string.IsNullOrWhiteSpace(f.ControllerInsertOverride)) || CurrentEntity.Fields.Any(f => f.KeyField))
                         s.Add($"");
                     if (CurrentEntity.HasASortField)
                     {
