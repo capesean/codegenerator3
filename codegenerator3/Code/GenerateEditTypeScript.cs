@@ -50,7 +50,7 @@ namespace WEB.Models
                 s.Add($"import {{ NgbModal }} from '@ng-bootstrap/ng-bootstrap';");
 
             if (CurrentEntity.EntityType != EntityType.Settings)
-                s.Add($"import {{ ConfirmModalComponent, ModalOptions }} from '{folders}../common/components/confirm.component';");
+                s.Add($"import {{ ConfirmModalComponent, ConfirmModalOptions }} from '{folders}../common/components/confirm.component';");
 
             if (relationshipsAsParent.Any())
                 s.Add($"import {{ PagingHeaders }} from '{folders}../common/models/http.model';");
@@ -340,7 +340,7 @@ namespace WEB.Models
                 s.Add($"    delete(): void {{");
                 s.Add($"");
                 s.Add($"        let modalRef = this.modalService.open(ConfirmModalComponent, {{ centered: true }});");
-                s.Add($"        (modalRef.componentInstance as ConfirmModalComponent).options = {{ title: \"Delete {CurrentEntity.FriendlyName}\", text: \"Are you sure you want to delete this {CurrentEntity.FriendlyName.ToLower()}?\", deleteStyle: true, ok: \"Delete\" }} as ModalOptions;");
+                s.Add($"        (modalRef.componentInstance as ConfirmModalComponent).options = {{ title: \"Delete {CurrentEntity.FriendlyName}\", text: \"Are you sure you want to delete this {CurrentEntity.FriendlyName.ToLower()}?\", deleteStyle: true, ok: \"Delete\" }} as ConfirmModalOptions;");
                 s.Add($"        modalRef.result.then(");
                 s.Add($"            () => {{");
                 s.Add($"");
@@ -468,7 +468,7 @@ namespace WEB.Models
                     s.Add($"        event.stopPropagation();");
                     s.Add($"");
                     s.Add($"        let modalRef = this.modalService.open(ConfirmModalComponent, {{ centered: true }});");
-                    s.Add($"        (modalRef.componentInstance as ConfirmModalComponent).options = {{ title: \"Delete {rel.ChildEntity.FriendlyName}\", text: \"Are you sure you want to delete this {rel.ChildEntity.FriendlyName.ToLower()}?\", deleteStyle: true, ok: \"Delete\" }} as ModalOptions;");
+                    s.Add($"        (modalRef.componentInstance as ConfirmModalComponent).options = {{ title: \"Delete {rel.ChildEntity.FriendlyName}\", text: \"Are you sure you want to delete this {rel.ChildEntity.FriendlyName.ToLower()}?\", deleteStyle: true, ok: \"Delete\" }} as ConfirmModalOptions;");
                     s.Add($"        modalRef.result.then(");
                     s.Add($"            () => {{");
                     s.Add($"");
@@ -488,7 +488,7 @@ namespace WEB.Models
                     s.Add($"");
                     s.Add($"    delete{rel.CollectionName}(): void {{");
                     s.Add($"        let modalRef = this.modalService.open(ConfirmModalComponent, {{ centered: true }});");
-                    s.Add($"        (modalRef.componentInstance as ConfirmModalComponent).options = {{ title: \"Delete {rel.ChildEntity.PluralFriendlyName}\", text: \"Are you sure you want to delete all the {rel.CollectionFriendlyName.ToLower()}?\", deleteStyle: true, ok: \"Delete\" }} as ModalOptions;");
+                    s.Add($"        (modalRef.componentInstance as ConfirmModalComponent).options = {{ title: \"Delete {rel.ChildEntity.PluralFriendlyName}\", text: \"Are you sure you want to delete all the {rel.CollectionFriendlyName.ToLower()}?\", deleteStyle: true, ok: \"Delete\" }} as ConfirmModalOptions;");
                     s.Add($"        modalRef.result.then(");
                     s.Add($"            () => {{");
                     s.Add($"");
