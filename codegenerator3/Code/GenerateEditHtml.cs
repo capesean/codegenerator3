@@ -504,7 +504,7 @@ namespace WEB.Models
                             if (relationship.UseMultiSelect)
                                 s.Add(t + $"                            <button class=\"btn btn-outline-primary me-2 mb-1\" (click)=\"add{relationship.CollectionName}()\">Add {relationship.CollectionFriendlyName}<i class=\"fas fa-plus ms-2\"></i></button>");
                             else
-                                s.Add(t + $"                            <a [routerLink]=\"['./{childEntity.PluralName.ToLower()}', 'add']\" class=\"btn btn-outline-primary me-2 mb-1\">Add<i class=\"fas fa-plus ms-2\"></i></a>");
+                                s.Add(t + $"                            <a [routerLink]=\"['./{childEntity.PluralName.ToLower()}'{string.Concat(Enumerable.Repeat(", 'add'", childEntity.KeyFields.Where(o => !relationship.RelationshipFields.Select(rf => rf.ChildFieldId).Contains(o.FieldId)).Count()))}]\" class=\"btn btn-outline-primary me-2 mb-1\">Add<i class=\"fas fa-plus ms-2\"></i></a>");
 
                         if (hasSearchForm)
                         {

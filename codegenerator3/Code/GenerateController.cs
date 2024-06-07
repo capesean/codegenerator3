@@ -651,7 +651,7 @@ namespace WEB.Models
                         s.Add($"");
                         foreach (var relationship in cascadeOnParentDeleteRelationships)
                         {
-                            var joins = CurrentEntity.KeyFields.Select(o => $"o.{relationship.ParentEntity.Name}.{o.Name} == {o.Name.ToCamelCase()}").Aggregate((current, next) => current + " && " + next);
+                            var joins = CurrentEntity.KeyFields.Select(o => $"o.{relationship.ParentName}.{o.Name} == {o.Name.ToCamelCase()}").Aggregate((current, next) => current + " && " + next);
 
                             if (relationship.ChildEntity.Fields.Any(o => o.EditPageType == EditPageType.FileContents))
                             {
