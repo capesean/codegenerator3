@@ -21,7 +21,7 @@ namespace WEB.Models
             foreach (var field in CurrentEntity.Fields.Where(f => f.SearchType == SearchType.Exact).OrderBy(f => f.FieldOrder))
             {
                 Relationship relationship = null;
-                if (CurrentEntity.RelationshipsAsChild.Any(r => r.RelationshipFields.Any(rf => rf.ChildFieldId == field.FieldId) && r.UseSelectorDirective))
+                if (CurrentEntity.RelationshipsAsChild.Any(r => r.RelationshipFields.Any(rf => rf.ChildFieldId == field.FieldId)))
                     relationship = CurrentEntity.GetParentSearchRelationship(field);
 
                 if (field.FieldType == FieldType.Enum || relationship != null)

@@ -59,9 +59,6 @@ namespace WEB.Models
         public bool CascadeDelete { get; set; }
 
         [Required]
-        public bool UseSelectorDirective { get; set; }
-
-        [Required]
         public bool UseMultiSelect { get; set; }
 
         [Required]

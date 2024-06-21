@@ -49,7 +49,7 @@ namespace WEB.Models
                 if (field.EditPageType == EditPageType.CalculatedField) continue;
                 if (field.EditPageType == EditPageType.FileContents) continue;
 
-                var isAppSelect = CurrentEntity.RelationshipsAsChild.Any(r => r.RelationshipFields.Any(f => f.ChildFieldId == field.FieldId)) && CurrentEntity.GetParentSearchRelationship(field).UseSelectorDirective;
+                var isAppSelect = CurrentEntity.RelationshipsAsChild.Any(r => r.RelationshipFields.Any(f => f.ChildFieldId == field.FieldId));
 
                 if (CurrentEntity.RelationshipsAsChild.Any(r => r.RelationshipFields.Any(f => f.ChildFieldId == field.FieldId)))
                 {
@@ -121,7 +121,7 @@ namespace WEB.Models
                     }
                     else
                     {
-                        if (!CurrentEntity.RelationshipsAsChild.Any(r => r.RelationshipFields.Any(f => f.ChildFieldId == field.FieldId) && r.UseSelectorDirective))
+                        if (!CurrentEntity.RelationshipsAsChild.Any(r => r.RelationshipFields.Any(f => f.ChildFieldId == field.FieldId)))
                         {
                             if (field.Length > 0 && field.EditPageType != EditPageType.FileName) attributes.Add("maxlength", field.Length.ToString());
                             if (field.MinLength > 0) attributes.Add("minlength", field.MinLength.ToString());
@@ -197,22 +197,10 @@ namespace WEB.Models
                 {
                     var relationship = CurrentEntity.GetParentSearchRelationship(field);
                     var relationshipField = relationship.RelationshipFields.Single(f => f.ChildFieldId == field.FieldId);
-                    if (!relationship.UseSelectorDirective)
-                    {
-                        // this was only for Read only's - needs to go above
-                        //if (field.EditPageType == EditPageType.ReadOnly)
-                        //{
-                        //    attributes.Remove("[(ngModel)]");
-                        //    attributes.Add("value", "{{" + CurrentEntity.Name.ToCamelCase() + "." + relationship.ParentName.ToCamelCase() + "?." + relationship.ParentEntity.PrimaryField.Name.ToCamelCase() + "}}");
-                        //}
-                    }
-                    else if (!relationship.Hierarchy)
-                    {
-                        tagType = relationship.ParentEntity.Name.Hyphenated() + "-select";
-                        if (attributes.ContainsKey("type")) attributes.Remove("type");
-                        if (attributes.ContainsKey("class")) attributes.Remove("class");
-                        attributes.Add($"[({relationship.ParentEntity.Name.ToCamelCase()})]", $"{relationship.ChildEntity.Name.ToCamelCase()}.{relationship.ParentName.ToCamelCase()}");
-                    }
+                    tagType = relationship.ParentEntity.Name.Hyphenated() + "-select";
+                    if (attributes.ContainsKey("type")) attributes.Remove("type");
+                    if (attributes.ContainsKey("class")) attributes.Remove("class");
+                    attributes.Add($"[({relationship.ParentEntity.Name.ToCamelCase()})]", $"{relationship.ChildEntity.Name.ToCamelCase()}.{relationship.ParentName.ToCamelCase()}");
                 }
 
                 s.Add(t + $"                    <div class=\"{controlSize}\"{ngIf}>");
@@ -286,7 +274,7 @@ namespace WEB.Models
                         if (field.EditPageType == EditPageType.FileName) validationErrors.Add("required", $"A file is required");
                         else validationErrors.Add("required", $"{field.Label} is required");
                     }
-                    if (!CurrentEntity.RelationshipsAsChild.Any(r => r.RelationshipFields.Any(f => f.ChildFieldId == field.FieldId) && r.UseSelectorDirective))
+                    if (!CurrentEntity.RelationshipsAsChild.Any(r => r.RelationshipFields.Any(f => f.ChildFieldId == field.FieldId)))
                     {
                         if (field.MinLength > 0) validationErrors.Add("minlength", $"{field.Label} must be at least {field.MinLength} characters long");
                         if (field.Length > 0 && field.EditPageType != EditPageType.FileName) validationErrors.Add("maxlength", $"{field.Label} must be at most {field.Length} characters long");

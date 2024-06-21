@@ -133,7 +133,7 @@ namespace WEB.Models
             {
                 // exclude UseSelectorDirectives to remove them from the edit typescript controller defn
                 // 20180417: if hierarchy, include relationship, so breadcrumb can be set for isnew
-                var entities = RelationshipsAsChild.Where(r => !r.ParentEntity.Exclude && r.ParentEntityId != EntityId && (r.Hierarchy || !r.UseSelectorDirective)).OrderBy(o => o.SortOrderOnChild).Select(r => r.ParentEntity).ToList();
+                var entities = RelationshipsAsChild.Where(r => !r.ParentEntity.Exclude && r.ParentEntityId != EntityId && r.Hierarchy).OrderBy(o => o.SortOrderOnChild).Select(r => r.ParentEntity).ToList();
                 entities.AddRange(RelationshipsAsParent.Where(r => !r.ChildEntity.Exclude && r.DisplayListOnParent).OrderBy(o => o.SortOrder).Select(r => r.ChildEntity).ToList());
                 return entities.Distinct().ToList();
             }
@@ -465,7 +465,7 @@ namespace WEB.Models
 
         internal bool HasAppSelects(ApplicationDbContext dbContext)
         {
-            return dbContext.Relationships.Any(o => o.ParentEntityId == EntityId && o.UseSelectorDirective);
+            return dbContext.Relationships.Any(o => o.ParentEntityId == EntityId);
         }
 
         internal Field SortField

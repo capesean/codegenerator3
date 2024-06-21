@@ -56,9 +56,6 @@ namespace WEB.Models
         public bool CascadeDelete { get; set; }
 
         [Required]
-        public bool UseSelectorDirective { get; set; }
-
-        [Required]
         public bool UseMultiSelect { get; set; }
 
         [Required]
@@ -98,7 +95,6 @@ namespace WEB.Models
             relationshipDTO.RelationshipAncestorLimit = relationship.RelationshipAncestorLimit;
             relationshipDTO.DisableDelete = relationship.DisableDelete;
             relationshipDTO.CascadeDelete = relationship.CascadeDelete;
-            relationshipDTO.UseSelectorDirective = relationship.UseSelectorDirective;
             relationshipDTO.UseMultiSelect = relationship.UseMultiSelect;
             relationshipDTO.IsOneToOne = relationship.IsOneToOne;
             relationshipDTO.SortOrderOnChild = relationship.SortOrderOnChild;
@@ -125,7 +121,6 @@ namespace WEB.Models
             relationship.RelationshipAncestorLimit = relationshipDTO.RelationshipAncestorLimit;
             relationship.CascadeDelete = relationshipDTO.CascadeDelete;
             relationship.DisableDelete = relationshipDTO.DisableDelete;
-            relationship.UseSelectorDirective = relationshipDTO.UseSelectorDirective;
             relationship.UseMultiSelect = relationshipDTO.UseMultiSelect;
             relationship.IsOneToOne = relationshipDTO.IsOneToOne;
             relationship.SortOrderOnChild = relationshipDTO.SortOrderOnChild;
