@@ -106,7 +106,7 @@
 
                         vm.codeReplacement = data;
                         notifications.success("The code replacement has been saved.", "Saved");
-                        //$state.go("app.entity", { projectId: $stateParams.projectId, entityId: $stateParams.entityId });
+                        $state.go("app.entity", { projectId: $stateParams.projectId, entityId: $stateParams.entityId });
 
                     },
                     err=> {

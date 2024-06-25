@@ -27,6 +27,7 @@
             var x = $.grep(appSettings.fieldType, function (type) { return type.id === vm.field.fieldType; })[0];
             return x.name.toLowerCase() === "decimal" || x.name.toLowerCase() === "money";
         };
+        vm.blurName = blurName;
         initPage();
         function initPage() {
             var promises = [];
@@ -98,6 +99,10 @@
                 errorService.handleApiError(err, "field", "delete");
             })
                 .$promise.finally(function () { return vm.loading = false; });
+        }
+        function blurName() {
+            if (vm.field.name && !vm.field.label)
+                vm.field.label = vm.field.name.split(/(?=[A-Z])/).join(' ');
         }
     }
     ;

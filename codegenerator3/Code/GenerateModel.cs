@@ -204,6 +204,7 @@ namespace WEB.Models
 
                     attributes.Add("Key");
                     attributes.Add("Required");
+                    attributes.Add($"ForeignKey(\"{CurrentEntity.Name}\")");
                     if (CurrentEntity.KeyFields.Count > 1)
                         attributes.Add($"Column(Order = {keyCounter})");
 

@@ -488,7 +488,7 @@ namespace WEB.Models
                     s.Add($"");
                     s.Add($"    delete{rel.CollectionName}(): void {{");
                     s.Add($"        let modalRef = this.modalService.open(ConfirmModalComponent, {{ centered: true }});");
-                    s.Add($"        (modalRef.componentInstance as ConfirmModalComponent).options = {{ title: \"Delete {rel.ChildEntity.PluralFriendlyName}\", text: \"Are you sure you want to delete all the {rel.CollectionFriendlyName.ToLower()}?\", deleteStyle: true, ok: \"Delete\" }} as ConfirmModalOptions;");
+                    s.Add($"        (modalRef.componentInstance as ConfirmModalComponent).options = {{ title: \"Delete {rel.CollectionFriendlyName}\", text: \"Are you sure you want to delete all the {rel.CollectionFriendlyName.ToLower()}?\", deleteStyle: true, ok: \"Delete\" }} as ConfirmModalOptions;");
                     s.Add($"        modalRef.result.then(");
                     s.Add($"            () => {{");
                     s.Add($"");

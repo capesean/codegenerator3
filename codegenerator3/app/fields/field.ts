@@ -29,6 +29,7 @@
             var x = $.grep(appSettings.fieldType, (type: any) => { return type.id === vm.field.fieldType; })[0];
             return x.name.toLowerCase() === "decimal" || x.name.toLowerCase() === "money";
         };
+        vm.blurName = blurName;
 
         initPage();
 
@@ -153,6 +154,11 @@
                 })
                 .$promise.finally(() => vm.loading = false);
 
+        }
+
+        function blurName() {
+            if (vm.field.name && !vm.field.label)
+                vm.field.label = vm.field.name.split(/(?=[A-Z])/).join(' ');
         }
     };
 

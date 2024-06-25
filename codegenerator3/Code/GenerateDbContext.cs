@@ -32,9 +32,9 @@ namespace WEB.Models
             {
                 s.Add($"        public DbSet<{e.Name}> {e.PluralName} {{ get; set; }}");
 
-                var fileContentsField = e.Fields.FirstOrDefault(o => o.EditPageType == EditPageType.FileContents);
-                if (fileContentsField != null)
-                    s.Add($"        public DbSet<{e.Name}Content> {e.Name}Contents {{ get; set; }}");
+                //var fileContentsField = e.Fields.FirstOrDefault(o => o.EditPageType == EditPageType.FileContents);
+                //if (fileContentsField != null)
+                //    s.Add($"        public DbSet<{e.Name}Content> {e.Name}Contents {{ get; set; }}");
 
             }
             s.Add($"");
@@ -99,13 +99,14 @@ namespace WEB.Models
                 if (fileContentsField != null)
                 {
                     s.Add($"");
-                    s.Add($"            modelBuilder.Entity<{entity.Name}Content>(o => o.ToTable(\"{entity.PluralName}\"));");
+                    s.Add($"            modelBuilder.Entity<{entity.Name}>()");
+                    s.Add($"                .HasOne(o => o.{entity.Name}Content)");
+                    s.Add($"                .WithOne(o => o.{entity.Name})");
+                    s.Add($"                .HasForeignKey<{entity.Name}Content>(o => o.{entity.KeyFields.Single().Name});");
+                    //if (!fileContentsField.IsNullable) s.Add($"                {entity.Name.ToCamelCase()}.Navigation(o => o.{entity.Name}Content).IsRequired();");
                     s.Add($"");
-                    s.Add($"            modelBuilder.Entity<{entity.Name}>({entity.Name.ToCamelCase()} =>");
-                    s.Add($"            {{");
-                    s.Add($"                {entity.Name.ToCamelCase()}.HasOne(o => o.{entity.Name}Content).WithOne(o => o.{entity.Name}).HasForeignKey<{entity.Name}>(o => o.{entity.KeyFields.Single().Name});");
-                    s.Add($"                {entity.Name.ToCamelCase()}.Navigation(o => o.{entity.Name}Content).IsRequired();");
-                    s.Add($"            }});");
+                    s.Add($"            modelBuilder.Entity<{entity.Name}Content>()");
+                    s.Add($"                .ToTable(\"{entity.Name}Contents\");");
                     s.Add($"");
                 }
             }
