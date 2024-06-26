@@ -432,6 +432,15 @@ namespace WEB.Models
         }
 
         [NotMapped]
+        internal bool HasAFileContentsField
+        {
+            get
+            {
+                return Fields.Any(o => o.EditPageType == EditPageType.FileContents);
+            }
+        }
+
+        [NotMapped]
         internal bool HasSortableFields
         {
             get

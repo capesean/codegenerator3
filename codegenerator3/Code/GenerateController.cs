@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Ajax.Utilities;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -361,36 +362,17 @@ namespace WEB.Models
                     s.Add($"            {{");
                     if (CurrentEntity.EntityType == EntityType.User)
                     {
-                        s.Add($"                user = await userManager.Users");
+                        s.Add($"                user = await userManager.FindByIdAsync(userDTO.Id.ToString());");
                         if (CurrentEntity.HasUserFilterField)
-                            s.Add($"                    .Where(o => o.{CurrentEntity.UserFilterFieldPath} == CurrentUser.{CurrentEntity.Project.UserFilterFieldName})");
-                        s.Add($"                    .Include(o => o.Roles)");
-                        s.Add($"                    .FirstOrDefaultAsync(o => o.Id == userDTO.Id);");
+                            throw new Exception("TO FIX");
+                        //s.Add($"                    .Where(o => o.{CurrentEntity.UserFilterFieldPath} == CurrentUser.{CurrentEntity.Project.UserFilterFieldName})");
                     }
                     else
                     {
-                        if (fileContentsFields.Any())
-                        {
-                            s.Add($"                if ({CurrentEntity.DTOName.ToCamelCase()}.{fileContentsField.Name} != null)");
-                            s.Add($"                    {CurrentEntity.CamelCaseName} = await {CurrentEntity.Project.DbContextVariable}.{CurrentEntity.PluralName}");
-                            if (CurrentEntity.HasUserFilterField)
-                                s.Add($"                        .Where(o => o.{CurrentEntity.UserFilterFieldPath} == CurrentUser.{CurrentEntity.Project.UserFilterFieldName})");
-                            s.Add($"                        .Include(o => o.{CurrentEntity.Name}Content)");
-                            s.Add($"                        .FirstOrDefaultAsync(o => {GetKeyFieldLinq("o", CurrentEntity.DTOName.ToCamelCase())});");
-                            s.Add($"                else");
-                            s.Add($"                    {CurrentEntity.CamelCaseName} = await {CurrentEntity.Project.DbContextVariable}.{CurrentEntity.PluralName}");
-                            if (CurrentEntity.HasUserFilterField)
-                                s.Add($"                        .Where(o => o.{CurrentEntity.UserFilterFieldPath} == CurrentUser.{CurrentEntity.Project.UserFilterFieldName})");
-                            s.Add($"                        .FirstOrDefaultAsync(o => {GetKeyFieldLinq("o", CurrentEntity.DTOName.ToCamelCase())});");
-
-                        }
-                        else
-                        {
-                            s.Add($"                {CurrentEntity.CamelCaseName} = await {CurrentEntity.Project.DbContextVariable}.{CurrentEntity.PluralName}");
-                            if (CurrentEntity.HasUserFilterField)
-                                s.Add($"                    .Where(o => o.{CurrentEntity.UserFilterFieldPath} == CurrentUser.{CurrentEntity.Project.UserFilterFieldName})");
-                            s.Add($"                    .FirstOrDefaultAsync(o => {GetKeyFieldLinq("o", CurrentEntity.DTOName.ToCamelCase())});");
-                        }
+                        s.Add($"                {CurrentEntity.CamelCaseName} = await {CurrentEntity.Project.DbContextVariable}.{CurrentEntity.PluralName}");
+                        if (CurrentEntity.HasUserFilterField)
+                            s.Add($"                    .Where(o => o.{CurrentEntity.UserFilterFieldPath} == CurrentUser.{CurrentEntity.Project.UserFilterFieldName})");
+                        s.Add($"                    .FirstOrDefaultAsync(o => {GetKeyFieldLinq("o", CurrentEntity.DTOName.ToCamelCase())});");
                     }
                     s.Add($"");
                     s.Add($"                if ({CurrentEntity.CamelCaseName} == null)");
@@ -420,14 +402,19 @@ namespace WEB.Models
             s.Add($"            ModelFactory.Hydrate({CurrentEntity.CamelCaseName}, {CurrentEntity.DTOName.ToCamelCase()});");
             s.Add($"");
 
-            if (fileContentsFields.Any())
+            if (CurrentEntity.HasAFileContentsField)
             {
                 s.Add($"            if ({CurrentEntity.DTOName.ToCamelCase()}.{fileContentsField.Name} != null)");
                 s.Add($"            {{");
                 s.Add($"                if (isNew)");
                 s.Add($"                    db.Entry({CurrentEntity.Name.ToCamelCase()}.{CurrentEntity.Name}Content).State = EntityState.Added;");
                 s.Add($"                else");
-                s.Add($"                    db.Entry({CurrentEntity.Name.ToCamelCase()}.{CurrentEntity.Name}Content).State = EntityState.Modified;");
+                s.Add($"                {{");
+                s.Add($"                    if (await {CurrentEntity.Project.DbContextVariable}.{CurrentEntity.PluralName}.AnyAsync(o => {GetKeyFieldLinq("o", CurrentEntity.DTOName.ToCamelCase())} && o.{CurrentEntity.Name}Content != null))");
+                s.Add($"                        db.Entry({CurrentEntity.Name.ToCamelCase()}.{CurrentEntity.Name}Content).State = EntityState.Modified;");
+                s.Add($"                    else");
+                s.Add($"                        db.Entry({CurrentEntity.Name.ToCamelCase()}.{CurrentEntity.Name}Content).State = EntityState.Added;");
+                s.Add($"                }}");
                 s.Add($"            }}");
                 s.Add($"");
             }
@@ -476,8 +463,6 @@ namespace WEB.Models
                 s.Add($"        public async Task<IActionResult> Delete({CurrentEntity.ControllerParameters})");
                 s.Add($"        {{");
                 s.Add($"            var {CurrentEntity.CamelCaseName} = await {(CurrentEntity.EntityType == EntityType.User ? "userManager" : CurrentEntity.Project.DbContextVariable)}.{CurrentEntity.PluralName}");
-                foreach (var field in CurrentEntity.Fields.Where(o => o.EditPageType == EditPageType.FileContents))
-                    s.Add($"                .Include(o => o.{CurrentEntity.Name}Content)");
                 if (CurrentEntity.HasUserFilterField)
                     s.Add($"                .Where(o => o.{CurrentEntity.UserFilterFieldPath} == CurrentUser.{CurrentEntity.Project.UserFilterFieldName})");
                 s.Add($"                .FirstOrDefaultAsync(o => {GetKeyFieldLinq("o")});");
@@ -496,10 +481,15 @@ namespace WEB.Models
                 }
 
                 var cascadeDeleteRelationships = CurrentEntity.RelationshipsAsParent.Where(rel => !rel.ChildEntity.Exclude && rel.CascadeDelete).OrderBy(o => o.SortOrder);
-                if (cascadeDeleteRelationships.Any())
+
+                if (cascadeDeleteRelationships.Any() || CurrentEntity.HasAFileContentsField)
                 {
                     s.Add($"            using var transactionScope = Utilities.General.CreateTransactionScope();");
                     s.Add($"");
+                }
+
+                if (cascadeDeleteRelationships.Any())
+                {
                     foreach (var relationship in cascadeDeleteRelationships)
                     {
                         var joins = relationship.RelationshipFields.Select(o => $"o.{o.ChildField.Name} == {CurrentEntity.CamelCaseName}.{o.ParentField.Name}").Aggregate((current, next) => current + " && " + next);
@@ -512,6 +502,12 @@ namespace WEB.Models
                     }
                 }
 
+                if (CurrentEntity.HasAFileContentsField)
+                {
+                    s.Add($"            await {CurrentEntity.Project.DbContextVariable}.{CurrentEntity.Name}Contents.Where(o => {CurrentEntity.KeyFields.Select(o => $"o.{o.Name} == {o.Name.ToCamelCase()}").Aggregate((current, next) => current + " && " + next)}).ExecuteDeleteAsync();");
+                    s.Add($"");
+                }
+
                 if (CurrentEntity.EntityType == EntityType.User)
                 {
                     s.Add($"            foreach (var role in await userManager.GetRolesAsync(user))");
@@ -522,12 +518,11 @@ namespace WEB.Models
                 else
                 {
                     s.Add($"            {CurrentEntity.Project.DbContextVariable}.Entry({CurrentEntity.CamelCaseName}).State = EntityState.Deleted;");
-                    foreach (var field in CurrentEntity.Fields.Where(o => o.EditPageType == EditPageType.FileContents))
-                        s.Add($"            {CurrentEntity.Project.DbContextVariable}.Entry({CurrentEntity.CamelCaseName}.{CurrentEntity.Name}Content).State = EntityState.Deleted;");
                     s.Add($"");
                     s.Add($"            await {CurrentEntity.Project.DbContextVariable}.SaveChangesAsync();");
                 }
-                if (cascadeDeleteRelationships.Any())
+
+                if (cascadeDeleteRelationships.Any() || CurrentEntity.HasAFileContentsField)
                 {
                     s.Add($"");
                     s.Add($"            transactionScope.Complete();");
@@ -645,10 +640,15 @@ namespace WEB.Models
                     }
 
                     var cascadeOnParentDeleteRelationships = entity.RelationshipsAsParent.Where(r => !r.ChildEntity.Exclude && r.CascadeDelete).OrderBy(o => o.SortOrder);
-                    if (cascadeOnParentDeleteRelationships.Any())
+
+                    if (cascadeOnParentDeleteRelationships.Any() || entity.HasAFileContentsField)
                     {
                         s.Add($"            using var transactionScope = Utilities.General.CreateTransactionScope();");
                         s.Add($"");
+                    }
+
+                    if (cascadeOnParentDeleteRelationships.Any())
+                    {
                         foreach (var relationship in cascadeOnParentDeleteRelationships)
                         {
                             var joins = CurrentEntity.KeyFields.Select(o => $"o.{relationship.ParentName}.{o.Name} == {o.Name.ToCamelCase()}").Aggregate((current, next) => current + " && " + next);
@@ -666,14 +666,18 @@ namespace WEB.Models
                     }
 
 
-                    if (entity.Fields.Any(o => o.EditPageType == EditPageType.FileContents))
-                        s.Add($"            await db.Database.ExecuteSqlRawAsync($\"DELETE FROM {entity.PluralName} WHERE {rel.RelationshipFields.Select(o => o.ChildField.Name + " = '{" + o.ParentField.Name.ToCamelCase() + "}'").Aggregate((current, next) => { return current + " AND " + next; })}\");");
+                    if (entity.HasAFileContentsField)
+                    {
+                        s.Add($"            await {CurrentEntity.Project.DbContextVariable}.{entity.Name}Contents.Where(o => {rel.RelationshipFields.Select(o => $"o.{rel.ChildEntity.Name}." + o.ChildField.Name + " == " + o.ParentField.Name.ToCamelCase()).Aggregate((current, next) => { return current + " && " + next; })}).ExecuteDeleteAsync();");
+                        s.Add($"");
+                        s.Add($"            await {CurrentEntity.Project.DbContextVariable}.{entity.PluralName}.Where(o => {rel.RelationshipFields.Select(o => "o." + o.ChildField.Name + " == " + o.ParentField.Name.ToCamelCase()).Aggregate((current, next) => { return current + " && " + next; })}).ExecuteDeleteAsync();");
+                    }
                     else
                         s.Add($"            await {CurrentEntity.Project.DbContextVariable}.{entity.PluralName}.Where(o => {rel.RelationshipFields.Select(o => "o." + o.ChildField.Name + " == " + o.ParentField.Name.ToCamelCase()).Aggregate((current, next) => { return current + " && " + next; })}).ExecuteDeleteAsync();");
                     s.Add($"");
 
 
-                    if (cascadeOnParentDeleteRelationships.Any())
+                    if (cascadeOnParentDeleteRelationships.Any() || entity.HasAFileContentsField)
                     {
                         s.Add($"            transactionScope.Complete();");
                         s.Add($"");

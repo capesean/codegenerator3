@@ -32,9 +32,8 @@ namespace WEB.Models
             {
                 s.Add($"        public DbSet<{e.Name}> {e.PluralName} {{ get; set; }}");
 
-                //var fileContentsField = e.Fields.FirstOrDefault(o => o.EditPageType == EditPageType.FileContents);
-                //if (fileContentsField != null)
-                //    s.Add($"        public DbSet<{e.Name}Content> {e.Name}Contents {{ get; set; }}");
+                if (e.Fields.Any(f => f.EditPageType == EditPageType.FileContents))
+                    s.Add($"        public DbSet<{e.Name}Content> {e.Name}Contents {{ get; set; }}");
 
             }
             s.Add($"");
