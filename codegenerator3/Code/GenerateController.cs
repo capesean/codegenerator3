@@ -493,11 +493,14 @@ namespace WEB.Models
                     foreach (var relationship in cascadeDeleteRelationships)
                     {
                         var joins = relationship.RelationshipFields.Select(o => $"o.{o.ChildField.Name} == {CurrentEntity.CamelCaseName}.{o.ParentField.Name}").Aggregate((current, next) => current + " && " + next);
+                        var joinsContents = relationship.RelationshipFields.Select(o => $"o.{relationship.ChildEntity.Name}.{o.ChildField.Name} == {CurrentEntity.CamelCaseName}.{o.ParentField.Name}").Aggregate((current, next) => current + " && " + next);
 
                         if (relationship.ChildEntity.Fields.Any(o => o.EditPageType == EditPageType.FileContents))
-                            s.Add($"            await db.Database.ExecuteSqlRawAsync($\"DELETE FROM {relationship.ChildEntity.PluralName} WHERE {relationship.RelationshipFields.Select(o => o.ChildField.Name + " = '{" + o.ParentField.Name.ToCamelCase() + "}'").Aggregate((current, next) => { return current + " AND " + next; })}\");");
-                        else
-                            s.Add($"            await {CurrentEntity.Project.DbContextVariable}.{(relationship.ChildEntity.EntityType == EntityType.User ? "Users" : relationship.ChildEntity.PluralName)}.Where(o => {joins}).ExecuteDeleteAsync();");
+                        {
+                            s.Add($"            await {CurrentEntity.Project.DbContextVariable}.{(relationship.ChildEntity.EntityType == EntityType.User ? "User" : relationship.ChildEntity.Name)}Contents.Where(o => {joinsContents}).ExecuteDeleteAsync();");
+                            s.Add($"");
+                        }
+                        s.Add($"            await {CurrentEntity.Project.DbContextVariable}.{(relationship.ChildEntity.EntityType == EntityType.User ? "Users" : relationship.ChildEntity.PluralName)}.Where(o => {joins}).ExecuteDeleteAsync();");
                         s.Add($"");
                     }
                 }
