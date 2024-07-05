@@ -30,7 +30,7 @@ namespace WEB.Models
                 var lookups = CurrentEntity.Fields.Where(o => o.FieldType == FieldType.Enum).Select(o => o.Lookup.PluralName).OrderBy(o => o).Distinct().Aggregate((current, next) => { return current + ", " + next; });
                 s.Add($"import {{ {lookups} }} from './enums.model';");
             }
-            foreach(var entity in relAsParent
+            foreach (var entity in relAsParent
                 .Where(o => o.ChildEntityId != CurrentEntity.EntityId)
                 .Select(o => o.ChildEntity)
                 .Distinct())
@@ -60,7 +60,10 @@ namespace WEB.Models
 
             foreach (var relationship in relAsParent)
             {
-                s.Add($"    {relationship.CollectionName.ToCamelCase()}: {relationship.ChildEntity.Name}[];");
+                if (!relationship.IsOneToOne)
+                    s.Add($"    {relationship.CollectionName.ToCamelCase()}: {relationship.ChildEntity.Name}[];");
+                else
+                    s.Add($"    {relationship.CollectionSingular.ToCamelCase()}: {relationship.ChildEntity.Name};");
             }
             if (relAsParent.Any())
                 s.Add($"");
@@ -73,7 +76,7 @@ namespace WEB.Models
             foreach (var field in CurrentEntity.Fields.OrderBy(o => o.FieldOrder))
                 if (!string.IsNullOrWhiteSpace(field.EditPageDefault))
                     s.Add($"        this.{field.Name.ToCamelCase()} = {field.EditPageDefault};");
-            foreach (var relationship in relAsParent)
+            foreach (var relationship in relAsParent.Where(o => !o.IsOneToOne))
                 s.Add($"        this.{relationship.CollectionName.ToCamelCase()} = [];");
             s.Add($"    }}");
             s.Add($"}}");

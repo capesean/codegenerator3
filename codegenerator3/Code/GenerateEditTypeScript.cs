@@ -12,7 +12,7 @@ namespace WEB.Models
             var folders = string.Join("", Enumerable.Repeat("../", CurrentEntity.Project.GeneratedPath.Count(o => o == '/')));
 
             var multiSelectRelationships = CurrentEntity.RelationshipsAsParent.Where(r => r.UseMultiSelect && !r.ChildEntity.Exclude).OrderBy(o => o.SortOrder);
-            var relationshipsAsParent = CurrentEntity.RelationshipsAsParent.Where(r => !r.ChildEntity.Exclude && r.DisplayListOnParent).OrderBy(r => r.SortOrder);
+            var relationshipsAsParent = CurrentEntity.RelationshipsAsParent.Where(r => !r.ChildEntity.Exclude && !r.IsOneToOne && r.DisplayListOnParent).OrderBy(r => r.SortOrder);
             var relationshipsAsChildHierarchy = CurrentEntity.RelationshipsAsChild.FirstOrDefault(r => r.Hierarchy);
             var enumLookups = CurrentEntity.Fields.Where(o => o.FieldType == FieldType.Enum).OrderBy(o => o.FieldOrder).Select(o => o.Lookup).Distinct().ToList();
             var nonHKeyFields = CurrentEntity.GetNonHierarchicalKeyFields();
@@ -72,7 +72,7 @@ namespace WEB.Models
             s.Add($"import {{ ErrorService }} from '{folders}../common/services/error.service';");
             s.Add($"import {{ {CurrentEntity.Name}Service }} from '{folders}../common/services/{CurrentEntity.Name.ToLower()}.service';");
 
-            foreach (var relChildEntity in relationshipsAsParent.Select(o => o.ChildEntity).Distinct().OrderBy(o => o.Name))
+            foreach (var relChildEntity in relationshipsAsParent.Where(o => !o.IsOneToOne).Select(o => o.ChildEntity).Distinct().OrderBy(o => o.Name))
             {
                 s.Add($"import {{ {(relChildEntity.EntityId == CurrentEntity.EntityId ? "" : relChildEntity.Name + ", ")}{relChildEntity.Name}SearchOptions, {relChildEntity.Name}SearchResponse }} from '{folders}../common/models/{relChildEntity.Name.ToLower()}.model';");
                 if (relChildEntity.EntityId != CurrentEntity.EntityId)
@@ -486,26 +486,29 @@ namespace WEB.Models
                     s.Add($"            }}, () => {{ }});");
                     s.Add($"    }}");
                     s.Add($"");
-                    s.Add($"    delete{rel.CollectionName}(): void {{");
-                    s.Add($"        let modalRef = this.modalService.open(ConfirmModalComponent, {{ centered: true }});");
-                    s.Add($"        (modalRef.componentInstance as ConfirmModalComponent).options = {{ title: \"Delete {rel.CollectionFriendlyName}\", text: \"Are you sure you want to delete all the {rel.CollectionFriendlyName.ToLower()}?\", deleteStyle: true, ok: \"Delete\" }} as ConfirmModalOptions;");
-                    s.Add($"        modalRef.result.then(");
-                    s.Add($"            () => {{");
-                    s.Add($"");
-                    s.Add($"                this.{CurrentEntity.Name.ToCamelCase()}Service.delete{rel.CollectionName}({CurrentEntity.KeyFields.Select(o => $"this.{CurrentEntity.Name.ToCamelCase()}.{o.Name.ToCamelCase()}").Aggregate((current, next) => { return current + ", " + next; })})");
-                    s.Add($"                    .subscribe({{");
-                    s.Add($"                        next: () => {{");
-                    s.Add($"                            this.toastr.success(\"The {rel.CollectionFriendlyName.ToLower()} have been deleted\", \"Delete {rel.CollectionFriendlyName}\");");
-                    s.Add($"                            this.search{rel.CollectionName}();");
-                    s.Add($"                        }},");
-                    s.Add($"                        error: err => {{");
-                    s.Add($"                            this.errorService.handleError(err, \"{rel.CollectionFriendlyName}\", \"Delete\");");
-                    s.Add($"                        }}");
-                    s.Add($"                    }});");
-                    s.Add($"            }}, () => {{ }});");
-                    s.Add($"");
-                    s.Add($"    }}");
-                    s.Add($"");
+                    if (!rel.IsOneToOne)
+                    {
+                        s.Add($"    delete{rel.CollectionName}(): void {{");
+                        s.Add($"        let modalRef = this.modalService.open(ConfirmModalComponent, {{ centered: true }});");
+                        s.Add($"        (modalRef.componentInstance as ConfirmModalComponent).options = {{ title: \"Delete {rel.CollectionFriendlyName}\", text: \"Are you sure you want to delete all the {rel.CollectionFriendlyName.ToLower()}?\", deleteStyle: true, ok: \"Delete\" }} as ConfirmModalOptions;");
+                        s.Add($"        modalRef.result.then(");
+                        s.Add($"            () => {{");
+                        s.Add($"");
+                        s.Add($"                this.{CurrentEntity.Name.ToCamelCase()}Service.delete{rel.CollectionName}({CurrentEntity.KeyFields.Select(o => $"this.{CurrentEntity.Name.ToCamelCase()}.{o.Name.ToCamelCase()}").Aggregate((current, next) => { return current + ", " + next; })})");
+                        s.Add($"                    .subscribe({{");
+                        s.Add($"                        next: () => {{");
+                        s.Add($"                            this.toastr.success(\"The {rel.CollectionFriendlyName.ToLower()} have been deleted\", \"Delete {rel.CollectionFriendlyName}\");");
+                        s.Add($"                            this.search{rel.CollectionName}();");
+                        s.Add($"                        }},");
+                        s.Add($"                        error: err => {{");
+                        s.Add($"                            this.errorService.handleError(err, \"{rel.CollectionFriendlyName}\", \"Delete\");");
+                        s.Add($"                        }}");
+                        s.Add($"                    }});");
+                        s.Add($"            }}, () => {{ }});");
+                        s.Add($"");
+                        s.Add($"    }}");
+                        s.Add($"");
+                    }
                 }
             }
 

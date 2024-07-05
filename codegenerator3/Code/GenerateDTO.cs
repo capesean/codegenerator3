@@ -87,7 +87,10 @@ namespace WEB.Models
 
             foreach (var relationship in CurrentEntity.RelationshipsAsParent.Where(o => !o.ChildEntity.Exclude).OrderBy(r => r.ChildEntity.Name).ThenBy(o => o.CollectionName).ThenBy(o => o.RelationshipId))
             {
-                s.Add($"        public virtual List<{relationship.ChildEntity.Name}DTO> {relationship.CollectionName} {{ get; set; }} = new List<{relationship.ChildEntity.Name}DTO>();");
+                if (!relationship.IsOneToOne)
+                    s.Add($"        public virtual List<{relationship.ChildEntity.Name}DTO> {relationship.CollectionName} {{ get; set; }} = new List<{relationship.ChildEntity.Name}DTO>();");
+                else
+                    s.Add($"        public {relationship.ChildEntity.Name}DTO {relationship.CollectionSingular} {{ get; set; }}");
                 s.Add($"");
             }
 
@@ -146,9 +149,16 @@ namespace WEB.Models
                 foreach (var relationship in relationshipsAsParent)
                 {
                     if (relationship.RelationshipFields.Count == 1 && relationship.RelationshipFields.First().ChildField.EditPageType == EditPageType.Exclude) continue;
-                    
-                    s.Add($"                foreach (var {relationship.CollectionSingular.ToCamelCase()} in {CurrentEntity.CamelCaseName}.{relationship.CollectionName})");
-                    s.Add($"                    {CurrentEntity.DTOName.ToCamelCase()}.{relationship.CollectionName}.Add(Create({relationship.CollectionSingular.ToCamelCase()}));");
+
+                    if (!relationship.IsOneToOne)
+                    {
+                        s.Add($"                foreach (var {relationship.CollectionSingular.ToCamelCase()} in {CurrentEntity.CamelCaseName}.{relationship.CollectionName})");
+                        s.Add($"                    {CurrentEntity.DTOName.ToCamelCase()}.{relationship.CollectionName}.Add(Create({relationship.CollectionSingular.ToCamelCase()}));");
+                    }
+                    else
+                    {
+                        s.Add($"                {CurrentEntity.DTOName.ToCamelCase()}.{relationship.CollectionSingular} = Create({CurrentEntity.Name.ToCamelCase()}.{relationship.CollectionSingular});");
+                    }
                 }
                 s.Add($"            }}");
             }
@@ -174,7 +184,7 @@ namespace WEB.Models
                     s.Add($"            if ({CurrentEntity.DTOName.ToCamelCase()}.{field.Name} != null)");
                     s.Add($"            {{");
                     s.Add($"                var {CurrentEntity.Name.ToCamelCase()}Content = new {CurrentEntity.Name}Content();");
-                    foreach(var keyField in CurrentEntity.KeyFields)
+                    foreach (var keyField in CurrentEntity.KeyFields)
                         s.Add($"                {CurrentEntity.Name.ToCamelCase()}Content.{keyField.Name} = {CurrentEntity.Name.ToCamelCase()}.{keyField.Name};");
                     s.Add($"                {CurrentEntity.Name.ToCamelCase()}Content.{fileContentsField.Name} = Convert.FromBase64String({CurrentEntity.DTOName.ToCamelCase()}.{field.Name});");
                     s.Add($"                {CurrentEntity.Name.ToCamelCase()}.{CurrentEntity.Name}Content = {CurrentEntity.Name.ToCamelCase()}Content;");

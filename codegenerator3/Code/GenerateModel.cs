@@ -122,7 +122,7 @@ namespace WEB.Models
                 if (!relationship.IsOneToOne)
                     s.Add($"        public virtual ICollection<{GetEntity(relationship.ChildEntityId).Name}> {relationship.CollectionName} {{ get; set; }} = new List<{GetEntity(relationship.ChildEntityId).Name}>();");
                 else
-                    s.Add($"        public virtual {GetEntity(relationship.ChildEntityId).Name} {relationship.CollectionName} {{ get; set; }}");
+                    s.Add($"        public {GetEntity(relationship.ChildEntityId).Name} {relationship.CollectionSingular} {{ get; set; }}");
                 s.Add($"");
             }
 

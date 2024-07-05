@@ -105,7 +105,10 @@ namespace WEB.Models
                     s.Add($"            {{");
                     foreach (var relationship in relAsParent)
                     {
-                        s.Add($"                results = results.Include(o => o.{relationship.CollectionName});");
+                        if (!relationship.IsOneToOne)
+                            s.Add($"                results = results.Include(o => o.{relationship.CollectionName});");
+                        //else
+                        //    s.Add($"                results = results.Include(o => o.{relationship.CollectionSingular});");
                     }
                     s.Add($"            }}");
                     s.Add($"");
@@ -201,6 +204,10 @@ namespace WEB.Models
             else
             {
                 s.Add($"            var {CurrentEntity.CamelCaseName} = await {CurrentEntity.Project.DbContextVariable}.{CurrentEntity.PluralName}");
+            }
+            foreach (var relationship in CurrentEntity.RelationshipsAsParent.Where(o => o.IsOneToOne).OrderBy(r => r.SortOrder).ThenBy(o => o.ParentName))
+            {
+                s.Add($"                .Include(o => o.{relationship.CollectionSingular})");
             }
             foreach (var relationship in CurrentEntity.RelationshipsAsChild.OrderBy(r => r.SortOrder).ThenBy(o => o.ParentName))
             {
@@ -636,7 +643,8 @@ namespace WEB.Models
                     var errorOnParentDeleteRelationships = entity.RelationshipsAsParent.Where(r => !r.ChildEntity.Exclude && !r.CascadeDelete).OrderBy(o => o.SortOrder);
                     foreach (var relationship in errorOnParentDeleteRelationships)
                     {
-                        var joins = CurrentEntity.KeyFields.Select(o => $"o.{relationship.ParentEntity.Name}.{o.Name} == {o.Name.ToCamelCase()}").Aggregate((current, next) => current + " && " + next);
+                        // changed to use field on parent entity, rather than child, to avoid issues where names between child/parent are not the same
+                        var joins = CurrentEntity.KeyFields.Select(o => $"o.{relationship.ParentEntity.Name}.{CurrentEntity.Name}.{o.Name} == {o.Name.ToCamelCase()}").Aggregate((current, next) => current + " && " + next);
                         s.Add($"            if (await {CurrentEntity.Project.DbContextVariable}.{(relationship.ChildEntity.EntityType == EntityType.User ? "Users" : relationship.ChildEntity.PluralName)}.AnyAsync(o => {joins}))");
                         s.Add($"                return BadRequest(\"Unable to delete the {rel.CollectionFriendlyName.ToLower()} as there are related {relationship.ChildEntity.PluralFriendlyName.ToLower()}\");");
                         s.Add($"");

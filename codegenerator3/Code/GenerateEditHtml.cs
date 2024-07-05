@@ -347,7 +347,7 @@ namespace WEB.Models
                 s.Add($"");
                 s.Add(t + $"    <nav ngbNav #nav=\"ngbNav\" class=\"nav-tabs\">");
                 s.Add($"");
-                foreach (var relationship in relationships)
+                foreach (var relationship in relationships.Where(o => !o.IsOneToOne))
                 {
                     counter++;
                     var entity = relationship.ChildEntity;
@@ -528,7 +528,12 @@ namespace WEB.Models
                         }
                     }
                     if (!relationship.DisableDelete)
-                        s.Add(t + $"                                    <th class=\"w-20px text-center\"><i class=\"fas fa-times text-danger cursor-pointer\" (click)=\"delete{relationship.CollectionName}()\" ngbTooltip=\"Delete all {relationship.CollectionFriendlyName.ToLower()}\" container=\"body\" placement=\"left\"></i></th>");
+                    {
+                        if (!relationship.IsOneToOne)
+                            s.Add(t + $"                                    <th class=\"w-20px text-center\"><i class=\"fas fa-times text-danger cursor-pointer\" (click)=\"delete{relationship.CollectionName}()\" ngbTooltip=\"Delete all {relationship.CollectionFriendlyName.ToLower()}\" container=\"body\" placement=\"left\"></i></th>");
+                        else
+                            s.Add(t + $"                                    <th class=\"w-20px text-center\"></th>");
+                    }
                     s.Add(t + $"                                </tr>");
                     s.Add(t + $"                            </thead>");
                     s.Add(t + $"                            <tbody class=\"list cursor-pointer\">");
