@@ -269,6 +269,7 @@
                 background-color: #ccc !important;
                 cursor: not-allowed;
             }
+
             .table-disabled input {
                 pointer-events: none;
                 cursor: not-allowed;
@@ -276,30 +277,6 @@
         </style>
         <div class="alert alert-info" ng-if="vm.entities.length">
             Click on an entity name (hyperlink) above to navigate to that entity; click on the cell/row to select all checkboxes in the row.
-        </div>
-
-        <div ng-if="vm.deploymentResults">
-
-            <h2>Deployment Results</h2>
-
-            <table class="table table-striped table-hover table-bordered">
-                <thead>
-                    <tr>
-                        <th scope="col">Entity</th>
-                        <th scope="col">Code Type</th>
-                        <th scope="col">Error Message</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr ng-repeat="result in vm.deploymentResults" ng-class="{ 'danger':  result.isError }">
-                        <td>{{result.entityName}}</td>
-                        <td>{{result.codeType}}</td>
-                        <td>{{result.errorMessage}}</td>
-                    </tr>
-                </tbody>
-            </table>
-
-
         </div>
 
         <hr />
@@ -331,6 +308,30 @@
             <div class="col-sm-5 text-right resultsInfo">
                 <app-pager-info headers="vm.lookupsHeaders"></app-pager-info>
             </div>
+        </div>
+
+        <div ng-if="vm.deploymentResults">
+
+            <h2>Deployment Results</h2>
+
+            <table class="table table-striped table-hover table-bordered">
+                <thead>
+                    <tr>
+                        <th scope="col">Entity</th>
+                        <th scope="col">Code Type</th>
+                        <th scope="col">Error Message</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="result in vm.deploymentResults" ng-class="{ 'danger':  result.isError }">
+                        <td>{{result.entityName}}</td>
+                        <td>{{result.codeType}}</td>
+                        <td>{{result.errorMessage}}</td>
+                    </tr>
+                </tbody>
+            </table>
+
+
         </div>
 
     </div>

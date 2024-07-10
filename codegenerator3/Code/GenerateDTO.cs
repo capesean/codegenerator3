@@ -163,12 +163,13 @@ namespace WEB.Models
                 s.Add($"            }}");
             }
 
+            var hasEditWhenNew = CurrentEntity.Fields.Any(o => o.EditPageType == EditPageType.EditWhenNew);
 
             s.Add($"");
             s.Add($"            return {CurrentEntity.DTOName.ToCamelCase()};");
             s.Add($"        }}");
             s.Add($"");
-            s.Add($"        public static void Hydrate({CurrentEntity.Name} {CurrentEntity.CamelCaseName}, {CurrentEntity.DTOName} {CurrentEntity.DTOName.ToCamelCase()})");
+            s.Add($"        public static void Hydrate({CurrentEntity.Name} {CurrentEntity.CamelCaseName}, {CurrentEntity.DTOName} {CurrentEntity.DTOName.ToCamelCase()}{(hasEditWhenNew ? ", bool isNew" : "")})");
             s.Add($"        {{");
             if (CurrentEntity.EntityType == EntityType.User)
             {
@@ -191,7 +192,7 @@ namespace WEB.Models
                     s.Add($"            }}");
                 }
                 else
-                    s.Add($"            {CurrentEntity.CamelCaseName}.{field.Name} = {CurrentEntity.DTOName.ToCamelCase()}.{field.Name};");
+                    s.Add($"            {(field.EditPageType == EditPageType.EditWhenNew ? "if (isNew) " : "")}{CurrentEntity.CamelCaseName}.{field.Name} = {CurrentEntity.DTOName.ToCamelCase()}.{field.Name};");
             }
             s.Add($"        }}");
             s.Add($"    }}");

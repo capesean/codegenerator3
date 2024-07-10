@@ -166,6 +166,8 @@ namespace WEB.Models
                 {
                     s.Add(t + $"                    <th{(string.IsNullOrWhiteSpace(field.DisplayClasses) ? "" : $" class=\"{field.DisplayClasses}\"")}>{field.Label}</th>");
                 }
+            if (CurrentEntity.HasAFileContentsField)
+                s.Add(t + $"                    <th class=\"w-20px text-center\"><i class=\"fas fa-cloud-download text-secondary\"></i></th>");
             s.Add(t + $"                </tr>");
             s.Add(t + $"            </thead>");
             s.Add(t + $"            <tbody class=\"list cursor-pointer\">");
@@ -174,6 +176,8 @@ namespace WEB.Models
             {
                 s.Add(t + $"                    <td{(string.IsNullOrWhiteSpace(field.DisplayClasses) ? "" : $" class=\"{field.DisplayClasses}\"")}>{field.ListFieldHtml}</td>");
             }
+            if (CurrentEntity.HasAFileContentsField)
+                s.Add(t + $"                    <td class=\"text-center\"><i class=\"fas fa-cloud-download cursor-pointer p-1 text-primary\" (click)=\"download{CurrentEntity.Name}({CurrentEntity.Name.ToCamelCase()}, $event)\"></i></td>");
             s.Add(t + $"                </tr>");
             s.Add(t + $"            </tbody>");
             s.Add(t + $"        </table>");

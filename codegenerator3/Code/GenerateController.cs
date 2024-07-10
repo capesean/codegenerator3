@@ -406,7 +406,7 @@ namespace WEB.Models
                 s.Add($"");
             }
 
-            s.Add($"            ModelFactory.Hydrate({CurrentEntity.CamelCaseName}, {CurrentEntity.DTOName.ToCamelCase()});");
+            s.Add($"            ModelFactory.Hydrate({CurrentEntity.CamelCaseName}, {CurrentEntity.DTOName.ToCamelCase()}{(CurrentEntity.Fields.Any(o => o.EditPageType == EditPageType.EditWhenNew) ? ", isNew" : "")});");
             s.Add($"");
 
             if (CurrentEntity.HasAFileContentsField)

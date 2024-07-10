@@ -50,6 +50,9 @@ namespace WEB.Models
             if (CurrentEntity.HasASortField)
                 s.Add($"import {{ {CurrentEntity.Name}SortComponent }} from './{CurrentEntity.Name.ToLower()}.sort.component';");
 
+            if (CurrentEntity.HasAFileContentsField)
+                s.Add($"import {{ DownloadService }} from '../common/services/download.service';");
+
             s.Add($"");
             s.Add($"@Component({{");
             s.Add($"    selector: '{CurrentEntity.Name.ToLower()}-list',");
@@ -74,6 +77,8 @@ namespace WEB.Models
             s.Add($"        private errorService: ErrorService,");
             if (CurrentEntity.HasASortField)
                 s.Add($"        private modalService: NgbModal,");
+            if (CurrentEntity.HasAFileContentsField)
+                s.Add($"        private downloadService: DownloadService,");
             s.Add($"        private {CurrentEntity.Name.ToCamelCase()}Service: {CurrentEntity.Name}Service");
             s.Add($"    ) {{");
             s.Add($"    }}");
@@ -146,6 +151,15 @@ namespace WEB.Models
                 s.Add($"                this.runSearch(this.headers.pageIndex);");
                 s.Add($"");
                 s.Add($"            }}, () => {{ }});");
+                s.Add($"    }}");
+                s.Add($"");
+            }
+            if (CurrentEntity.HasAFileContentsField)
+            {
+                s.Add($"    download{CurrentEntity.Name}({CurrentEntity.Name.ToCamelCase()}: {CurrentEntity.Name}, event: MouseEvent) {{");
+                s.Add($"        event.stopPropagation();");
+                s.Add($"");
+                s.Add($"        this.downloadService.download{CurrentEntity.Name}({CurrentEntity.KeyFields.Select(o => $"{CurrentEntity.Name.ToCamelCase()}.{o.Name.ToCamelCase()}").Aggregate((current, next) => { return current + ", " + next; })}).subscribe();");
                 s.Add($"    }}");
                 s.Add($"");
             }
