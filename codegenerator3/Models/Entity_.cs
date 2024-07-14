@@ -441,6 +441,15 @@ namespace WEB.Models
         }
 
         [NotMapped]
+        internal bool HasAzureBlobStorageField
+        {
+            get
+            {
+                return Fields.Where(o => o.EditPageType == EditPageType.FileContents && o.UseAzureBlobStorage).Count() == 1;
+            }
+        }
+
+        [NotMapped]
         internal bool HasSortableFields
         {
             get

@@ -735,6 +735,10 @@
     <Compile Include="Migrations\202406211457016_RemoveUseSelectorDirective.designer.cs">
       <DependentUpon>202406211457016_RemoveUseSelectorDirective.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202407132036218_UseAzureBlobStorage.cs" />
+    <Compile Include="Migrations\202407132036218_UseAzureBlobStorage.designer.cs">
+      <DependentUpon>202407132036218_UseAzureBlobStorage.cs</DependentUpon>
+    </Compile>
     <Compile Include="Models\Relationship_.cs" />
     <Compile Include="Startup.cs" />
     <Compile Include="Utilities\ApiException.cs" />
@@ -896,6 +900,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202406211457016_RemoveUseSelectorDirective.resx">
       <DependentUpon>202406211457016_RemoveUseSelectorDirective.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202407132036218_UseAzureBlobStorage.resx">
+      <DependentUpon>202407132036218_UseAzureBlobStorage.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

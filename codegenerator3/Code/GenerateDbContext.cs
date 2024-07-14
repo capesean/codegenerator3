@@ -32,7 +32,7 @@ namespace WEB.Models
             {
                 s.Add($"        public DbSet<{e.Name}> {e.PluralName} {{ get; set; }}");
 
-                if (e.Fields.Any(f => f.EditPageType == EditPageType.FileContents))
+                if (e.Fields.Any(f => f.EditPageType == EditPageType.FileContents && !f.UseAzureBlobStorage))
                     s.Add($"        public DbSet<{e.Name}Content> {e.Name}Contents {{ get; set; }}");
 
             }
@@ -95,7 +95,7 @@ namespace WEB.Models
                 if (needsBreak) s.Add($"");
 
                 var fileContentsField = entity.Fields.FirstOrDefault(o => o.EditPageType == EditPageType.FileContents);
-                if (fileContentsField != null)
+                if (fileContentsField != null && !fileContentsField.UseAzureBlobStorage)
                 {
                     s.Add($"");
                     s.Add($"            modelBuilder.Entity<{entity.Name}>()");

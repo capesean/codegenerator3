@@ -66,9 +66,12 @@ namespace WEB.Models
                     attributes.Add($"Column(TypeName=\"decimal({field.Precision},{field.Scale})\")");
                 else if (field.EditPageType == EditPageType.FileContents)
                 {
-                    s.Add($"        [Required]");
-                    s.Add($"        public virtual {CurrentEntity.Name}Content {CurrentEntity.Name}Content {{ get; set; }}");
-                    s.Add($"");
+                    if (!field.UseAzureBlobStorage)
+                    {
+                        s.Add($"        [Required]");
+                        s.Add($"        public virtual {CurrentEntity.Name}Content {CurrentEntity.Name}Content {{ get; set; }}");
+                        s.Add($"");
+                    }
                     continue;
                 }
                 else
@@ -192,7 +195,7 @@ namespace WEB.Models
 
             s.Add($"    }}");
 
-            if (fileContentsField != null)
+            if (fileContentsField != null && !fileContentsField.UseAzureBlobStorage)
             {
                 s.Add($"");
                 s.Add($"    public class {CurrentEntity.Name}Content");

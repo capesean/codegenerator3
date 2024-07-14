@@ -182,14 +182,17 @@ namespace WEB.Models
 
                 if (field.EditPageType == EditPageType.FileContents)
                 {
-                    s.Add($"            if ({CurrentEntity.DTOName.ToCamelCase()}.{field.Name} != null)");
-                    s.Add($"            {{");
-                    s.Add($"                var {CurrentEntity.Name.ToCamelCase()}Content = new {CurrentEntity.Name}Content();");
-                    foreach (var keyField in CurrentEntity.KeyFields)
-                        s.Add($"                {CurrentEntity.Name.ToCamelCase()}Content.{keyField.Name} = {CurrentEntity.Name.ToCamelCase()}.{keyField.Name};");
-                    s.Add($"                {CurrentEntity.Name.ToCamelCase()}Content.{fileContentsField.Name} = Convert.FromBase64String({CurrentEntity.DTOName.ToCamelCase()}.{field.Name});");
-                    s.Add($"                {CurrentEntity.Name.ToCamelCase()}.{CurrentEntity.Name}Content = {CurrentEntity.Name.ToCamelCase()}Content;");
-                    s.Add($"            }}");
+                    if (!field.UseAzureBlobStorage)
+                    {
+                        s.Add($"            if ({CurrentEntity.DTOName.ToCamelCase()}.{field.Name} != null)");
+                        s.Add($"            {{");
+                        s.Add($"                var {CurrentEntity.Name.ToCamelCase()}Content = new {CurrentEntity.Name}Content();");
+                        foreach (var keyField in CurrentEntity.KeyFields)
+                            s.Add($"                {CurrentEntity.Name.ToCamelCase()}Content.{keyField.Name} = {CurrentEntity.Name.ToCamelCase()}.{keyField.Name};");
+                        s.Add($"                {CurrentEntity.Name.ToCamelCase()}Content.{fileContentsField.Name} = Convert.FromBase64String({CurrentEntity.DTOName.ToCamelCase()}.{field.Name});");
+                        s.Add($"                {CurrentEntity.Name.ToCamelCase()}.{CurrentEntity.Name}Content = {CurrentEntity.Name.ToCamelCase()}Content;");
+                        s.Add($"            }}");
+                    }
                 }
                 else
                     s.Add($"            {(field.EditPageType == EditPageType.EditWhenNew ? "if (isNew) " : "")}{CurrentEntity.CamelCaseName}.{field.Name} = {CurrentEntity.DTOName.ToCamelCase()}.{field.Name};");

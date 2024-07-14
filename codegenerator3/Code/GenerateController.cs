@@ -413,15 +413,23 @@ namespace WEB.Models
             {
                 s.Add($"            if ({CurrentEntity.DTOName.ToCamelCase()}.{fileContentsField.Name} != null)");
                 s.Add($"            {{");
-                s.Add($"                if (isNew)");
-                s.Add($"                    db.Entry({CurrentEntity.Name.ToCamelCase()}.{CurrentEntity.Name}Content).State = EntityState.Added;");
-                s.Add($"                else");
-                s.Add($"                {{");
-                s.Add($"                    if (await {CurrentEntity.Project.DbContextVariable}.{CurrentEntity.PluralName}.AnyAsync(o => {GetKeyFieldLinq("o", CurrentEntity.DTOName.ToCamelCase())} && o.{CurrentEntity.Name}Content != null))");
-                s.Add($"                        db.Entry({CurrentEntity.Name.ToCamelCase()}.{CurrentEntity.Name}Content).State = EntityState.Modified;");
-                s.Add($"                    else");
-                s.Add($"                        db.Entry({CurrentEntity.Name.ToCamelCase()}.{CurrentEntity.Name}Content).State = EntityState.Added;");
-                s.Add($"                }}");
+                if (CurrentEntity.HasAzureBlobStorageField)
+                {
+                    s.Add($"                var blobStorageService = new BlobStorageService(AppSettings.AzureBlobStorage.ConnectionString, AppSettings.AzureBlobStorage.ContainerName);");
+                    s.Add($"                await blobStorageService.UploadBlobAsync({CurrentEntity.Name.ToCamelCase()}.{CurrentEntity.KeyFields.Single().Name}.ToString().ToLowerInvariant(), Convert.FromBase64String({CurrentEntity.DTOName.ToCamelCase()}.{fileContentsField.Name}));");
+                }
+                else
+                {
+                    s.Add($"                if (isNew)");
+                    s.Add($"                    db.Entry({CurrentEntity.Name.ToCamelCase()}.{CurrentEntity.Name}Content).State = EntityState.Added;");
+                    s.Add($"                else");
+                    s.Add($"                {{");
+                    s.Add($"                    if (await {CurrentEntity.Project.DbContextVariable}.{CurrentEntity.PluralName}.AnyAsync(o => {GetKeyFieldLinq("o", CurrentEntity.DTOName.ToCamelCase())} && o.{CurrentEntity.Name}Content != null))");
+                    s.Add($"                        db.Entry({CurrentEntity.Name.ToCamelCase()}.{CurrentEntity.Name}Content).State = EntityState.Modified;");
+                    s.Add($"                    else");
+                    s.Add($"                        db.Entry({CurrentEntity.Name.ToCamelCase()}.{CurrentEntity.Name}Content).State = EntityState.Added;");
+                    s.Add($"                }}");
+                }
                 s.Add($"            }}");
                 s.Add($"");
             }
@@ -489,7 +497,7 @@ namespace WEB.Models
 
                 var cascadeDeleteRelationships = CurrentEntity.RelationshipsAsParent.Where(rel => !rel.ChildEntity.Exclude && rel.CascadeDelete).OrderBy(o => o.SortOrder);
 
-                if (cascadeDeleteRelationships.Any() || CurrentEntity.HasAFileContentsField)
+                if (cascadeDeleteRelationships.Any() || (CurrentEntity.HasAFileContentsField && !CurrentEntity.HasAzureBlobStorageField))
                 {
                     s.Add($"            using var transactionScope = Utilities.General.CreateTransactionScope();");
                     s.Add($"");
@@ -512,7 +520,7 @@ namespace WEB.Models
                     }
                 }
 
-                if (CurrentEntity.HasAFileContentsField)
+                if (CurrentEntity.HasAFileContentsField && !CurrentEntity.HasAzureBlobStorageField)
                 {
                     s.Add($"            await {CurrentEntity.Project.DbContextVariable}.{CurrentEntity.Name}Contents.Where(o => {CurrentEntity.KeyFields.Select(o => $"o.{o.Name} == {o.Name.ToCamelCase()}").Aggregate((current, next) => current + " && " + next)}).ExecuteDeleteAsync();");
                     s.Add($"");
@@ -532,11 +540,19 @@ namespace WEB.Models
                     s.Add($"            await {CurrentEntity.Project.DbContextVariable}.SaveChangesAsync();");
                 }
 
-                if (cascadeDeleteRelationships.Any() || CurrentEntity.HasAFileContentsField)
+                if (cascadeDeleteRelationships.Any() || (CurrentEntity.HasAFileContentsField && !CurrentEntity.HasAzureBlobStorageField))
                 {
                     s.Add($"");
                     s.Add($"            transactionScope.Complete();");
                 }
+
+                if (CurrentEntity.HasAzureBlobStorageField)
+                {
+                    s.Add($"");
+                    s.Add($"            var blobStorageService = new BlobStorageService(AppSettings.AzureBlobStorage.ConnectionString, AppSettings.AzureBlobStorage.ContainerName);");
+                    s.Add($"            await blobStorageService.DeleteBlobAsync({CurrentEntity.KeyFields.Single().Name.ToCamelCase()}.ToString().ToLowerInvariant());");
+                }
+
                 s.Add($"");
                 s.Add($"            return Ok();");
                 s.Add($"        }}");
@@ -652,7 +668,14 @@ namespace WEB.Models
 
                     var cascadeOnParentDeleteRelationships = entity.RelationshipsAsParent.Where(r => !r.ChildEntity.Exclude && r.CascadeDelete).OrderBy(o => o.SortOrder);
 
-                    if (cascadeOnParentDeleteRelationships.Any() || entity.HasAFileContentsField)
+                    if (entity.HasAzureBlobStorageField)
+                    {
+                        s.Add($"            var blobStorageService = new BlobStorageService(AppSettings.AzureBlobStorage.ConnectionString, AppSettings.AzureBlobStorage.ContainerName);");
+                        s.Add($"");
+                        s.Add($"            var {entity.KeyFields.Single().Name.ToCamelCase()}s = await db.{entity.PluralName}.Where(o => o.{rel.RelationshipFields.Single().ChildField.Name} == {rel.RelationshipFields.Single().ChildField.Name.ToCamelCase()}).Select(o => o.{entity.KeyFields.Single().Name}).ToListAsync();");
+                        s.Add($"");
+                    }
+                    else if (cascadeOnParentDeleteRelationships.Any() || entity.HasAFileContentsField)
                     {
                         s.Add($"            using var transactionScope = Utilities.General.CreateTransactionScope();");
                         s.Add($"");
@@ -676,19 +699,21 @@ namespace WEB.Models
                         }
                     }
 
-
-                    if (entity.HasAFileContentsField)
+                    if (entity.HasAFileContentsField && !entity.HasAzureBlobStorageField)
                     {
                         s.Add($"            await {CurrentEntity.Project.DbContextVariable}.{entity.Name}Contents.Where(o => {rel.RelationshipFields.Select(o => $"o.{rel.ChildEntity.Name}." + o.ChildField.Name + " == " + o.ParentField.Name.ToCamelCase()).Aggregate((current, next) => { return current + " && " + next; })}).ExecuteDeleteAsync();");
                         s.Add($"");
-                        s.Add($"            await {CurrentEntity.Project.DbContextVariable}.{entity.PluralName}.Where(o => {rel.RelationshipFields.Select(o => "o." + o.ChildField.Name + " == " + o.ParentField.Name.ToCamelCase()).Aggregate((current, next) => { return current + " && " + next; })}).ExecuteDeleteAsync();");
                     }
-                    else
-                        s.Add($"            await {CurrentEntity.Project.DbContextVariable}.{entity.PluralName}.Where(o => {rel.RelationshipFields.Select(o => "o." + o.ChildField.Name + " == " + o.ParentField.Name.ToCamelCase()).Aggregate((current, next) => { return current + " && " + next; })}).ExecuteDeleteAsync();");
+                    s.Add($"            await {CurrentEntity.Project.DbContextVariable}.{entity.PluralName}.Where(o => {rel.RelationshipFields.Select(o => "o." + o.ChildField.Name + " == " + o.ParentField.Name.ToCamelCase()).Aggregate((current, next) => { return current + " && " + next; })}).ExecuteDeleteAsync();");
                     s.Add($"");
 
-
-                    if (cascadeOnParentDeleteRelationships.Any() || entity.HasAFileContentsField)
+                    if (entity.HasAzureBlobStorageField)
+                    {
+                        s.Add($"            foreach (var {entity.KeyFields.Single().Name.ToCamelCase()} in {entity.KeyFields.Single().Name.ToCamelCase()}s)");
+                        s.Add($"                await blobStorageService.DeleteBlobAsync({entity.KeyFields.Single().Name.ToCamelCase()}.ToString().ToLowerInvariant());");
+                        s.Add($"");
+                    }
+                    else if (cascadeOnParentDeleteRelationships.Any() || entity.HasAFileContentsField)
                     {
                         s.Add($"            transactionScope.Complete();");
                         s.Add($"");

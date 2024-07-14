@@ -69,6 +69,9 @@ namespace WEB.Models
         [Required]
         public EditPageType EditPageType { get; set; }
 
+        [Required]
+        public bool UseAzureBlobStorage { get; set; }
+
         [MaxLength(50)]
         public string ControllerInsertOverride { get; set; }
 

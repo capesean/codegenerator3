@@ -66,6 +66,9 @@ namespace WEB.Models
         [Required]
         public EditPageType EditPageType { get; set; }
 
+        [Required]
+        public bool UseAzureBlobStorage { get; set; }
+
         [MaxLength(50)]
         public string ControllerInsertOverride { get; set; }
 
@@ -125,6 +128,7 @@ namespace WEB.Models
             fieldDTO.FieldOrder = field.FieldOrder;
             fieldDTO.LookupId = field.LookupId;
             fieldDTO.EditPageType = field.EditPageType;
+            fieldDTO.UseAzureBlobStorage = field.UseAzureBlobStorage;
             fieldDTO.ControllerInsertOverride = field.ControllerInsertOverride;
             fieldDTO.ControllerUpdateOverride = field.ControllerUpdateOverride;
             fieldDTO.EditPageDefault = field.EditPageDefault;
@@ -161,6 +165,7 @@ namespace WEB.Models
             field.FieldOrder = fieldDTO.FieldOrder;
             field.LookupId = fieldDTO.LookupId;
             field.EditPageType = fieldDTO.EditPageType;
+            field.UseAzureBlobStorage = fieldDTO.UseAzureBlobStorage;
             field.ControllerInsertOverride = fieldDTO.ControllerInsertOverride;
             field.ControllerUpdateOverride = fieldDTO.ControllerUpdateOverride;
             field.EditPageDefault = fieldDTO.EditPageDefault;
