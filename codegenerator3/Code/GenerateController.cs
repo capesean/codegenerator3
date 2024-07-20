@@ -660,7 +660,7 @@ namespace WEB.Models
                     foreach (var relationship in errorOnParentDeleteRelationships)
                     {
                         // changed to use field on parent entity, rather than child, to avoid issues where names between child/parent are not the same
-                        var joins = CurrentEntity.KeyFields.Select(o => $"o.{relationship.ParentEntity.Name}.{CurrentEntity.Name}.{o.Name} == {o.Name.ToCamelCase()}").Aggregate((current, next) => current + " && " + next);
+                        var joins = CurrentEntity.KeyFields.Select(o => $"o.{relationship.ParentName}.{CurrentEntity.Name}.{o.Name} == {o.Name.ToCamelCase()}").Aggregate((current, next) => current + " && " + next);
                         s.Add($"            if (await {CurrentEntity.Project.DbContextVariable}.{(relationship.ChildEntity.EntityType == EntityType.User ? "Users" : relationship.ChildEntity.PluralName)}.AnyAsync(o => {joins}))");
                         s.Add($"                return BadRequest(\"Unable to delete the {rel.CollectionFriendlyName.ToLower()} as there are related {relationship.ChildEntity.PluralFriendlyName.ToLower()}\");");
                         s.Add($"");
@@ -675,7 +675,8 @@ namespace WEB.Models
                         s.Add($"            var {entity.KeyFields.Single().Name.ToCamelCase()}s = await db.{entity.PluralName}.Where(o => o.{rel.RelationshipFields.Single().ChildField.Name} == {rel.RelationshipFields.Single().ChildField.Name.ToCamelCase()}).Select(o => o.{entity.KeyFields.Single().Name}).ToListAsync();");
                         s.Add($"");
                     }
-                    else if (cascadeOnParentDeleteRelationships.Any() || entity.HasAFileContentsField)
+                    
+                    if (cascadeOnParentDeleteRelationships.Any() || (entity.HasAFileContentsField && !entity.HasAzureBlobStorageField))
                     {
                         s.Add($"            using var transactionScope = Utilities.General.CreateTransactionScope();");
                         s.Add($"");
@@ -707,15 +708,16 @@ namespace WEB.Models
                     s.Add($"            await {CurrentEntity.Project.DbContextVariable}.{entity.PluralName}.Where(o => {rel.RelationshipFields.Select(o => "o." + o.ChildField.Name + " == " + o.ParentField.Name.ToCamelCase()).Aggregate((current, next) => { return current + " && " + next; })}).ExecuteDeleteAsync();");
                     s.Add($"");
 
+                    if (cascadeOnParentDeleteRelationships.Any() || (entity.HasAFileContentsField && !entity.HasAzureBlobStorageField))
+                    {
+                        s.Add($"            transactionScope.Complete();");
+                        s.Add($"");
+                    }
+
                     if (entity.HasAzureBlobStorageField)
                     {
                         s.Add($"            foreach (var {entity.KeyFields.Single().Name.ToCamelCase()} in {entity.KeyFields.Single().Name.ToCamelCase()}s)");
                         s.Add($"                await blobStorageService.DeleteBlobAsync({entity.KeyFields.Single().Name.ToCamelCase()}.ToString().ToLowerInvariant());");
-                        s.Add($"");
-                    }
-                    else if (cascadeOnParentDeleteRelationships.Any() || entity.HasAFileContentsField)
-                    {
-                        s.Add($"            transactionScope.Complete();");
                         s.Add($"");
                     }
 

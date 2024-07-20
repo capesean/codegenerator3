@@ -96,6 +96,7 @@
                         vm.relationship.relationshipId = appSettings.newGuid;
                         vm.relationship.relationshipAncestorLimit = 1;
                         vm.relationship.parentEntityId = $stateParams.entityId;
+                        vm.relationship.disableDelete = true;
 
                         promises.push(
                             entityResource.get(
