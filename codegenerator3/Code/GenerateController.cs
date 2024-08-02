@@ -443,10 +443,10 @@ namespace WEB.Models
                 s.Add($"");
                 s.Add($"            if (!isNew)");
                 s.Add($"            {{");
-                s.Add($"                foreach (var roleId in user.Roles.ToList())");
+                // changed 1/8/24 based on what works in ixesha-2
+                s.Add($"                foreach (var role in await userManager.GetRolesAsync(user))");
                 s.Add($"                {{");
-                s.Add($"                    var role = rm.Roles.Single(o => o.Id == roleId.RoleId);");
-                s.Add($"                    await userManager.RemoveFromRoleAsync(user, role.Name);");
+                s.Add($"                    await userManager.RemoveFromRoleAsync(user, role);");
                 s.Add($"                }}");
                 s.Add($"            }}");
                 s.Add($"");
