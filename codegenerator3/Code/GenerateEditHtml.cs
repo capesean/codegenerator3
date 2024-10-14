@@ -21,13 +21,22 @@ namespace WEB.Models
                 s.Add($"");
                 t = "    ";
             }
-            s.Add(t + $"<app-page-title title=\"{CurrentEntity.FriendlyName}\"></app-page-title>");
+            s.Add(t + $"<app-page-title></app-page-title>");
             s.Add($"");
             s.Add(t + $"<form id=\"form\" name=\"form\" (submit)=\"save(form)\" novalidate #form=\"ngForm\" [ngClass]=\"{{ 'was-validated': form.submitted }}\">");
             s.Add($"");
 
-            s.Add(t + $"    <div class=\"card border-0\">");
+            s.Add(t + $"    <div class=\"card card-edit\">");
             s.Add($"");
+            s.Add(t + $"        <div class=\"card-header\">");
+            s.Add($"");
+            s.Add(t + $"            <div class=\"card-header-title\">");
+            s.Add(t + $"                <h4 class=\"text-uppercase m-0\">{CurrentEntity.FriendlyName}</h4>");
+            s.Add(t + $"            </div>");
+            s.Add($"");
+            s.Add(t + $"        </div>");
+            s.Add($"");
+
             s.Add(t + $"        <div class=\"card-body\">");
             s.Add($"");
             s.Add(t + $"            <fieldset class=\"group\">");
@@ -320,15 +329,16 @@ namespace WEB.Models
             s.Add(t + $"            </fieldset>");
             s.Add($"");
 
-            s.Add(t + $"            <fieldset class=\"my-3\">");
-            s.Add(t + $"                <button type=\"submit\" class=\"btn btn-outline-success me-2 mb-1\">Save<i class=\"fas fa-check ms-2\"></i></button>");
-            if (CurrentEntity.EntityType != EntityType.Settings)
-                s.Add(t + $"                <button type=\"button\" *ngIf=\"!isNew\" class=\"btn btn-outline-danger me-2 mb-1\" (click)=\"delete()\">Delete<i class=\"fas fa-times ms-2\"></i></button>");
-            s.Add(t + $"            </fieldset>");
-            s.Add($"");
-
             s.Add(t + $"        </div>");
             s.Add($"");
+
+            s.Add(t + $"    </div>");
+            s.Add($"");
+
+            s.Add(t + $"    <div class=\"mb-4\">");
+            s.Add(t + $"        <button type=\"submit\" class=\"btn btn-outline-success me-2 mb-1\">Save<i class=\"fas fa-check ms-2\"></i></button>");
+            if (CurrentEntity.EntityType != EntityType.Settings)
+                s.Add(t + $"        <button type=\"button\" *ngIf=\"!isNew\" class=\"btn btn-outline-danger me-2 mb-1\" (click)=\"delete()\">Delete<i class=\"fas fa-times ms-2\"></i></button>");
             s.Add(t + $"    </div>");
             s.Add($"");
 
@@ -343,8 +353,6 @@ namespace WEB.Models
 
                 s.Add(t + $"<ng-container *ngIf=\"!isNew\">");
                 s.Add($"");
-                s.Add(t + $"    <hr />");
-                s.Add($"");
                 s.Add(t + $"    <nav ngbNav #nav=\"ngbNav\" class=\"nav-tabs\">");
                 s.Add($"");
                 foreach (var relationship in relationships.Where(o => !o.IsOneToOne))
@@ -352,34 +360,61 @@ namespace WEB.Models
                     counter++;
                     var entity = relationship.ChildEntity;
 
-                    s.Add(t + $"        <ng-container ngbNavItem class=\"pt-6\">");
+                    s.Add(t + $"        <ng-container ngbNavItem>");
                     s.Add($"");
                     s.Add(t + $"            <a ngbNavLink>{relationship.CollectionFriendlyName}</a>");
                     s.Add($"");
                     s.Add(t + $"            <ng-template ngbNavContent>");
                     s.Add($"");
-                    s.Add(t + $"                <div class=\"card border-0 search-results\">");
+                    s.Add(t + $"                <div class=\"card card-list\">");
                     s.Add($"");
-                    s.Add(t + $"                    <div class=\"card-header border-0\">");
+                    s.Add(t + $"                    <div class=\"card-header\">");
                     s.Add($"");
-                    s.Add(t + $"                        <h4 class=\"card-header-title text-uppercase\">");
-                    s.Add(t + $"                            {relationship.CollectionFriendlyName}");
-                    s.Add(t + $"                        </h4>");
+                    s.Add(t + $"                        <div class=\"card-header-title\">");
+                    s.Add(t + $"                            <h4>{relationship.CollectionFriendlyName}</h4>");
+
+                    var childEntity = relationship.ChildEntity;
+                    var nonTextSearchFields = entity.AllNonTextSearchableFields.Where(o => !relationship.RelationshipFields.Any(rf => rf.ChildFieldId == o.FieldId));
+                    var hasSearchForm = nonTextSearchFields.Any() || entity.TextSearchFields.Any();
+                    var formName = $"formSearch{relationship.CollectionName}";
+
+                    if (relationship.UseMultiSelect || hasSearchForm || childEntity.HasASortField || relationship.Hierarchy)
+                    {
+                        s.Add(t + $"                            <div>");
+
+                        // add icon
+                        if (relationship.Hierarchy)
+                        {
+                            if (relationship.UseMultiSelect)
+                                s.Add(t + $"                                <i class=\"fa fa-fw ms-1 fa-plus cursor-pointer\" ngbTooltip=\"Add {relationship.CollectionFriendlyName}\" (click)=\"add{relationship.CollectionName}()\"></i>");
+                            else
+                                s.Add(t + $"                                <i class=\"fa fa-fw ms-1 fa-plus cursor-pointer\" ngbTooltip=\"Add {relationship.CollectionFriendlyName}\" [routerLink]=\"['./{childEntity.PluralName.ToLower()}'{string.Concat(Enumerable.Repeat(", 'add'", childEntity.KeyFields.Where(o => !relationship.RelationshipFields.Select(rf => rf.ChildFieldId).Contains(o.FieldId)).Count()))}]\"></i>");
+                        }
+
+                        // search options icon
+                        if (hasSearchForm)
+                            s.Add(t + $"                                <i class=\"fa fa-fw ms-1 fa-search cursor-pointer\" (click)=\"show{relationship.CollectionName}Search=!show{relationship.CollectionName}Search\" ngbTooltip=\"Toggle search options\"></i>");
+                        //s.Add(t + $"                            <button *ngIf=\"show{relationship.CollectionName}Search\" form=\"{formName}\" type=\"submit\" class=\"btn btn-outline-primary me-2 mb-1\">Search<i class=\"fas fa-search ms-2\"></i></button>");
+
+                        // sort icon
+                        if (relationship.Hierarchy && childEntity.HasASortField)
+                            s.Add(t + $"                                <i class=\"fa fa-fw ms-1 fa-sort cursor-pointer\" (click)=\"show{childEntity.Name}Sort()\" *ngIf=\"{relationship.CollectionName.ToCamelCase()}Headers.totalRecords > 1\" ngbTooltip=\"Sort {relationship.CollectionFriendlyName}\"></i>");
+
+                        s.Add(t + $"                            </div>");
+                    }
+                    s.Add(t + $"                        </div>");
                     s.Add($"");
                     s.Add(t + $"                    </div>");
                     s.Add($"");
 
-                    s.Add(t + $"                    <div class=\"card-body\">");
+                    s.Add(t + $"                    <div class=\"card-body\" *ngIf=\"show{relationship.CollectionName}Search\" @fadeThenShrink>");
                     s.Add($"");
 
-                    var nonTextSearchFields = entity.AllNonTextSearchableFields.Where(o => !relationship.RelationshipFields.Any(rf => rf.ChildFieldId == o.FieldId));
-                    var hasSearchForm = nonTextSearchFields.Any() || entity.TextSearchFields.Any();
-                    var formName = $"formSearch{relationship.CollectionName}";
                     if (hasSearchForm)
                     {
                         var searchOptions = $"{relationship.CollectionName.ToCamelCase()}SearchOptions";
 
-                        s.Add(t + $"                        <form id=\"{formName}\" (submit)=\"search{relationship.CollectionName}(0)\" novalidate *ngIf=\"show{relationship.CollectionName}Search\" class=\"mb-5\">");
+                        s.Add(t + $"                        <form id=\"{formName}\" (submit)=\"search{relationship.CollectionName}(0)\" novalidate>");
                         s.Add($"");
                         s.Add(t + $"                            <div class=\"row g-3\">");
                         s.Add($"");
@@ -476,32 +511,16 @@ namespace WEB.Models
                             }
                         }
 
+                        s.Add(t + $"                                <div class=\"col-sm-3 col-md-3 col-lg-3 col-xl-2\">");
+                        s.Add(t + $"                                    <div class=\"form-group\">");
+                        s.Add(t + $"                                        <button form=\"{formName}\" type=\"submit\" class=\"btn btn-outline-primary me-2 mb-1\">Search<i class=\"fas fa-search ms-2\"></i></button>");
+                        s.Add(t + $"                                    </div>");
+                        s.Add(t + $"                                </div>");
+                        s.Add($"");
+
                         s.Add(t + $"                            </div>");
                         s.Add($"");
                         s.Add(t + $"                        </form>");
-                        s.Add($"");
-                    }
-
-                    var childEntity = relationship.ChildEntity;
-
-                    if (relationship.UseMultiSelect || hasSearchForm || childEntity.HasASortField || relationship.Hierarchy)
-                    {
-                        s.Add(t + $"                        <div class=\"mb-3\">");
-
-                        if (relationship.Hierarchy)
-                            if (relationship.UseMultiSelect)
-                                s.Add(t + $"                            <button class=\"btn btn-outline-primary me-2 mb-1\" (click)=\"add{relationship.CollectionName}()\">Add {relationship.CollectionFriendlyName}<i class=\"fas fa-plus ms-2\"></i></button>");
-                            else
-                                s.Add(t + $"                            <a [routerLink]=\"['./{childEntity.PluralName.ToLower()}'{string.Concat(Enumerable.Repeat(", 'add'", childEntity.KeyFields.Where(o => !relationship.RelationshipFields.Select(rf => rf.ChildFieldId).Contains(o.FieldId)).Count()))}]\" class=\"btn btn-outline-primary me-2 mb-1\">Add<i class=\"fas fa-plus ms-2\"></i></a>");
-
-                        if (hasSearchForm)
-                        {
-                            s.Add(t + $"                            <button *ngIf=\"!show{relationship.CollectionName}Search\" type=\"button\" class=\"btn btn-outline-secondary me-2 mb-1\" (click)=\"show{relationship.CollectionName}Search=true\">Filter<i class=\"fas fa-filter ms-2\"></i></button>");
-                            s.Add(t + $"                            <button *ngIf=\"show{relationship.CollectionName}Search\" form=\"{formName}\" type=\"submit\" class=\"btn btn-outline-primary me-2 mb-1\">Search<i class=\"fas fa-search ms-2\"></i></button>");
-                        }
-                        if (relationship.Hierarchy && childEntity.HasASortField)
-                            s.Add(t + $"                            <button type=\"button\" class=\"btn btn-outline-secondary me-2 mb-1\" (click)=\"show{childEntity.Name}Sort()\" *ngIf=\"{relationship.CollectionName.ToCamelCase()}Headers.totalRecords > 1 && !show{relationship.CollectionName}Search\">Sort<i class=\"fas fa-sort ms-2\"></i></button>");
-                        s.Add(t + $"                        </div>");
                         s.Add($"");
                     }
 
