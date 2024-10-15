@@ -43,7 +43,7 @@ export class NAMEModalComponent implements OnInit {
 
     open(): NgbModalRef {
         if (this.resetOnOpen) this.selectedItems = [];
-/*SEARCHOPTIONS*/        this.modal = this.modalService.open(this.content, { size: 'xl', centered: true, scrollable: true });
+/*SEARCHOPTIONS*/        this.modal = this.modalService.open(this.content, { size: 'xl', centered: true, scrollable: false });
         this.runSearch();
         this.modal.result.then((CAMELCASENAME: NAME | NAME[]) => {
             if (this.multiple) this.changes.emit(CAMELCASENAME as NAME[]);

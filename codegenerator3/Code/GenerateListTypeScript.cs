@@ -41,6 +41,7 @@ namespace WEB.Models
             s.Add($"import {{ {CurrentEntity.Name}SearchOptions, {CurrentEntity.Name}SearchResponse, {CurrentEntity.Name} }} from '{folders}../common/models/{CurrentEntity.Name.ToLower()}.model';");
             if (enumLookups.Any())
                 s.Add($"import {{ Enum, Enums }} from '{folders}../common/models/enums.model';");
+            s.Add($"import {{ FadeThenShrink }} from '{folders}../common/animations/fadethenshrink';");
             if (CurrentEntity.EntityType == EntityType.User && !enumLookups.Any())
                 s.Add($"import {{ Enums }} from '{folders}../common/models/enums.model';");
 
@@ -56,12 +57,14 @@ namespace WEB.Models
             s.Add($"");
             s.Add($"@Component({{");
             s.Add($"    selector: '{CurrentEntity.Name.ToLower()}-list',");
-            s.Add($"    templateUrl: './{CurrentEntity.Name.ToLower()}.list.component.html'");
+            s.Add($"    templateUrl: './{CurrentEntity.Name.ToLower()}.list.component.html',");
+            s.Add($"    animations: [FadeThenShrink]");
             s.Add($"}})");
             s.Add($"export class {CurrentEntity.Name}ListComponent implements OnInit{(hasChildRoutes ? ", OnDestroy" : "")} {{");
             s.Add($"");
             s.Add($"    public {CurrentEntity.PluralName.ToCamelCase()}: {CurrentEntity.Name}[] = [];");
             s.Add($"    public searchOptions = new {CurrentEntity.Name}SearchOptions();");
+            s.Add($"    public showSearchOptions = false;");
             s.Add($"    public headers = new PagingHeaders();");
             if (hasChildRoutes)
                 s.Add($"    private routerSubscription: Subscription;");
@@ -143,7 +146,7 @@ namespace WEB.Models
             if (CurrentEntity.HasASortField)
             {
                 s.Add($"    showSort(): void {{");
-                s.Add($"        let modalRef = this.modalService.open({CurrentEntity.Name}SortComponent, {{ size: 'xl', centered: true, scrollable: true }});");
+                s.Add($"        let modalRef = this.modalService.open({CurrentEntity.Name}SortComponent, {{ size: 'xl', centered: true, scrollable: false }});");
                 s.Add($"        modalRef.result.then(");
                 s.Add($"            () => {{");
                 s.Add($"");

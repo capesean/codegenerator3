@@ -31,7 +31,7 @@ namespace WEB.Models
             s.Add(t + $"        <div class=\"card-header\">");
             s.Add($"");
             s.Add(t + $"            <div class=\"card-header-title\">");
-            s.Add(t + $"                <h4 class=\"text-uppercase m-0\">{CurrentEntity.FriendlyName}</h4>");
+            s.Add(t + $"                <h4>{CurrentEntity.FriendlyName}</h4>");
             s.Add(t + $"            </div>");
             s.Add($"");
             s.Add(t + $"        </div>");
@@ -416,7 +416,7 @@ namespace WEB.Models
 
                         s.Add(t + $"                        <form id=\"{formName}\" (submit)=\"search{relationship.CollectionName}(0)\" novalidate>");
                         s.Add($"");
-                        s.Add(t + $"                            <div class=\"row g-3\">");
+                        s.Add(t + $"                            <div class=\"row g-2\">");
                         s.Add($"");
 
                         if (entity.Fields.Any(f => f.SearchType == SearchType.Text))

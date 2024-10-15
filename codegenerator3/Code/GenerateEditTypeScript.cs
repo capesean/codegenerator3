@@ -58,6 +58,9 @@ namespace WEB.Models
             if (CurrentEntity.EntityType != EntityType.User && (enumLookups.Count > 0 || addEnum))
                 s.Add($"import {{ Enum, Enums{(CurrentEntity.PrimaryField.FieldType == FieldType.Enum ? ", " + CurrentEntity.PrimaryField.Lookup.PluralName : "")} }} from '{folders}../common/models/enums.model';");
 
+            if (relationshipsAsParent.Where(o => !o.IsOneToOne).Select(o => o.ChildEntity).Any())
+                s.Add($"import {{ FadeThenShrink }} from '{folders}../common/animations/fadethenshrink';");
+
             if (CurrentEntity.EntityType == EntityType.User)
             {
                 s.Add($"import {{ Enum, Enums, Roles }} from '{folders}../common/models/enums.model';");
@@ -103,7 +106,8 @@ namespace WEB.Models
 
             s.Add($"@Component({{");
             s.Add($"    selector: '{CurrentEntity.Name.ToLower()}-edit',");
-            s.Add($"    templateUrl: './{CurrentEntity.Name.ToLower()}.edit.component.html'");
+            s.Add($"    templateUrl: './{CurrentEntity.Name.ToLower()}.edit.component.html'{(relationshipsAsParent.Where(o => !o.IsOneToOne).Select(o => o.ChildEntity).Any() ? "," : "")}");
+            if (relationshipsAsParent.Where(o => !o.IsOneToOne).Select(o => o.ChildEntity).Any()) s.Add($"    animations: [FadeThenShrink]");
             s.Add($"}})");
 
             s.Add($"export class {CurrentEntity.Name}EditComponent implements OnInit{(hasChildRoutes ? ", OnDestroy" : "")} {{");

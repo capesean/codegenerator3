@@ -21,17 +21,45 @@ namespace WEB.Models
                 s.Add($"");
                 t = "    ";
             }
-            s.Add(t + $"<app-page-title title=\"{CurrentEntity.PluralFriendlyName}\"></app-page-title>");
+            s.Add(t + $"<app-page-title></app-page-title>");
             s.Add($"");
-            s.Add(t + $"<div class=\"card border-0\">");
+            s.Add(t + $"<div class=\"card card-list\">");
             s.Add($"");
-            s.Add(t + $"    <div class=\"card-body\">");
+            s.Add(t + $"    <div class=\"card-header\">");
+            s.Add($"");
+            s.Add(t + $"        <div class=\"card-header-title\">");
+            s.Add(t + $"            <h4>{CurrentEntity.PluralFriendlyName}</h4>");
+
+            var hasIcons = CurrentEntity.RelationshipsAsChild.Count(r => r.Hierarchy) == 0
+                || (CurrentEntity.Fields.Any(f => f.SearchType != SearchType.None) || CurrentEntity.EntityType == EntityType.User)
+                || CurrentEntity.HasASortField;
+
+            if (hasIcons)
+                s.Add(t + $"            <div>");
+
+            if (CurrentEntity.RelationshipsAsChild.Count(r => r.Hierarchy) == 0)
+                s.Add(t + $"                <i class=\"fa fa-fw ms-1 fa-plus cursor-pointer\" ngbTooltip=\"Add {CurrentEntity.FriendlyName}\" [routerLink]=\"['./', 'add']\"></i>");
+
+            if (CurrentEntity.Fields.Any(f => f.SearchType != SearchType.None) || CurrentEntity.EntityType == EntityType.User)
+                s.Add(t + $"                <i class=\"fa fa-fw ms-1 fa-search cursor-pointer\" ngbTooltip=\"Toggle search options\" (click)=\"showSearchOptions = !showSearchOptions\"></i>");
+
+            if (CurrentEntity.HasASortField)
+                s.Add(t + $"                <i class=\"fa fa-fw ms-1 fa-sort cursor-pointer\" ngbTooltip=\"Sort {CurrentEntity.PluralFriendlyName}\" (click)=\"showSort()\"></i>");
+
+            if (hasIcons)
+                s.Add(t + $"            </div>");
+
+            s.Add(t + $"        </div>");
+            s.Add($"");
+            s.Add(t + $"    </div>");
+            s.Add($"");
+            s.Add(t + $"    <div class=\"card-body\" *ngIf=\"showSearchOptions\" @fadeThenShrink>");
             s.Add($"");
             if (CurrentEntity.Fields.Any(f => f.SearchType != SearchType.None) || CurrentEntity.EntityType == EntityType.User)
             {
                 s.Add(t + $"        <form (submit)=\"runSearch(0)\" novalidate>");
                 s.Add($"");
-                s.Add(t + $"            <div class=\"row g-3\">");
+                s.Add(t + $"            <div class=\"row g-2\">");
                 s.Add($"");
 
                 if (CurrentEntity.Fields.Any(f => f.SearchType == SearchType.Text))
@@ -122,32 +150,19 @@ namespace WEB.Models
                         s.Add($"");
                     }
                 }
+
+                s.Add(t + $"                <div class=\"col-sm-3 col-md-3 col-lg-3 col-xl-2\">");
+                s.Add(t + $"                    <div class=\"form-group\">");
+                s.Add(t + $"                        <button type=\"submit\" class=\"btn btn-outline-primary me-2 mb-1\">Search<i class=\"fas fa-search ms-2\"></i></button>");
+                s.Add(t + $"                    </div>");
+                s.Add(t + $"                </div>");
+                s.Add($"");
+
                 s.Add(t + $"            </div>");
-                s.Add($"");
-                s.Add(t + $"            <fieldset class=\"mt-3\">");
-                s.Add($"");
-                s.Add(t + $"                <button type=\"submit\" class=\"btn btn-outline-primary me-2 mb-1\">Search<i class=\"fas fa-search ms-2\"></i></button>");
-                if (CurrentEntity.RelationshipsAsChild.Count(r => r.Hierarchy) == 0)
-                {
-                    s.Add(t + $"                <a [routerLink]=\"['./', 'add']\" class=\"btn btn-outline-primary me-2 mb-1\">Add<i class=\"fas fa-plus ms-2\"></i></a>");
-                }
-                if (CurrentEntity.HasASortField)
-                    s.Add(t + $"                <button type=\"button\" class=\"btn btn-outline-secondary me-2 mb-1\" (click)=\"showSort()\" *ngIf=\"headers.totalRecords > 1\">Sort<i class=\"fas fa-sort ms-2\"></i></button>");
-                s.Add($"");
-                s.Add(t + $"            </fieldset>");
                 s.Add($"");
                 s.Add(t + $"        </form>");
             }
             s.Add($"");
-            s.Add(t + $"    </div>");
-            s.Add($"");
-            s.Add(t + $"</div>");
-            s.Add($"");
-
-            s.Add(t + $"<div class=\"card border-0\">");
-            s.Add($"");
-            s.Add(t + $"    <div class=\"card-header border-0 card-header-space-between\">");
-            s.Add(t + $"        <h4 class=\"card-header-title text-uppercase\">{CurrentEntity.PluralFriendlyName}</h4>");
             s.Add(t + $"    </div>");
             s.Add($"");
 
