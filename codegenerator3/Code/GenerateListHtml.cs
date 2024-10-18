@@ -53,7 +53,7 @@ namespace WEB.Models
             s.Add($"");
             s.Add(t + $"    </div>");
             s.Add($"");
-            s.Add(t + $"    <div class=\"card-body\" *ngIf=\"showSearchOptions\" @fadeThenShrink>");
+            s.Add(t + $"    <div class=\"card-body\" *ngIf=\"showSearchOptions\" @FadeThenShrink>");
             s.Add($"");
             if (CurrentEntity.Fields.Any(f => f.SearchType != SearchType.None) || CurrentEntity.EntityType == EntityType.User)
             {
@@ -169,7 +169,7 @@ namespace WEB.Models
             s.Add(t + $"    <div class=\"table-responsive\">");
             s.Add($"");
 
-            s.Add(t + $"        <table class=\"table table-hover table-edge table-nowrap mb-0 align-middle\">");
+            s.Add(t + $"        <table class=\"table table-hover table-striped table-edge table-nowrap mb-0 align-middle\">");
             s.Add(t + $"            <thead class=\"thead-light\">");
             s.Add(t + $"                <tr>");
             foreach (var field in CurrentEntity.Fields.Where(f => f.ShowInSearchResults).OrderBy(f => f.FieldOrder))

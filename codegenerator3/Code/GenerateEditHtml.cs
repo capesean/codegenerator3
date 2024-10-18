@@ -513,7 +513,7 @@ namespace WEB.Models
 
                         s.Add(t + $"                                <div class=\"col-sm-3 col-md-3 col-lg-3 col-xl-2\">");
                         s.Add(t + $"                                    <div class=\"form-group\">");
-                        s.Add(t + $"                                        <button form=\"{formName}\" type=\"submit\" class=\"btn btn-outline-primary me-2 mb-1\">Search<i class=\"fas fa-search ms-2\"></i></button>");
+                        s.Add(t + $"                                        <button type=\"submit\" class=\"btn btn-outline-primary me-2 mb-1\">Search<i class=\"fas fa-search ms-2\"></i></button>");
                         s.Add(t + $"                                    </div>");
                         s.Add(t + $"                                </div>");
                         s.Add($"");
