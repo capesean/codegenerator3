@@ -84,6 +84,8 @@
                         if (vm.isNew && vm.project.name) {
                             vm.project.webPath = vm.project.name + "\\WEB";
                             vm.project.modelsPath = vm.project.name + "\\WEB\\Models";
+                            vm.project.dtOsPath = vm.project.name + "\\WEB\\Models\\DTOs";
+                            vm.project.searchOptionsPath = vm.project.name + "\\WEB\\Models\\SearchOptions";
                         }
                         
                     });

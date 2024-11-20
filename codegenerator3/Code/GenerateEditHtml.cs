@@ -530,7 +530,7 @@ namespace WEB.Models
                     #region table
                     s.Add(t + $"                    <div class=\"table-responsive\">");
                     s.Add($"");
-                    s.Add(t + $"                        <table class=\"table table-hover table-striped table-edge table-nowrap mb-0 align-middle\">");
+                    s.Add(t + $"                        <table class=\"table table-hover table-striped table-nowrap mb-0 align-middle\">");
                     s.Add(t + $"                            <thead class=\"thead-light\">");
                     s.Add(t + $"                                <tr>");
                     if (relationship.UseMultiSelect)

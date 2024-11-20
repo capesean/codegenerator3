@@ -75,6 +75,24 @@
                             </div>
                         </div>
 
+                        <div class="col-sm-6 col-md-4 col-lg-3" uib-popover-html="'This is the <strong>relative</strong> path from the <code>RootPath</code> defined in <code>Web.config</code> to the root of your Models project. Example: If your models project is on path <code>c:\\source\\mymodels</code>, your <code>RootPath</code> should be <code>c:\\source\\</code> and your <code>DTOs Path</code> should be <code>mymodels\\DTOs</code>. (This allows you to have Web and Models in different projects, or they could be the same value if it is a single project.)'" popover-trigger="'mouseenter'" popover-append-to-body="true" popover-title="Models Path">
+                            <div class="form-group" ng-class="{ 'has-error':  mainForm.$submitted && mainForm.dtosPath.$invalid }">
+                                <label for="dtosPath" class="control-label">
+                                    DTOs Path:
+                                </label>
+                                <input type="text" id="dtosPath" name="dtosPath" ng-model="vm.project.dtOsPath" maxlength="50" class="form-control" ng-required="true" />
+                            </div>
+                        </div>
+
+                        <div class="col-sm-6 col-md-4 col-lg-3" uib-popover-html="'This is the <strong>relative</strong> path from the <code>RootPath</code> defined in <code>Web.config</code> to the root of your Models project. Example: If your models project is on path <code>c:\\source\\mymodels</code>, your <code>RootPath</code> should be <code>c:\\source\\</code> and your <code>Search Options Path</code> should be <code>mymodels\\SearchOptions</code>. (This allows you to have Web and Models in different projects, or they could be the same value if it is a single project.)'" popover-trigger="'mouseenter'" popover-append-to-body="true" popover-title="Models Path">
+                            <div class="form-group" ng-class="{ 'has-error':  mainForm.$submitted && mainForm.searchOptionsPath.$invalid }">
+                                <label for="searchOptionsPath" class="control-label">
+                                    Search Options Path:
+                                </label>
+                                <input type="text" id="searchOptionsPath" name="searchOptionsPath" ng-model="vm.project.searchOptionsPath" maxlength="50" class="form-control" ng-required="true" />
+                            </div>
+                        </div>
+
                         <div class="col-sm-6 col-md-4 col-lg-3" uib-popover-html="'This is the <strong>relative</strong> path from the <code>ClientApp\\src\\app</code> folder into which the generated front-end files will be placed. If you want your generated files places into an \'admin\' subfolder, use a value of <code>admin\\</code> here.'" popover-trigger="'mouseenter'" popover-append-to-body="true" popover-title="Generated Path">
                             <div class="form-group" ng-class="{ 'has-error':  mainForm.$submitted && mainForm.generatedPath.$invalid }">
                                 <label for="modelsPath" class="control-label">

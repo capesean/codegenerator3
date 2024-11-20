@@ -34,6 +34,12 @@ namespace WEB.Models
         [NotMapped]
         public string RootPathModels { get { return ConfigurationManager.AppSettings["RootPath"] + (String.IsNullOrWhiteSpace(ModelsPath) ? Name : ModelsPath) + @"\"; } }
 
+        [NotMapped]
+        public string RootPathDTOs { get { return ConfigurationManager.AppSettings["RootPath"] + (String.IsNullOrWhiteSpace(DTOsPath) ? Name : DTOsPath) + @"\"; } }
+
+        [NotMapped]
+        public string RootPathSearchOptions { get { return ConfigurationManager.AppSettings["RootPath"] + (String.IsNullOrWhiteSpace(SearchOptionsPath) ? Name : SearchOptionsPath) + @"\"; } }
+
         [Required(AllowEmptyStrings = true)]
         [MaxLength(20)]
         public string Namespace { get; set; }
@@ -55,6 +61,12 @@ namespace WEB.Models
 
         [MaxLength(50)]
         public string ModelsPath { get; set; }
+
+        [MaxLength(50)]
+        public string DTOsPath { get; set; }
+
+        [MaxLength(50)]
+        public string SearchOptionsPath { get; set; }
 
         [MaxLength(50)]
         public string GeneratedPath { get; set; }

@@ -568,12 +568,11 @@ namespace WEB.Models
             #region dto
             if (deploymentOptions.DTO)
             {
-                var path = Path.Combine(entity.Project.RootPathModels, "DTOs");
-                if (!Directory.Exists(path))
-                    return ("DTOs path does not exist: " + path);
+                if (!Directory.Exists(entity.Project.RootPathDTOs))
+                    return ("DTOs path does not exist: " + entity.Project.RootPathDTOs);
 
                 var code = codeGenerator.GenerateDTO();
-                if (code != string.Empty) File.WriteAllText(Path.Combine(path, entity.Name + "DTO.cs"), code);
+                if (code != string.Empty) File.WriteAllText(Path.Combine(entity.Project.RootPathDTOs, entity.Name + "DTO.cs"), code);
             }
             #endregion
 
@@ -603,9 +602,8 @@ namespace WEB.Models
             #region settings
             if (deploymentOptions.SettingsDTO)
             {
-                var path = Path.Combine(entity.Project.RootPathModels, "DTOs");
-                if (!Directory.Exists(path))
-                    return ("DTOs path does not exist: " + path);
+                if (!Directory.Exists(entity.Project.RootPathDTOs))
+                    return ("Settings path does not exist: " + entity.Project.RootPathDTOs);
 
                 // settings now manually done
                 //var code = codeGenerator.GenerateSettingsDTO();
@@ -616,9 +614,8 @@ namespace WEB.Models
             #region settings dto
             if (deploymentOptions.SettingsDTO)
             {
-                var path = Path.Combine(entity.Project.RootPathModels, "DTOs");
-                if (!Directory.Exists(path))
-                    return ("DTOs path does not exist: " + path);
+                if (!Directory.Exists(entity.Project.RootPathDTOs))
+                    return ("Settings DTOs path does not exist: " + entity.Project.RootPathDTOs);
 
                 //var code = codeGenerator.GenerateSettingsDTO();
                 //if (code != string.Empty) File.WriteAllText(Path.Combine(path, "SettingsDTO_.cs"), code);
@@ -797,12 +794,11 @@ namespace WEB.Models
             #region search options
             if (deploymentOptions.SearchOptions)
             {
-                var path = Path.Combine(entity.Project.RootPathModels, "SearchOptions");
-                if (!Directory.Exists(path))
-                    return ("SearchOptions path does not exist: " + path);
+                if (!Directory.Exists(entity.Project.RootPathSearchOptions))
+                    return ("SearchOptions path does not exist: " + entity.Project.RootPathSearchOptions);
 
                 var code = codeGenerator.GenerateSearchOptions();
-                if (code != string.Empty) File.WriteAllText(Path.Combine(path, entity.Name + "SearchOptions.cs"), code);
+                if (code != string.Empty) File.WriteAllText(Path.Combine(entity.Project.RootPathSearchOptions, entity.Name + "SearchOptions.cs"), code);
             }
             #endregion
 

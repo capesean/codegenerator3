@@ -497,10 +497,12 @@ namespace WEB.Models
 
                 var cascadeDeleteRelationships = CurrentEntity.RelationshipsAsParent.Where(rel => !rel.ChildEntity.Exclude && rel.CascadeDelete).OrderBy(o => o.SortOrder);
 
-                if (cascadeDeleteRelationships.Any() || (CurrentEntity.HasAFileContentsField && !CurrentEntity.HasAzureBlobStorageField))
+                var usingTransaction = cascadeDeleteRelationships.Any() || (CurrentEntity.HasAFileContentsField && !CurrentEntity.HasAzureBlobStorageField);
+                if (usingTransaction)
                 {
-                    s.Add($"            using var transactionScope = Utilities.General.CreateTransactionScope();");
-                    s.Add($"");
+                    // using () -> otherwise any db calls outside the transaction will error
+                    s.Add($"            using (var transactionScope = Utilities.General.CreateTransactionScope())");
+                    s.Add($"            {{");
                 }
 
                 if (cascadeDeleteRelationships.Any())
@@ -512,38 +514,39 @@ namespace WEB.Models
 
                         if (relationship.ChildEntity.Fields.Any(o => o.EditPageType == EditPageType.FileContents))
                         {
-                            s.Add($"            await {CurrentEntity.Project.DbContextVariable}.{(relationship.ChildEntity.EntityType == EntityType.User ? "User" : relationship.ChildEntity.Name)}Contents.Where(o => {joinsContents}).ExecuteDeleteAsync();");
+                            s.Add($"{(usingTransaction ? "    " : "")}            await {CurrentEntity.Project.DbContextVariable}.{(relationship.ChildEntity.EntityType == EntityType.User ? "User" : relationship.ChildEntity.Name)}Contents.Where(o => {joinsContents}).ExecuteDeleteAsync();");
                             s.Add($"");
                         }
-                        s.Add($"            await {CurrentEntity.Project.DbContextVariable}.{(relationship.ChildEntity.EntityType == EntityType.User ? "Users" : relationship.ChildEntity.PluralName)}.Where(o => {joins}).ExecuteDeleteAsync();");
+                        s.Add($"{(usingTransaction ? "    " : "")}            await {CurrentEntity.Project.DbContextVariable}.{(relationship.ChildEntity.EntityType == EntityType.User ? "Users" : relationship.ChildEntity.PluralName)}.Where(o => {joins}).ExecuteDeleteAsync();");
                         s.Add($"");
                     }
                 }
 
                 if (CurrentEntity.HasAFileContentsField && !CurrentEntity.HasAzureBlobStorageField)
                 {
-                    s.Add($"            await {CurrentEntity.Project.DbContextVariable}.{CurrentEntity.Name}Contents.Where(o => {CurrentEntity.KeyFields.Select(o => $"o.{o.Name} == {o.Name.ToCamelCase()}").Aggregate((current, next) => current + " && " + next)}).ExecuteDeleteAsync();");
+                    s.Add($"{(usingTransaction ? "    " : "")}            await {CurrentEntity.Project.DbContextVariable}.{CurrentEntity.Name}Contents.Where(o => {CurrentEntity.KeyFields.Select(o => $"o.{o.Name} == {o.Name.ToCamelCase()}").Aggregate((current, next) => current + " && " + next)}).ExecuteDeleteAsync();");
                     s.Add($"");
                 }
 
                 if (CurrentEntity.EntityType == EntityType.User)
                 {
-                    s.Add($"            foreach (var role in await userManager.GetRolesAsync(user))");
-                    s.Add($"                await userManager.RemoveFromRoleAsync(user, role);");
+                    s.Add($"{(usingTransaction ? "    " : "")}            foreach (var role in await userManager.GetRolesAsync(user))");
+                    s.Add($"{(usingTransaction ? "    " : "")}                await userManager.RemoveFromRoleAsync(user, role);");
                     s.Add($"");
-                    s.Add($"            await userManager.DeleteAsync(user);");
+                    s.Add($"{(usingTransaction ? "    " : "")}            await userManager.DeleteAsync(user);");
                 }
                 else
                 {
-                    s.Add($"            {CurrentEntity.Project.DbContextVariable}.Entry({CurrentEntity.CamelCaseName}).State = EntityState.Deleted;");
+                    s.Add($"{(usingTransaction ? "    " : "")}            {CurrentEntity.Project.DbContextVariable}.Entry({CurrentEntity.CamelCaseName}).State = EntityState.Deleted;");
                     s.Add($"");
-                    s.Add($"            await {CurrentEntity.Project.DbContextVariable}.SaveChangesAsync();");
+                    s.Add($"{(usingTransaction ? "    " : "")}            await {CurrentEntity.Project.DbContextVariable}.SaveChangesAsync();");
                 }
 
-                if (cascadeDeleteRelationships.Any() || (CurrentEntity.HasAFileContentsField && !CurrentEntity.HasAzureBlobStorageField))
+                if (usingTransaction)
                 {
                     s.Add($"");
-                    s.Add($"            transactionScope.Complete();");
+                    s.Add($"                transactionScope.Complete();");
+                    s.Add($"            }}");
                 }
 
                 if (CurrentEntity.HasAzureBlobStorageField)
@@ -676,11 +679,13 @@ namespace WEB.Models
                         s.Add($"            var {entity.KeyFields.Single().Name.ToCamelCase()}s = await db.{entity.PluralName}.Where(o => o.{rel.RelationshipFields.Single().ChildField.Name} == {rel.RelationshipFields.Single().ChildField.Name.ToCamelCase()}).Select(o => o.{entity.KeyFields.Single().Name}).ToListAsync();");
                         s.Add($"");
                     }
-                    
-                    if (cascadeOnParentDeleteRelationships.Any() || (entity.HasAFileContentsField && !entity.HasAzureBlobStorageField))
+
+                    usingTransaction = cascadeOnParentDeleteRelationships.Any() || (entity.HasAFileContentsField && !entity.HasAzureBlobStorageField);
+                    if (usingTransaction)
                     {
-                        s.Add($"            using var transactionScope = Utilities.General.CreateTransactionScope();");
-                        s.Add($"");
+                        // using () -> otherwise any db calls outside the transaction will error
+                        s.Add($"            using (var transactionScope = Utilities.General.CreateTransactionScope())");
+                        s.Add($"            {{");
                     }
 
                     if (cascadeOnParentDeleteRelationships.Any())
@@ -692,26 +697,27 @@ namespace WEB.Models
                             if (relationship.ChildEntity.Fields.Any(o => o.EditPageType == EditPageType.FileContents))
                             {
                                 // this may not be right?
-                                s.Add($"            await {CurrentEntity.Project.DbContextVariable}.{(relationship.ChildEntity.EntityType == EntityType.User ? "Users" : relationship.ChildEntity.PluralName)}.Where(o => {joins}).ExecuteDeleteAsync();");
+                                s.Add($"{(usingTransaction ? "    " : "")}            await {CurrentEntity.Project.DbContextVariable}.{(relationship.ChildEntity.EntityType == EntityType.User ? "Users" : relationship.ChildEntity.PluralName)}.Where(o => {joins}).ExecuteDeleteAsync();");
                                 //s.Add($"            await db.Database.ExecuteSqlRawAsync($\"DELETE FROM {relationship.ChildEntity.PluralName} WHERE {relationship.RelationshipFields.Select(o => o.ChildField.Name + " = '{" + o.ParentField.Name.ToCamelCase() + "}'").Aggregate((current, next) => { return current + " AND " + next; })}\");");
                             }
                             else
-                                s.Add($"            await {CurrentEntity.Project.DbContextVariable}.{(relationship.ChildEntity.EntityType == EntityType.User ? "Users" : relationship.ChildEntity.PluralName)}.Where(o => {joins}).ExecuteDeleteAsync();");
+                                s.Add($"{(usingTransaction ? "    " : "")}            await {CurrentEntity.Project.DbContextVariable}.{(relationship.ChildEntity.EntityType == EntityType.User ? "Users" : relationship.ChildEntity.PluralName)}.Where(o => {joins}).ExecuteDeleteAsync();");
                             s.Add($"");
                         }
                     }
 
                     if (entity.HasAFileContentsField && !entity.HasAzureBlobStorageField)
                     {
-                        s.Add($"            await {CurrentEntity.Project.DbContextVariable}.{entity.Name}Contents.Where(o => {rel.RelationshipFields.Select(o => $"o.{rel.ChildEntity.Name}." + o.ChildField.Name + " == " + o.ParentField.Name.ToCamelCase()).Aggregate((current, next) => { return current + " && " + next; })}).ExecuteDeleteAsync();");
+                        s.Add($"{(usingTransaction ? "    " : "")}            await {CurrentEntity.Project.DbContextVariable}.{entity.Name}Contents.Where(o => {rel.RelationshipFields.Select(o => $"o.{rel.ChildEntity.Name}." + o.ChildField.Name + " == " + o.ParentField.Name.ToCamelCase()).Aggregate((current, next) => { return current + " && " + next; })}).ExecuteDeleteAsync();");
                         s.Add($"");
                     }
-                    s.Add($"            await {CurrentEntity.Project.DbContextVariable}.{entity.PluralName}.Where(o => {rel.RelationshipFields.Select(o => "o." + o.ChildField.Name + " == " + o.ParentField.Name.ToCamelCase()).Aggregate((current, next) => { return current + " && " + next; })}).ExecuteDeleteAsync();");
+                    s.Add($"{(usingTransaction ? "    " : "")}            await {CurrentEntity.Project.DbContextVariable}.{entity.PluralName}.Where(o => {rel.RelationshipFields.Select(o => "o." + o.ChildField.Name + " == " + o.ParentField.Name.ToCamelCase()).Aggregate((current, next) => { return current + " && " + next; })}).ExecuteDeleteAsync();");
                     s.Add($"");
 
-                    if (cascadeOnParentDeleteRelationships.Any() || (entity.HasAFileContentsField && !entity.HasAzureBlobStorageField))
+                    if (usingTransaction)
                     {
-                        s.Add($"            transactionScope.Complete();");
+                        s.Add($"                transactionScope.Complete();");
+                        s.Add($"            }}");
                         s.Add($"");
                     }
 
