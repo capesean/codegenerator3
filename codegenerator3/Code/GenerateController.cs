@@ -406,30 +406,30 @@ namespace WEB.Models
                 s.Add($"");
             }
 
+            var deleteFile = CurrentEntity.HasAFileContentsField && CurrentEntity.HasAzureBlobStorageField && CurrentEntity.Fields.Single(o => o.EditPageType == EditPageType.FileName).IsNullable;
+            if (deleteFile)
+            {
+                var fieldName = CurrentEntity.Fields.Single(o => o.EditPageType == EditPageType.FileName).Name;
+                s.Add($"            var deleteFile = {CurrentEntity.CamelCaseName}DTO.{fieldName} == null && {CurrentEntity.CamelCaseName}.{fieldName} != null;");
+                s.Add($"");
+            }
+
             s.Add($"            ModelFactory.Hydrate({CurrentEntity.CamelCaseName}, {CurrentEntity.DTOName.ToCamelCase()}{(CurrentEntity.Fields.Any(o => o.EditPageType == EditPageType.EditWhenNew) ? ", isNew" : "")});");
             s.Add($"");
 
-            if (CurrentEntity.HasAFileContentsField)
+            if (CurrentEntity.HasAFileContentsField && !CurrentEntity.HasAzureBlobStorageField)
             {
                 s.Add($"            if ({CurrentEntity.DTOName.ToCamelCase()}.{fileContentsField.Name} != null)");
                 s.Add($"            {{");
-                if (CurrentEntity.HasAzureBlobStorageField)
-                {
-                    s.Add($"                var blobStorageService = new BlobStorageService(AppSettings.AzureBlobStorage.ConnectionString, AppSettings.AzureBlobStorage.ContainerName);");
-                    s.Add($"                await blobStorageService.UploadBlobAsync({CurrentEntity.Name.ToCamelCase()}.{CurrentEntity.KeyFields.Single().Name}.ToString().ToLowerInvariant(), Convert.FromBase64String({CurrentEntity.DTOName.ToCamelCase()}.{fileContentsField.Name}));");
-                }
-                else
-                {
-                    s.Add($"                if (isNew)");
-                    s.Add($"                    db.Entry({CurrentEntity.Name.ToCamelCase()}.{CurrentEntity.Name}Content).State = EntityState.Added;");
-                    s.Add($"                else");
-                    s.Add($"                {{");
-                    s.Add($"                    if (await {CurrentEntity.Project.DbContextVariable}.{CurrentEntity.PluralName}.AnyAsync(o => {GetKeyFieldLinq("o", CurrentEntity.DTOName.ToCamelCase())} && o.{CurrentEntity.Name}Content != null))");
-                    s.Add($"                        db.Entry({CurrentEntity.Name.ToCamelCase()}.{CurrentEntity.Name}Content).State = EntityState.Modified;");
-                    s.Add($"                    else");
-                    s.Add($"                        db.Entry({CurrentEntity.Name.ToCamelCase()}.{CurrentEntity.Name}Content).State = EntityState.Added;");
-                    s.Add($"                }}");
-                }
+                s.Add($"                if (isNew)");
+                s.Add($"                    db.Entry({CurrentEntity.Name.ToCamelCase()}.{CurrentEntity.Name}Content).State = EntityState.Added;");
+                s.Add($"                else");
+                s.Add($"                {{");
+                s.Add($"                    if (await {CurrentEntity.Project.DbContextVariable}.{CurrentEntity.PluralName}.AnyAsync(o => {GetKeyFieldLinq("o", CurrentEntity.DTOName.ToCamelCase())} && o.{CurrentEntity.Name}Content != null))");
+                s.Add($"                        db.Entry({CurrentEntity.Name.ToCamelCase()}.{CurrentEntity.Name}Content).State = EntityState.Modified;");
+                s.Add($"                    else");
+                s.Add($"                        db.Entry({CurrentEntity.Name.ToCamelCase()}.{CurrentEntity.Name}Content).State = EntityState.Added;");
+                s.Add($"                }}");
                 s.Add($"            }}");
                 s.Add($"");
             }
@@ -464,6 +464,25 @@ namespace WEB.Models
             {
                 s.Add($"            await {CurrentEntity.Project.DbContextVariable}.SaveChangesAsync();");
             }
+
+            if (CurrentEntity.HasAFileContentsField && CurrentEntity.HasAzureBlobStorageField)
+            {
+                s.Add($"");
+                s.Add($"            if ({CurrentEntity.DTOName.ToCamelCase()}.{fileContentsField.Name} != null)");
+                s.Add($"            {{");
+                s.Add($"                var blobStorageService = new BlobStorageService(AppSettings.AzureBlobStorage.ConnectionString, AppSettings.AzureBlobStorage.ContainerName);");
+                s.Add($"                await blobStorageService.UploadBlobAsync({CurrentEntity.Name.ToCamelCase()}.{CurrentEntity.KeyFields.Single().Name}.ToString().ToLowerInvariant(), Convert.FromBase64String({CurrentEntity.DTOName.ToCamelCase()}.{fileContentsField.Name}));");
+                s.Add($"            }}");
+                if (deleteFile)
+                {
+                    s.Add($"            else if (deleteFile)");
+                    s.Add($"            {{");
+                    s.Add($"                var blobStorageService = new BlobStorageService(AppSettings.AzureBlobStorage.ConnectionString, AppSettings.AzureBlobStorage.ContainerName);");
+                    s.Add($"                await blobStorageService.DeleteBlobAsync({CurrentEntity.Name.ToCamelCase()}.{CurrentEntity.KeyFields.Single().Name}.ToString().ToLowerInvariant());");
+                    s.Add($"            }}");
+                }
+            }
+
             s.Add($"");
             s.Add($"            return await Get({(CurrentEntity.EntityType == EntityType.Settings ? string.Empty : CurrentEntity.KeyFields.Select(f => CurrentEntity.CamelCaseName + "." + f.Name).Aggregate((current, next) => current + ", " + next))});");
             s.Add($"        }}");

@@ -78,7 +78,7 @@ namespace WEB.Models
                     s.Add(t + $"                    <div class=\"form-group\">");
                     s.Add(t + $"                        <select id=\"roles\" name=\"roles\" class=\"form-select\" [(ngModel)]=\"searchOptions.roleName\">");
                     s.Add(t + $"                            <option [value]=\"undefined\">All roles</option>");
-                    s.Add(t + $"                            <option *ngFor=\"let role of roles\" [ngValue]=\"role.name\">{{{{role.name}}}}</option>");
+                    s.Add(t + $"                            <option *ngFor=\"let role of roles\" [ngValue]=\"role.name\">{{{{role.label}}}}</option>");
                     s.Add(t + $"                        </select>");
                     s.Add(t + $"                    </div>");
                     s.Add(t + $"                </div>");
