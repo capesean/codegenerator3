@@ -743,6 +743,10 @@
     <Compile Include="Migrations\202411051236587_DTOsSearchOptionsPaths.Designer.cs">
       <DependentUpon>202411051236587_DTOsSearchOptionsPaths.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202502041007539_DisableListDelete.cs" />
+    <Compile Include="Migrations\202502041007539_DisableListDelete.Designer.cs">
+      <DependentUpon>202502041007539_DisableListDelete.cs</DependentUpon>
+    </Compile>
     <Compile Include="Models\Relationship_.cs" />
     <Compile Include="Startup.cs" />
     <Compile Include="Utilities\ApiException.cs" />
@@ -910,6 +914,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202411051236587_DTOsSearchOptionsPaths.resx">
       <DependentUpon>202411051236587_DTOsSearchOptionsPaths.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202502041007539_DisableListDelete.resx">
+      <DependentUpon>202502041007539_DisableListDelete.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

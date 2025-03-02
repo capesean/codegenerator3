@@ -546,7 +546,7 @@ namespace WEB.Models
                             s.Add(t + $"                                    <th{(string.IsNullOrWhiteSpace(column.Field.DisplayClasses) ? "" : $" class=\"{column.Field.DisplayClasses}\"")}>{column.Header}</th>");
                         }
                     }
-                    if (!relationship.DisableDelete)
+                    if (!relationship.DisableListDelete)
                     {
                         if (!relationship.IsOneToOne)
                             s.Add(t + $"                                    <th class=\"w-20px text-center\"><i class=\"fas fa-times text-danger cursor-pointer\" (click)=\"delete{relationship.CollectionName}()\" ngbTooltip=\"Delete all {relationship.CollectionFriendlyName.ToLower()}\" container=\"body\" placement=\"left\"></i></th>");
@@ -571,7 +571,7 @@ namespace WEB.Models
                             s.Add(t + $"                                    <td{(string.IsNullOrWhiteSpace(column.Field.DisplayClasses) ? "" : $" class=\"{column.Field.DisplayClasses}\"")}>{column.Value}</td>");
                         }
                     }
-                    if (!relationship.DisableDelete)
+                    if (!relationship.DisableListDelete)
                         s.Add(t + $"                                    <td class=\"text-center\"><i class=\"fas fa-times cursor-pointer p-1 text-danger\" (click)=\"delete{relationship.CollectionSingular}({relationship.ChildEntity.Name.ToCamelCase()}, $event)\"></i></td>");
                     s.Add(t + $"                                </tr>");
                     s.Add(t + $"                            </tbody>");

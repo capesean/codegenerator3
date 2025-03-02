@@ -466,7 +466,7 @@ namespace WEB.Models
                     s.Add($"");
                 }
 
-                if (!rel.DisableDelete)
+                if (!rel.DisableListDelete)
                 {
                     s.Add($"    delete{rel.CollectionSingular}({rel.ChildEntity.Name.ToCamelCase()}: {rel.ChildEntity.Name}, event: MouseEvent): void {{");
                     s.Add($"        event.stopPropagation();");

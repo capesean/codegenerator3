@@ -53,7 +53,7 @@ namespace WEB.Models
         public RelationshipAncestorLimits RelationshipAncestorLimit { get; set; }
 
         [Required]
-        public bool DisableDelete { get; set; }
+        public bool DisableListDelete { get; set; }
 
         [Required]
         public bool CascadeDelete { get; set; }
