@@ -1,7 +1,7 @@
 ﻿import { Component, OnInit } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { CdkDragDrop, CdkDragStart, moveItemInArray } from '@angular/cdk/drag-drop';
-import { NAMESearchOptions, NAMESearchResponse, NAME } from '/*FOLDERS*/../common/models/NAME_TOLOWER.model';
+import { NAMESearchOptions, NAMESearchResponse, TYPESCRIPTNAME } from '/*FOLDERS*/../common/models/NAME_TOLOWER.model';
 import { NAMEService } from '/*FOLDERS*/../common/services/NAME_TOLOWER.service';
 import { PagingHeaders } from '/*FOLDERS*/../common/models/http.model';
 import { ErrorService } from '/*FOLDERS*/../common/services/error.service';
@@ -9,13 +9,14 @@ import { ToastrService } from 'ngx-toastr';
 ENUM_IMPORTS
 @Component({
     selector: 'HYPHENATEDNAME-sort',
-    templateUrl: './NAME_TOLOWER.sort.component.html'
+    templateUrl: './NAME_TOLOWER.sort.component.html',
+    standalone: false
 })
 export class NAMESortComponent implements OnInit {
 
     public headers: PagingHeaders = new PagingHeaders();
     private bodyElement: HTMLElement = document.body;
-    public PLURALNAME_TOCAMELCASE: NAME[];
+    public PLURALNAME_TOCAMELCASE: TYPESCRIPTNAME[];
 ENUM_PROPERTIESPARENTPKFIELDS
     constructor(
         public modal: NgbActiveModal,

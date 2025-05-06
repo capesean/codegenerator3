@@ -18,10 +18,10 @@
     <AssemblyName>codegenerator</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <UseIISExpress>true</UseIISExpress>
-    <IISExpressSSLPort />
-    <IISExpressAnonymousAuthentication />
-    <IISExpressWindowsAuthentication />
-    <IISExpressUseClassicPipelineMode />
+    <IISExpressSSLPort>51399</IISExpressSSLPort>
+    <IISExpressAnonymousAuthentication>enabled</IISExpressAnonymousAuthentication>
+    <IISExpressWindowsAuthentication>disabled</IISExpressWindowsAuthentication>
+    <IISExpressUseClassicPipelineMode>false</IISExpressUseClassicPipelineMode>
     <UseGlobalApplicationHostFile />
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
@@ -747,6 +747,10 @@
     <Compile Include="Migrations\202502041007539_DisableListDelete.Designer.cs">
       <DependentUpon>202502041007539_DisableListDelete.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202505060732318_TypeScriptClassName.cs" />
+    <Compile Include="Migrations\202505060732318_TypeScriptClassName.Designer.cs">
+      <DependentUpon>202505060732318_TypeScriptClassName.cs</DependentUpon>
+    </Compile>
     <Compile Include="Models\Relationship_.cs" />
     <Compile Include="Startup.cs" />
     <Compile Include="Utilities\ApiException.cs" />
@@ -917,6 +921,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202502041007539_DisableListDelete.resx">
       <DependentUpon>202502041007539_DisableListDelete.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202505060732318_TypeScriptClassName.resx">
+      <DependentUpon>202505060732318_TypeScriptClassName.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

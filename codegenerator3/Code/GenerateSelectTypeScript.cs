@@ -49,11 +49,11 @@ namespace WEB.Models
                     inputs += $"    @Input() {field.Name.ToCamelCase()}: boolean;" + Environment.NewLine;
                 else if (relationship != null)
                 {
-                    inputs += $"    @Input() {relationship.ParentName.ToCamelCase()}: {relationship.ParentEntity.Name};" + Environment.NewLine;
+                    inputs += $"    @Input() {relationship.ParentName.ToCamelCase()}: {relationship.ParentEntity.TypeScriptName};" + Environment.NewLine;
                     if (relationship.ParentEntity != CurrentEntity && !imported.Contains(relationship.ParentEntity.Name))
                     {
                         imported.Add(relationship.ParentEntity.Name);
-                        imports += $"import {{ {relationship.ParentEntity.Name} }} from '{folders}../common/models/{relationship.ParentEntity.Name.ToLower()}.model';" + Environment.NewLine;
+                        imports += $"import {{ {relationship.ParentEntity.TypeScriptName} }} from '{folders}../common/models/{relationship.ParentEntity.Name.ToLower()}.model';" + Environment.NewLine;
                     }
                 }
             }
@@ -65,7 +65,7 @@ namespace WEB.Models
 
             if (CurrentEntity.PrimaryField.CustomType == CustomType.Date)
             {
-                imports += $"import * as moment from 'moment';" + Environment.NewLine;
+                imports += $"import moment from 'moment';" + Environment.NewLine;
                 LABEL_OUTPUT_MULTI = $"({LABEL_OUTPUT_MULTI} ? moment({LABEL_OUTPUT_MULTI}).format(\"LL\") : undefined)";
                 LABEL_OUTPUT_SINGLE = $"({LABEL_OUTPUT_SINGLE} ? moment({LABEL_OUTPUT_SINGLE}).format(\"LL\") : undefined)";
             }

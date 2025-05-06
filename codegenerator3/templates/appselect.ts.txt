@@ -1,7 +1,7 @@
 ﻿import { Component, OnInit, forwardRef, ViewChild, Input, EventEmitter, Output } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { NAMEModalComponent } from './NAME_TOLOWER.modal.component';
-import { NAME } from '/*FOLDERS*/../common/models/NAME_TOLOWER.model';
+import { TYPESCRIPTNAME } from '/*FOLDERS*/../common/models/NAME_TOLOWER.model';
 import { Enum/*ENUMS*/ } from '/*FOLDERS*/../common/models/enums.model';
 /*IMPORTS*/
 @Component({
@@ -12,14 +12,15 @@ import { Enum/*ENUMS*/ } from '/*FOLDERS*/../common/models/enums.model';
         useExisting: forwardRef(() => NAMESelectComponent),
         multi: true
     }],
-    host: { 'class': 'app-select' }
+    host: { 'class': 'app-select' },
+    standalone: false
 })
 export class NAMESelectComponent implements OnInit, ControlValueAccessor {
 
-    @Input() CAMELCASENAME: NAME;
-    @Input() PLURALNAME_TOCAMELCASE: NAME[] = [];
-    @Output() CAMELCASENAMEChange = new EventEmitter<NAME>();
-    @Output() PLURALNAME_TOCAMELCASEChange = new EventEmitter<NAME[]>();
+    @Input() CAMELCASENAME: TYPESCRIPTNAME;
+    @Input() PLURALNAME_TOCAMELCASE: TYPESCRIPTNAME[] = [];
+    @Output() CAMELCASENAMEChange = new EventEmitter<TYPESCRIPTNAME>();
+    @Output() PLURALNAME_TOCAMELCASEChange = new EventEmitter<TYPESCRIPTNAME[]>();
     @Input() canRemoveFilters = false;
     @Input() multiple = false;
     @Input() showAddNew = false;
@@ -55,16 +56,16 @@ export class NAMESelectComponent implements OnInit, ControlValueAccessor {
         this.disabled = isDisabled;
     }
 
-    changed(CAMELCASENAME: NAME | NAME[]) {
+    changed(CAMELCASENAME: TYPESCRIPTNAME | TYPESCRIPTNAME[]) {
         if (this.disabled) return;
         if (this.multiple) {
-            this.writeValue(CAMELCASENAME ? (CAMELCASENAME as NAME[]).map(o => o.KEYFIELD) : null);
-            this.PLURALNAME_TOCAMELCASE = (CAMELCASENAME as NAME[]);
-            this.PLURALNAME_TOCAMELCASEChange.emit((CAMELCASENAME as NAME[]));
+            this.writeValue(CAMELCASENAME ? (CAMELCASENAME as TYPESCRIPTNAME[]).map(o => o.KEYFIELD) : null);
+            this.PLURALNAME_TOCAMELCASE = (CAMELCASENAME as TYPESCRIPTNAME[]);
+            this.PLURALNAME_TOCAMELCASEChange.emit((CAMELCASENAME as TYPESCRIPTNAME[]));
         } else {
-            this.writeValue(CAMELCASENAME ? (CAMELCASENAME as NAME).KEYFIELD : null);
-            this.CAMELCASENAME = (CAMELCASENAME as NAME);
-            this.CAMELCASENAMEChange.emit((CAMELCASENAME as NAME));
+            this.writeValue(CAMELCASENAME ? (CAMELCASENAME as TYPESCRIPTNAME).KEYFIELD : null);
+            this.CAMELCASENAME = (CAMELCASENAME as TYPESCRIPTNAME);
+            this.CAMELCASENAMEChange.emit((CAMELCASENAME as TYPESCRIPTNAME));
         }
     }
 

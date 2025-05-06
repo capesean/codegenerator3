@@ -331,6 +331,15 @@
                             </div>
                         </div>
 
+                        <div class="col-sm-6 col-md-4">
+                            <div class="form-group" ng-class="{ 'has-error':  mainForm.$submitted && mainForm.typeScriptClassName.$invalid }">
+                                <label for="typeScriptClassName" class="control-label">
+                                    TypeScript Class Name:
+                                </label>
+                                <input type="text" id="typeScriptClassName" name="typeScriptClassName" ng-model="vm.entity.typeScriptClassName" maxlength="50" class="form-control" />
+                            </div>
+                        </div>
+
                         <div class="col-sm-4 col-md-3 col-lg-2">
                             <div class="form-group" ng-class="{ 'has-error':  mainForm.$submitted && mainForm.exclude.$invalid }">
                                 <label for="exclude" class="control-label">

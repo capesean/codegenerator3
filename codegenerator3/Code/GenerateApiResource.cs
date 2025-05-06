@@ -22,11 +22,11 @@ namespace WEB.Models
 
             if (CurrentEntity.EntityType != EntityType.Settings)
                 s.Add($"import {{ map }} from 'rxjs/operators';");
-            s.Add($"import {{ {CurrentEntity.Name}{(CurrentEntity.EntityType != EntityType.Settings ? $", {CurrentEntity.Name}SearchOptions, {CurrentEntity.Name}SearchResponse" : "")} }} from '../models/{CurrentEntity.Name.ToLower()}.model';");
+            s.Add($"import {{ {CurrentEntity.TypeScriptName}{(CurrentEntity.EntityType != EntityType.Settings ? $", {CurrentEntity.Name}SearchOptions, {CurrentEntity.Name}SearchResponse" : "")} }} from '../models/{CurrentEntity.Name.ToLower()}.model';");
             if (CurrentEntity.EntityType != EntityType.Settings)
                 s.Add($"import {{ SearchQuery, PagingHeaders }} from '../models/http.model';");
             if (CurrentEntity.KeyFields.Any(f => f.CustomType == CustomType.Date))
-                s.Add($"import * as moment from 'moment';");
+                s.Add($"import moment from 'moment';");
 
             s.Add($"");
             s.Add($"@Injectable({{ providedIn: 'root' }})");
@@ -47,7 +47,7 @@ namespace WEB.Models
                 s.Add($"            .pipe(");
                 s.Add($"                map(response => {{");
                 s.Add($"                    const headers = JSON.parse(response.headers.get(\"x-pagination\")) as PagingHeaders;");
-                s.Add($"                    const {CurrentEntity.PluralName.ToCamelCase()} = response.body as {CurrentEntity.Name}[];");
+                s.Add($"                    const {CurrentEntity.PluralName.ToCamelCase()} = response.body as {CurrentEntity.TypeScriptName}[];");
                 s.Add($"                    return {{ {CurrentEntity.PluralName.ToCamelCase()}: {CurrentEntity.PluralName.ToCamelCase()}, headers: headers }};");
                 s.Add($"                }})");
                 s.Add($"            );");
@@ -56,7 +56,7 @@ namespace WEB.Models
             }
 
             var getParams = CurrentEntity.KeyFields.Select(o => o.Name.ToCamelCase() + ": " + o.JavascriptType).Aggregate((current, next) => current + ", " + next);
-            var saveParams = CurrentEntity.Name.ToCamelCase() + ": " + CurrentEntity.Name;
+            var saveParams = CurrentEntity.Name.ToCamelCase() + ": " + CurrentEntity.TypeScriptName;
             var getUrl = "/" + CurrentEntity.KeyFields.Select(o => "${" + (o.CustomType == CustomType.Date ? $"moment({o.Name.ToCamelCase()}).toISOString()" : o.Name.ToCamelCase()) + "}").Aggregate((current, next) => current + "/" + next);
             var saveUrl = "/" + CurrentEntity.KeyFields.Select(o => "${" + (o.CustomType == CustomType.Date ? $"moment({CurrentEntity.Name.ToCamelCase() + "." + o.Name.ToCamelCase()}).toISOString()" : CurrentEntity.Name.ToCamelCase() + "." + o.Name.ToCamelCase() + (o.FieldType == FieldType.Int && CurrentEntity.KeyFields.Count() == 1 ? " ?? 0" : "")) + "}").Aggregate((current, next) => current + "/" + next);
 
@@ -67,13 +67,13 @@ namespace WEB.Models
                 saveUrl = string.Empty;
             }
 
-            s.Add($"    get({getParams}): Observable<{CurrentEntity.Name}> {{");
-            s.Add($"        return this.http.get<{CurrentEntity.Name}>(`${{environment.baseApiUrl}}{CurrentEntity.PluralName.ToLower()}{getUrl}`);");
+            s.Add($"    get({getParams}): Observable<{CurrentEntity.TypeScriptName}> {{");
+            s.Add($"        return this.http.get<{CurrentEntity.TypeScriptName}>(`${{environment.baseApiUrl}}{CurrentEntity.PluralName.ToLower()}{getUrl}`);");
             s.Add($"    }}");
             s.Add($"");
 
-            s.Add($"    save({saveParams}): Observable<{CurrentEntity.Name}> {{");
-            s.Add($"        return this.http.post<{CurrentEntity.Name}>(`${{environment.baseApiUrl}}{CurrentEntity.PluralName.ToLower()}{saveUrl}`, {CurrentEntity.Name.ToCamelCase()});");
+            s.Add($"    save({saveParams}): Observable<{CurrentEntity.TypeScriptName}> {{");
+            s.Add($"        return this.http.post<{CurrentEntity.TypeScriptName}>(`${{environment.baseApiUrl}}{CurrentEntity.PluralName.ToLower()}{saveUrl}`, {CurrentEntity.Name.ToCamelCase()});");
             s.Add($"    }}");
             s.Add($"");
 

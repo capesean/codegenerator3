@@ -125,6 +125,9 @@ namespace WEB.Models
         [MaxLength(100)]
         public string UserFilterFieldPath { get; set; }
 
+        [MaxLength(50)]
+        public string TypeScriptClassName { get; set; }
+
         public virtual ICollection<Relationship> RelationshipsAsParent { get; set; } = new List<Relationship>();
 
         public virtual ICollection<Field> Fields { get; set; } = new List<Field>();
@@ -138,6 +141,14 @@ namespace WEB.Models
 
         [ForeignKey("ProjectId")]
         public virtual Project Project { get; set; }
+
+        public string TypeScriptName
+        {
+            get
+            {
+                return TypeScriptClassName ?? Name;
+            }
+        }
 
         public Entity()
         {

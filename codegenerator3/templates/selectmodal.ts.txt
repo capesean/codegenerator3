@@ -1,27 +1,28 @@
 ﻿import { Component, OnInit, ViewChild, Output, EventEmitter, TemplateRef, Input } from '@angular/core';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { Observable } from 'rxjs';
-import { NAMESearchOptions, NAMESearchResponse, NAME } from '/*FOLDERS*/../common/models/NAME_TOLOWER.model';
+import { NAMESearchOptions, NAMESearchResponse, TYPESCRIPTNAME } from '/*FOLDERS*/../common/models/NAME_TOLOWER.model';
 import { NAMEService } from '/*FOLDERS*/../common/services/NAME_TOLOWER.service';
 import { PagingHeaders } from '/*FOLDERS*/../common/models/http.model';
 import { ErrorService } from '/*FOLDERS*/../common/services/error.service';
 /*IMPORTS*/
 @Component({
     selector: 'HYPHENATEDNAME-modal',
-    templateUrl: './NAME_TOLOWER.modal.component.html'
+    templateUrl: './NAME_TOLOWER.modal.component.html',
+    standalone: false
 })
 export class NAMEModalComponent implements OnInit {
 
     public modal: NgbModalRef;
-    public selectedItems: NAME[] = [];
+    public selectedItems: TYPESCRIPTNAME[] = [];
     public headers: PagingHeaders = new PagingHeaders();
     public searchOptions: NAMESearchOptions = new NAMESearchOptions();
-    public PLURALNAME_TOCAMELCASE: NAME[];
+    public PLURALNAME_TOCAMELCASE: TYPESCRIPTNAME[];
     public allSelected = false;
 /*PROPERTIES*/
     @ViewChild('content') content: TemplateRef<unknown>;
-    @Output() change: EventEmitter<NAME> = new EventEmitter<NAME>();
-    @Output() changes: EventEmitter<NAME[]> = new EventEmitter<NAME[]>();
+    @Output() change: EventEmitter<TYPESCRIPTNAME> = new EventEmitter<TYPESCRIPTNAME>();
+    @Output() changes: EventEmitter<TYPESCRIPTNAME[]> = new EventEmitter<TYPESCRIPTNAME[]>();
     @Input() canRemoveFilters = false;
     @Input() multiple = false;
     @Input() showAddNew = false;
@@ -45,9 +46,9 @@ export class NAMEModalComponent implements OnInit {
         if (this.resetOnOpen) this.selectedItems = [];
 /*SEARCHOPTIONS*/        this.modal = this.modalService.open(this.content, { size: 'xl', centered: true, scrollable: false });
         this.runSearch();
-        this.modal.result.then((CAMELCASENAME: NAME | NAME[]) => {
-            if (this.multiple) this.changes.emit(CAMELCASENAME as NAME[]);
-            else this.change.emit(CAMELCASENAME as NAME);
+        this.modal.result.then((CAMELCASENAME: TYPESCRIPTNAME | TYPESCRIPTNAME[]) => {
+            if (this.multiple) this.changes.emit(CAMELCASENAME as TYPESCRIPTNAME[]);
+            else this.change.emit(CAMELCASENAME as TYPESCRIPTNAME);
         }, () => {
             // dismissed
         });
@@ -88,7 +89,7 @@ export class NAMEModalComponent implements OnInit {
         else this.modal.close(undefined);
     }
 
-    select(CAMELCASENAME: NAME) {
+    select(CAMELCASENAME: TYPESCRIPTNAME) {
         if (this.multiple) {
             if (this.isSelected(CAMELCASENAME)) {
                 for (let i = 0; i < this.selectedItems.length; i++) {
@@ -105,7 +106,7 @@ export class NAMEModalComponent implements OnInit {
         }
     }
 
-    isSelected(CAMELCASENAME: NAME) {
+    isSelected(CAMELCASENAME: TYPESCRIPTNAME) {
         if (!this.multiple) return false;
         return this.selectedItems.filter(item => item.KEYFIELD === CAMELCASENAME.KEYFIELD).length > 0;
     }

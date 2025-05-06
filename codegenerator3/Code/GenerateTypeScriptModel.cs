@@ -23,7 +23,7 @@ namespace WEB.Models
             s.Add($"import {{ SearchOptions, PagingHeaders }} from './http.model';");
             foreach (var relationshipParentEntity in CurrentEntity.RelationshipsAsChild.Where(r => !r.ParentEntity.Exclude && r.ParentEntityId != CurrentEntity.EntityId).Select(o => o.ParentEntity).Distinct().OrderBy(o => o.Name))
             {
-                s.Add($"import {{ {relationshipParentEntity.Name} }} from './{relationshipParentEntity.Name.ToLower()}.model';");
+                s.Add($"import {{ {relationshipParentEntity.TypeScriptName} }} from './{relationshipParentEntity.Name.ToLower()}.model';");
             }
             if (CurrentEntity.Fields.Any(o => o.FieldType == FieldType.Enum))
             {
@@ -37,7 +37,7 @@ namespace WEB.Models
                 s.Add($"import {{ {entity.Name} }} from './{entity.Name.ToLower()}.model';");
             s.Add($"");
 
-            s.Add($"export class {CurrentEntity.Name} {{");
+            s.Add($"export class {CurrentEntity.TypeScriptName} {{");
 
             // fields
             foreach (var field in CurrentEntity.Fields.Where(o => o.EditPageType != EditPageType.Exclude).OrderBy(f => f.FieldOrder))
@@ -50,7 +50,7 @@ namespace WEB.Models
                 )
             {
                 if (relationship.RelationshipFields.Count == 1 && relationship.RelationshipFields.Single().ChildField.EditPageType == EditPageType.Exclude) continue;
-                s.Add($"    {relationship.ParentName.ToCamelCase()}: {relationship.ParentEntity.Name};");
+                s.Add($"    {relationship.ParentName.ToCamelCase()}: {relationship.ParentEntity.TypeScriptName};");
             }
             if (CurrentEntity.EntityType == EntityType.User)
             {
@@ -61,9 +61,9 @@ namespace WEB.Models
             foreach (var relationship in relAsParent)
             {
                 if (!relationship.IsOneToOne)
-                    s.Add($"    {relationship.CollectionName.ToCamelCase()}: {relationship.ChildEntity.Name}[];");
+                    s.Add($"    {relationship.CollectionName.ToCamelCase()}: {relationship.ChildEntity.TypeScriptName}[];");
                 else
-                    s.Add($"    {relationship.CollectionSingular.ToCamelCase()}: {relationship.ChildEntity.Name};");
+                    s.Add($"    {relationship.CollectionSingular.ToCamelCase()}: {relationship.ChildEntity.TypeScriptName};");
             }
             if (relAsParent.Any())
                 s.Add($"");
@@ -106,7 +106,7 @@ namespace WEB.Models
             s.Add($"");
 
             s.Add($"export class {CurrentEntity.Name}SearchResponse {{");
-            s.Add($"    {CurrentEntity.PluralName.ToCamelCase()}: {CurrentEntity.Name}[] = [];");
+            s.Add($"    {CurrentEntity.PluralName.ToCamelCase()}: {CurrentEntity.TypeScriptName}[] = [];");
             s.Add($"    headers: PagingHeaders;");
             s.Add($"}}");
 

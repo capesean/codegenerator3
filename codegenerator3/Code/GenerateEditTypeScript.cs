@@ -54,7 +54,7 @@ namespace WEB.Models
 
             if (relationshipsAsParent.Any())
                 s.Add($"import {{ PagingHeaders }} from '{folders}../common/models/http.model';");
-            s.Add($"import {{ {CurrentEntity.Name} }} from '{folders}../common/models/{CurrentEntity.Name.ToLower()}.model';");
+            s.Add($"import {{ {CurrentEntity.TypeScriptName} }} from '{folders}../common/models/{CurrentEntity.Name.ToLower()}.model';");
             if (CurrentEntity.EntityType != EntityType.User && (enumLookups.Count > 0 || addEnum))
                 s.Add($"import {{ Enum, Enums{(CurrentEntity.PrimaryField.FieldType == FieldType.Enum ? ", " + CurrentEntity.PrimaryField.Lookup.PluralName : "")} }} from '{folders}../common/models/enums.model';");
 
@@ -98,7 +98,7 @@ namespace WEB.Models
                     s.Add($"import {{ {entity.Name}SortComponent }} from '../{entity.PluralName.ToLower()}/{entity.Name.ToLower()}.sort.component';");
             }
             if (CurrentEntity.PrimaryField.CustomType == CustomType.Date)
-                s.Add($"import * as moment from 'moment';");
+                s.Add($"import moment from 'moment';");
             if (hasFileContents)
                 s.Add($"import {{ DownloadService }} from '{folders}../common/services/download.service';");
 
@@ -106,13 +106,15 @@ namespace WEB.Models
 
             s.Add($"@Component({{");
             s.Add($"    selector: '{CurrentEntity.Name.ToLower()}-edit',");
-            s.Add($"    templateUrl: './{CurrentEntity.Name.ToLower()}.edit.component.html'{(relationshipsAsParent.Where(o => !o.IsOneToOne).Select(o => o.ChildEntity).Any() ? "," : "")}");
-            if (relationshipsAsParent.Where(o => !o.IsOneToOne).Select(o => o.ChildEntity).Any()) s.Add($"    animations: [FadeThenShrink]");
+            s.Add($"    templateUrl: './{CurrentEntity.Name.ToLower()}.edit.component.html',");
+            if (relationshipsAsParent.Where(o => !o.IsOneToOne).Select(o => o.ChildEntity).Any()) s.Add($"    animations: [FadeThenShrink],");
+            s.Add($"    standalone: false");
+
             s.Add($"}})");
 
             s.Add($"export class {CurrentEntity.Name}EditComponent implements OnInit{(hasChildRoutes ? ", OnDestroy" : "")} {{");
             s.Add($"");
-            s.Add($"    public {CurrentEntity.Name.ToCamelCase()}: {CurrentEntity.Name} = new {CurrentEntity.Name}();");
+            s.Add($"    public {CurrentEntity.Name.ToCamelCase()}: {CurrentEntity.TypeScriptName} = new {CurrentEntity.TypeScriptName}();");
             if (CurrentEntity.EntityType != EntityType.Settings)
                 s.Add($"    public isNew = true;");
             if (hasChildRoutes)
@@ -130,7 +132,7 @@ namespace WEB.Models
             {
                 s.Add($"    public {rel.CollectionName.ToCamelCase()}SearchOptions = new {rel.ChildEntity.Name}SearchOptions();");
                 s.Add($"    public {rel.CollectionName.ToCamelCase()}Headers = new PagingHeaders();");
-                s.Add($"    public {rel.CollectionName.ToCamelCase()}: {rel.ChildEntity.Name}[] = [];");
+                s.Add($"    public {rel.CollectionName.ToCamelCase()}: {rel.ChildEntity.TypeScriptName}[] = [];");
                 s.Add($"    public show{rel.CollectionName}Search = false;");
                 s.Add($"");
             }
@@ -433,7 +435,7 @@ namespace WEB.Models
                 s.Add($"    }}");
                 s.Add($"");
                 // todo: use relative links? can then disable 'includeParents' on these entities
-                s.Add($"    goTo{rel.CollectionSingular}({rel.ChildEntity.Name.ToCamelCase()}: {rel.ChildEntity.Name}): void {{");
+                s.Add($"    goTo{rel.CollectionSingular}({rel.ChildEntity.Name.ToCamelCase()}: {rel.ChildEntity.TypeScriptName}): void {{");
                 s.Add($"        this.router.navigate({GetRouterLink(rel.ChildEntity, CurrentEntity)});");
                 s.Add($"    }}");
                 s.Add($"");
@@ -468,7 +470,7 @@ namespace WEB.Models
 
                 if (!rel.DisableListDelete)
                 {
-                    s.Add($"    delete{rel.CollectionSingular}({rel.ChildEntity.Name.ToCamelCase()}: {rel.ChildEntity.Name}, event: MouseEvent): void {{");
+                    s.Add($"    delete{rel.CollectionSingular}({rel.ChildEntity.Name.ToCamelCase()}: {rel.ChildEntity.TypeScriptName}, event: MouseEvent): void {{");
                     s.Add($"        event.stopPropagation();");
                     s.Add($"");
                     s.Add($"        let modalRef = this.modalService.open(ConfirmModalComponent, {{ centered: true }});");

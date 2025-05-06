@@ -38,7 +38,7 @@ namespace WEB.Models
 
 
             s.Add($"import {{ PagingHeaders }} from '{folders}../common/models/http.model';");
-            s.Add($"import {{ {CurrentEntity.Name}SearchOptions, {CurrentEntity.Name}SearchResponse, {CurrentEntity.Name} }} from '{folders}../common/models/{CurrentEntity.Name.ToLower()}.model';");
+            s.Add($"import {{ {CurrentEntity.Name}SearchOptions, {CurrentEntity.Name}SearchResponse, {CurrentEntity.TypeScriptName} }} from '{folders}../common/models/{CurrentEntity.Name.ToLower()}.model';");
             if (enumLookups.Any())
                 s.Add($"import {{ Enum, Enums }} from '{folders}../common/models/enums.model';");
             s.Add($"import {{ FadeThenShrink }} from '{folders}../common/animations/fadethenshrink';");
@@ -58,11 +58,12 @@ namespace WEB.Models
             s.Add($"@Component({{");
             s.Add($"    selector: '{CurrentEntity.Name.ToLower()}-list',");
             s.Add($"    templateUrl: './{CurrentEntity.Name.ToLower()}.list.component.html',");
-            s.Add($"    animations: [FadeThenShrink]");
+            s.Add($"    animations: [FadeThenShrink],");
+            s.Add($"    standalone: false");
             s.Add($"}})");
             s.Add($"export class {CurrentEntity.Name}ListComponent implements OnInit{(hasChildRoutes ? ", OnDestroy" : "")} {{");
             s.Add($"");
-            s.Add($"    public {CurrentEntity.PluralName.ToCamelCase()}: {CurrentEntity.Name}[] = [];");
+            s.Add($"    public {CurrentEntity.PluralName.ToCamelCase()}: {CurrentEntity.TypeScriptName}[] = [];");
             s.Add($"    public searchOptions = new {CurrentEntity.Name}SearchOptions();");
             s.Add($"    public showSearchOptions = false;");
             s.Add($"    public headers = new PagingHeaders();");
@@ -166,7 +167,7 @@ namespace WEB.Models
                 s.Add($"    }}");
                 s.Add($"");
             }
-            s.Add($"    goTo{CurrentEntity.Name}({CurrentEntity.Name.ToCamelCase()}: {CurrentEntity.Name}): void {{");
+            s.Add($"    goTo{CurrentEntity.Name}({CurrentEntity.Name.ToCamelCase()}: {CurrentEntity.TypeScriptName}): void {{");
             s.Add($"        this.router.navigate({GetRouterLink(CurrentEntity, CurrentEntity)});");
             s.Add($"    }}");
             s.Add($"}}");

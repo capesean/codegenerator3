@@ -295,6 +295,7 @@ namespace WEB.Models
                 .Replace("HYPHENATEDNAME", CurrentEntity.Name.Hyphenated())
                 .Replace("KEYFIELDTYPE", CurrentEntity.KeyFields.First().JavascriptType)
                 .Replace("KEYFIELD", CurrentEntity.KeyFields.First().Name.ToCamelCase())
+                .Replace("TYPESCRIPTNAME", CurrentEntity.TypeScriptName)
                 .Replace("NAME", CurrentEntity.Name)
                 .Replace("STARTSWITHVOWEL", new Regex("^[aeiou]").IsMatch(CurrentEntity.Name.ToLower()) && CurrentEntity.Name != "User" ? "n" : "")
                 .Replace("ICONLINK", GetIconLink(CurrentEntity))

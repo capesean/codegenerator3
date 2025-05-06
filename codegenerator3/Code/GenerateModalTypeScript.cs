@@ -73,13 +73,13 @@ namespace WEB.Models
                 }
                 else if (relationship != null)
                 {
-                    inputs += $"    @Input() {relationship.ParentName.ToCamelCase()}: {relationship.ParentEntity.Name};" + Environment.NewLine;
+                    inputs += $"    @Input() {relationship.ParentName.ToCamelCase()}: {relationship.ParentEntity.TypeScriptName};" + Environment.NewLine;
                     searchOptions += $"        this.searchOptions.{field.Name.ToCamelCase()} = this.{relationship.ParentName.ToCamelCase()}?.{relationship.ParentEntity.KeyFields.First().Name.ToCamelCase()};" + Environment.NewLine;
 
                     if (relationship.ParentEntity != CurrentEntity && !imported.Contains(relationship.ParentEntity.Name))
                     {
                         imported.Add(relationship.ParentEntity.Name);
-                        imports += $"import {{ {relationship.ParentEntity.Name} }} from '{folders}../common/models/{relationship.ParentEntity.Name.ToLower()}.model';" + Environment.NewLine;
+                        imports += $"import {{ {relationship.ParentEntity.TypeScriptName} }} from '{folders}../common/models/{relationship.ParentEntity.Name.ToLower()}.model';" + Environment.NewLine;
                     }
                 }
             }
