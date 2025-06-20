@@ -14,7 +14,6 @@ import { ErrorService } from '/*FOLDERS*/../common/services/error.service';
 export class NAMEModalComponent implements OnInit {
 
     public modal: NgbModalRef;
-    public selectedItems: TYPESCRIPTNAME[] = [];
     public headers: PagingHeaders = new PagingHeaders();
     public searchOptions: NAMESearchOptions = new NAMESearchOptions();
     public PLURALNAME_TOCAMELCASE: TYPESCRIPTNAME[];
@@ -23,6 +22,7 @@ export class NAMEModalComponent implements OnInit {
     @ViewChild('content') content: TemplateRef<unknown>;
     @Output() change: EventEmitter<TYPESCRIPTNAME> = new EventEmitter<TYPESCRIPTNAME>();
     @Output() changes: EventEmitter<TYPESCRIPTNAME[]> = new EventEmitter<TYPESCRIPTNAME[]>();
+    @Input() selectedItems: TYPESCRIPTNAME[] = [];
     @Input() canRemoveFilters = false;
     @Input() multiple = false;
     @Input() showAddNew = false;

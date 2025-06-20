@@ -41,7 +41,7 @@ namespace WEB.Models
             s.Add($"");
             s.Add(t + $"            <fieldset class=\"group\">");
             s.Add($"");
-            s.Add(t + $"                <div class=\"row g-3\">");
+            s.Add(t + $"                <div class=\"row gx-3\">");
             s.Add($"");
 
             #region form fields
@@ -355,7 +355,7 @@ namespace WEB.Models
                 s.Add($"");
                 s.Add(t + $"    <nav ngbNav #nav=\"ngbNav\" class=\"nav-tabs\">");
                 s.Add($"");
-                foreach (var relationship in relationships.Where(o => !o.IsOneToOne))
+                foreach (var relationship in relationships.Where(o => !o.IsOneToOne).OrderBy(o => o.SortOrder))
                 {
                     counter++;
                     var entity = relationship.ChildEntity;
