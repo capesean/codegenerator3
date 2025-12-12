@@ -90,7 +90,7 @@ namespace WEB.Models
                 var reverseRel = rel.ChildEntity.RelationshipsAsChild.Where(o => o.RelationshipId != rel.RelationshipId).SingleOrDefault();
 
                 s.Add($"import {{ {reverseRel.ParentEntity.Name}ModalComponent }} from '../{reverseRel.ParentEntity.PluralName.ToLower()}/{reverseRel.ParentEntity.Name.ToLower()}.modal.component';");
-                if (reverseRel.ParentEntity != CurrentEntity) s.Add($"import {{ {reverseRel.ParentEntity.Name} }} from '{folders}../common/models/{reverseRel.ParentEntity.Name.ToLower()}.model';");
+                if (reverseRel.ParentEntity != CurrentEntity) s.Add($"import {{ {reverseRel.ParentEntity.TypeScriptName} }} from '{folders}../common/models/{reverseRel.ParentEntity.Name.ToLower()}.model';");
             }
             if (relationshipsAsParent.Any(o => o.Hierarchy && o.ChildEntity.HasASortField))
             {
@@ -448,7 +448,7 @@ namespace WEB.Models
                     s.Add($"    }}");
                     s.Add($"");
 
-                    s.Add($"    change{reverseRel.ParentEntity.Name}({reverseRel.ParentEntity.PluralName.ToCamelCase()}: {reverseRel.ParentEntity.Name}[]): void {{");
+                    s.Add($"    change{reverseRel.ParentEntity.Name}({reverseRel.ParentEntity.PluralName.ToCamelCase()}: {reverseRel.ParentEntity.TypeScriptName}[]): void {{");
                     s.Add($"        if (!{reverseRel.ParentEntity.PluralName.ToCamelCase()}.length) return;");
                     s.Add($"        const {reverseRel.RelationshipFields.First().ParentField.Name.ToCamelCase()}List = {reverseRel.ParentEntity.PluralName.ToCamelCase()}.map(o => o.{reverseRel.RelationshipFields.First().ParentField.Name.ToCamelCase()});");
                     s.Add($"        this.{CurrentEntity.Name.ToCamelCase()}Service.save{rel.ChildEntity.PluralName}({CurrentEntity.KeyFields.Select(o => $"this.{CurrentEntity.Name.ToCamelCase()}.{o.Name.ToCamelCase()}").Aggregate((current, next) => { return current + ", " + next; })}, {reverseRel.RelationshipFields.First().ParentField.Name.ToCamelCase()}List)");

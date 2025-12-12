@@ -69,19 +69,23 @@ namespace WEB.Models
                     if (field.FieldType == FieldType.Enum)
                     {
                         appSelectFilters += $"                    <div class=\"col-sm-6 col-md-6 col-lg-4\" *ngIf=\"!{field.Name.ToCamelCase()}\">" + Environment.NewLine;
-                        appSelectFilters += $"                        <select id=\"{field.Name.ToCamelCase()}\" name=\"{field.Name.ToCamelCase()}\" [(ngModel)]=\"searchOptions.{field.Name.ToCamelCase()}\" #{field.Name.ToCamelCase()}=\"ngModel\" class=\"form-select\">" + Environment.NewLine;
-                        appSelectFilters += $"                            <option *ngFor=\"let {field.Lookup.Name.ToCamelCase()} of {field.Lookup.PluralName.ToCamelCase()}\" [ngValue]=\"{field.Lookup.Name.ToCamelCase()}.value\">{{{{ {field.Lookup.Name.ToCamelCase()}.label }}}}</option>" + Environment.NewLine;
-                        appSelectFilters += $"                        </select>" + Environment.NewLine;
+                        appSelectFilters += $"                        <div class=\"form-group\">" + Environment.NewLine;
+                        appSelectFilters += $"                            <select id=\"{field.Name.ToCamelCase()}\" name=\"{field.Name.ToCamelCase()}\" [(ngModel)]=\"searchOptions.{field.Name.ToCamelCase()}\" #{field.Name.ToCamelCase()}=\"ngModel\" class=\"form-select\">" + Environment.NewLine;
+                        appSelectFilters += $"                                <option *ngFor=\"let {field.Lookup.Name.ToCamelCase()} of {field.Lookup.PluralName.ToCamelCase()}\" [ngValue]=\"{field.Lookup.Name.ToCamelCase()}.value\">{{{{ {field.Lookup.Name.ToCamelCase()}.label }}}}</option>" + Environment.NewLine;
+                        appSelectFilters += $"                            </select>" + Environment.NewLine;
+                        appSelectFilters += $"                        </div>" + Environment.NewLine;
                         appSelectFilters += $"                    </div>" + Environment.NewLine;
                     }
                     else if (field.FieldType == FieldType.Bit)
                     {
                         appSelectFilters += $"                    <div class=\"col-sm-6 col-md-4 col-lg-4 col-xl-3\">" + Environment.NewLine;
-                        appSelectFilters += $"                        <select id=\"{field.Name.ToCamelCase()}\" name=\"{field.Name.ToCamelCase()}\" [(ngModel)]=\"searchOptions.{field.Name.ToCamelCase()}\" #{field.Name.ToCamelCase()}=\"ngModel\" class=\"form-select\">" + Environment.NewLine;
-                        appSelectFilters += $"                            <option [ngValue]=\"undefined\">{field.Label}: Any</option>" + Environment.NewLine;
-                        appSelectFilters += $"                            <option [ngValue]=\"true\">{field.Label}: Yes</option>" + Environment.NewLine;
-                        appSelectFilters += $"                            <option [ngValue]=\"false\">{field.Label}: No</option>" + Environment.NewLine;
-                        appSelectFilters += $"                        </select>" + Environment.NewLine;
+                        appSelectFilters += $"                        <div class=\"form-group\">" + Environment.NewLine;
+                        appSelectFilters += $"                            <select id=\"{field.Name.ToCamelCase()}\" name=\"{field.Name.ToCamelCase()}\" [(ngModel)]=\"searchOptions.{field.Name.ToCamelCase()}\" #{field.Name.ToCamelCase()}=\"ngModel\" class=\"form-select\">" + Environment.NewLine;
+                        appSelectFilters += $"                                <option [ngValue]=\"undefined\">{field.Label}: Any</option>" + Environment.NewLine;
+                        appSelectFilters += $"                                <option [ngValue]=\"true\">{field.Label}: Yes</option>" + Environment.NewLine;
+                        appSelectFilters += $"                                <option [ngValue]=\"false\">{field.Label}: No</option>" + Environment.NewLine;
+                        appSelectFilters += $"                            </select>" + Environment.NewLine;
+                        appSelectFilters += $"                        </div>" + Environment.NewLine;
                         appSelectFilters += $"                    </div>" + Environment.NewLine;
                     }
                     else

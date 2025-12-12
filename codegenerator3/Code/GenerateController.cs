@@ -470,14 +470,14 @@ namespace WEB.Models
                 s.Add($"");
                 s.Add($"            if ({CurrentEntity.DTOName.ToCamelCase()}.{fileContentsField.Name} != null)");
                 s.Add($"            {{");
-                s.Add($"                var blobStorageService = new BlobStorageService(AppSettings.Azure.Documents.ConnectionString, AppSettings.Azure.Documents.ContainerName);");
+                s.Add($"                var blobStorageService = new BlobStorageService(AppSettings.AzureSettings.Documents.ConnectionString, AppSettings.AzureSettings.Documents.ContainerName);");
                 s.Add($"                await blobStorageService.UploadBlobAsync({CurrentEntity.Name.ToCamelCase()}.{CurrentEntity.KeyFields.Single().Name}.ToString().ToLowerInvariant(), Convert.FromBase64String({CurrentEntity.DTOName.ToCamelCase()}.{fileContentsField.Name}));");
                 s.Add($"            }}");
                 if (deleteFile)
                 {
                     s.Add($"            else if (deleteFile)");
                     s.Add($"            {{");
-                    s.Add($"                var blobStorageService = new BlobStorageService(AppSettings.Azure.Documents.ConnectionString, AppSettings.Azure.Documents.ContainerName);");
+                    s.Add($"                var blobStorageService = new BlobStorageService(AppSettings.AzureSettings.Documents.ConnectionString, AppSettings.AzureSettings.Documents.ContainerName);");
                     s.Add($"                await blobStorageService.DeleteBlobAsync({CurrentEntity.Name.ToCamelCase()}.{CurrentEntity.KeyFields.Single().Name}.ToString().ToLowerInvariant());");
                     s.Add($"            }}");
                 }
@@ -571,7 +571,7 @@ namespace WEB.Models
                 if (CurrentEntity.HasAzureBlobStorageField)
                 {
                     s.Add($"");
-                    s.Add($"            var blobStorageService = new BlobStorageService(AppSettings.Azure.Documents.ConnectionString, AppSettings.Azure.Documents.ContainerName);");
+                    s.Add($"            var blobStorageService = new BlobStorageService(AppSettings.AzureSettings.Documents.ConnectionString, AppSettings.AzureSettings.Documents.ContainerName);");
                     s.Add($"            await blobStorageService.DeleteBlobAsync({CurrentEntity.KeyFields.Single().Name.ToCamelCase()}.ToString().ToLowerInvariant());");
                 }
 
@@ -693,7 +693,7 @@ namespace WEB.Models
 
                     if (entity.HasAzureBlobStorageField)
                     {
-                        s.Add($"            var blobStorageService = new BlobStorageService(AppSettings.Azure.Documents.ConnectionString, AppSettings.Azure.Documents.ContainerName);");
+                        s.Add($"            var blobStorageService = new BlobStorageService(AppSettings.AzureSettings.Documents.ConnectionString, AppSettings.AzureSettings.Documents.ContainerName);");
                         s.Add($"");
                         s.Add($"            var {entity.KeyFields.Single().Name.ToCamelCase()}s = await db.{entity.PluralName}.Where(o => o.{rel.RelationshipFields.Single().ChildField.Name} == {rel.RelationshipFields.Single().ChildField.Name.ToCamelCase()}).Select(o => o.{entity.KeyFields.Single().Name}).ToListAsync();");
                         s.Add($"");

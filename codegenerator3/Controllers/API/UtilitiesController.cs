@@ -82,17 +82,17 @@ namespace WEB.Controllers
                     if (option.SharedModule && !sharedModuleHasRun) { RunDeploy(entity, CodeType.SharedModule, results); sharedModuleHasRun = true; }
                     if (option.AppRouter && !approuterHasRun) { RunDeploy(entity, CodeType.AppRouter, results); approuterHasRun = true; }
                     if (option.ApiResource) RunDeploy(entity, CodeType.ApiResource, results);
-                    if (option.ListHtml) RunDeploy(entity, CodeType.ListHtml, results);
-                    if (option.ListTypeScript) RunDeploy(entity, CodeType.ListTypeScript, results);
+                    if (option.ListHtml && entity.EntityType != EntityType.Settings) RunDeploy(entity, CodeType.ListHtml, results);
+                    if (option.ListTypeScript && entity.EntityType != EntityType.Settings) RunDeploy(entity, CodeType.ListTypeScript, results);
                     if (option.EditHtml) RunDeploy(entity, CodeType.EditHtml, results);
                     if (option.EditTypeScript) RunDeploy(entity, CodeType.EditTypeScript, results);
-                    if (option.AppSelectHtml) RunDeploy(entity, CodeType.AppSelectHtml, results);
-                    if (option.AppSelectTypeScript) RunDeploy(entity, CodeType.AppSelectTypeScript, results);
-                    if (option.SelectModalHtml) RunDeploy(entity, CodeType.SelectModalHtml, results);
-                    if (option.SelectModalTypeScript) RunDeploy(entity, CodeType.SelectModalTypeScript, results);
-                    if (option.SortHtml) RunDeploy(entity, CodeType.SortHtml, results);
-                    if (option.SortTypeScript) RunDeploy(entity, CodeType.SortTypeScript, results);
-                    if (option.SearchOptions) RunDeploy(entity, CodeType.SearchOptions, results);
+                    if (option.AppSelectHtml && entity.EntityType != EntityType.Settings) RunDeploy(entity, CodeType.AppSelectHtml, results);
+                    if (option.AppSelectTypeScript && entity.EntityType != EntityType.Settings) RunDeploy(entity, CodeType.AppSelectTypeScript, results);
+                    if (option.SelectModalHtml && entity.EntityType != EntityType.Settings) RunDeploy(entity, CodeType.SelectModalHtml, results);
+                    if (option.SelectModalTypeScript && entity.EntityType != EntityType.Settings) RunDeploy(entity, CodeType.SelectModalTypeScript, results);
+                    if (option.SortHtml && entity.EntityType != EntityType.Settings) RunDeploy(entity, CodeType.SortHtml, results);
+                    if (option.SortTypeScript && entity.EntityType != EntityType.Settings) RunDeploy(entity, CodeType.SortTypeScript, results);
+                    if (option.SearchOptions && entity.EntityType != EntityType.Settings) RunDeploy(entity, CodeType.SearchOptions, results);
                 }
             }
 

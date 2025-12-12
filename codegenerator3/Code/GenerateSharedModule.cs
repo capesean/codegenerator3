@@ -24,6 +24,8 @@ namespace WEB.Models
 
             foreach (var e in entities)
             {
+                if (e.EntityType == EntityType.Settings) continue;
+
                 if (string.IsNullOrWhiteSpace(e.PreventAppSelectTypeScriptDeployment))
                 {
                     imports += $"import {{ {e.Name}SelectComponent }} from './{e.Project.GeneratedPath}{e.PluralName.ToLower()}/{e.Name.ToLower()}.select.component';{Environment.NewLine}";

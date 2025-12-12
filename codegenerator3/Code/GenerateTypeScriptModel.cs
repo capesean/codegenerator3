@@ -15,6 +15,7 @@ namespace WEB.Models
         {
             var relAsParent = CurrentEntity.RelationshipsAsParent
                 .Where(r => r.RelationshipAncestorLimit != RelationshipAncestorLimits.Exclude)
+                .Where(o => !o.ChildEntity.Exclude)
                 .OrderBy(r => r.SortOrderOnChild)
                 .ThenBy(o => o.CollectionName)
                 .ToList();
@@ -65,7 +66,7 @@ namespace WEB.Models
                 else
                     s.Add($"    {relationship.CollectionSingular.ToCamelCase()}: {relationship.ChildEntity.TypeScriptName};");
             }
-            if (relAsParent.Any())
+            if (relAsParent.Where(o => !o.ChildEntity.Exclude).Any())
                 s.Add($"");
 
             s.Add($"    constructor() {{");
