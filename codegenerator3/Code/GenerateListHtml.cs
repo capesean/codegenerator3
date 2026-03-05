@@ -89,7 +89,7 @@ namespace WEB.Models
                 {
                     if (field.CustomType == CustomType.Enum)
                     {
-                        s.Add(t + $"                <div class=\"col-sm-6 col-md-4 col-lg-3\">");
+                        s.Add(t + $"                <div class=\"{(string.IsNullOrWhiteSpace(field.SearchClasses) ? "col-sm-6 col-md-4 col-lg-3" : field.SearchClasses)}\">");
                         s.Add(t + $"                    <div class=\"form-group\">");
                         s.Add(t + $"                        <select id=\"{field.Name.ToCamelCase()}\" name=\"{field.Name.ToCamelCase()}\" [(ngModel)]=\"searchOptions.{field.Name.ToCamelCase()}\" #{field.Name.ToCamelCase()}=\"ngModel\" class=\"form-select\">");
                         s.Add(t + $"                            <option [ngValue]=\"undefined\" disabled>{field.Label}</option>");
@@ -104,7 +104,7 @@ namespace WEB.Models
                         var relationship = CurrentEntity.GetParentSearchRelationship(field);
                         var parentEntity = relationship.ParentEntity;
                         var relField = relationship.RelationshipFields.Single();
-                        s.Add(t + $"                <div class=\"col-sm-6 col-md-5 col-xl-4\">");
+                        s.Add(t + $"                <div class=\"{(string.IsNullOrWhiteSpace(field.SearchClasses) ? "col-sm-6 col-md-5 col-xl-4" : field.SearchClasses)}\">");
                         s.Add(t + $"                    <div class=\"form-group\">");
                         s.Add(t + $"                        {relationship.AppSelector}");
                         s.Add(t + $"                    </div>");
@@ -113,7 +113,7 @@ namespace WEB.Models
                     }
                     else if (field.CustomType == CustomType.Boolean)
                     {
-                        s.Add(t + $"                <div class=\"col-sm-6 col-md-4 col-xl-3\">");
+                        s.Add(t + $"                <div class=\"{(string.IsNullOrWhiteSpace(field.SearchClasses) ? "col-sm-6 col-md-4 col-xl-3" : field.SearchClasses)}\">");
                         s.Add(t + $"                    <div class=\"form-group\">");
                         s.Add(t + $"                        <select id=\"{field.Name.ToCamelCase()}\" name=\"{field.Name.ToCamelCase()}\" [(ngModel)]=\"searchOptions.{field.Name.ToCamelCase()}\" #{field.Name.ToCamelCase()}=\"ngModel\" class=\"form-select\">");
                         s.Add(t + $"                            <option [ngValue]=\"undefined\">{field.Label}: Any</option>");
@@ -130,7 +130,7 @@ namespace WEB.Models
                 {
                     if (field.CustomType == CustomType.Date)
                     {
-                        s.Add(t + $"                <div class=\"col-sm-6 col-md-4 col-xl-3\">");
+                        s.Add(t + $"                <div class=\"{(string.IsNullOrWhiteSpace(field.SearchClasses) ? "col-sm-6 col-md-4 col-xl-3" : field.SearchClasses)}\">");
                         s.Add(t + $"                    <div class=\"form-group\" ngbTooltip=\"From Date\" container=\"body\" placement=\"top\">");
                         s.Add(t + $"                        <div class=\"input-group\">");
                         s.Add(t + $"                            <input type=\"text\" id=\"from{field.Name}\" name=\"from{field.Name}\" [(ngModel)]=\"searchOptions.from{field.Name}\" #from{field.Name}=\"ngModel\" class=\"form-control\" readonly placeholder=\"yyyy-mm-dd\" ngbDatepicker #dpFrom{field.Name}=\"ngbDatepicker\" tabindex=\"-1\" (click)=\"dpFrom{field.Name}.toggle()\" container=\"body\" />");
@@ -139,7 +139,7 @@ namespace WEB.Models
                         s.Add(t + $"                    </div>");
                         s.Add(t + $"                </div>");
                         s.Add($"");
-                        s.Add(t + $"                <div class=\"col-sm-6 col-md-4 col-xl-3\">");
+                        s.Add(t + $"                <div class=\"{(string.IsNullOrWhiteSpace(field.SearchClasses) ? "col-sm-6 col-md-4 col-xl-3" : field.SearchClasses)}\">");
                         s.Add(t + $"                    <div class=\"form-group\" ngbTooltip=\"To Date\" container=\"body\" placement=\"top\">");
                         s.Add(t + $"                        <div class=\"input-group\">");
                         s.Add(t + $"                            <input type=\"text\" id=\"to{field.Name}\" name=\"to{field.Name}\" [(ngModel)]=\"searchOptions.to{field.Name}\" #to{field.Name}=\"ngModel\" class=\"form-control\" readonly placeholder=\"yyyy-mm-dd\" ngbDatepicker #dpTo{field.Name}=\"ngbDatepicker\" tabindex=\"-1\" (click)=\"dpTo{field.Name}.toggle()\" container=\"body\" />");

@@ -751,6 +751,10 @@
     <Compile Include="Migrations\202505060732318_TypeScriptClassName.Designer.cs">
       <DependentUpon>202505060732318_TypeScriptClassName.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202602161529197_SearchClasses.cs" />
+    <Compile Include="Migrations\202602161529197_SearchClasses.Designer.cs">
+      <DependentUpon>202602161529197_SearchClasses.cs</DependentUpon>
+    </Compile>
     <Compile Include="Models\Relationship_.cs" />
     <Compile Include="Startup.cs" />
     <Compile Include="Utilities\ApiException.cs" />
@@ -924,6 +928,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202505060732318_TypeScriptClassName.resx">
       <DependentUpon>202505060732318_TypeScriptClassName.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202602161529197_SearchClasses.resx">
+      <DependentUpon>202602161529197_SearchClasses.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

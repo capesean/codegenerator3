@@ -92,7 +92,10 @@ namespace WEB.Models
 
         [MaxLength(50)]
         public string DisplayClasses { get; set; }
-        
+
+        [MaxLength(50)]
+        public string SearchClasses { get; set; }
+
         public EntityDTO Entity { get; set; }
 
         public LookupDTO Lookup { get; set; }
@@ -137,6 +140,7 @@ namespace WEB.Models
             fieldDTO.EditPageClasses = field.EditPageClasses;
             fieldDTO.DisplayPipe = field.DisplayPipe;
             fieldDTO.DisplayClasses = field.DisplayClasses;
+            fieldDTO.SearchClasses = field.SearchClasses;
             fieldDTO.Lookup = Create(field.Lookup);
             fieldDTO.Entity = Create(field.Entity);
 
@@ -174,6 +178,7 @@ namespace WEB.Models
             field.EditPageClasses = fieldDTO.EditPageClasses;
             field.DisplayPipe = fieldDTO.DisplayPipe;
             field.DisplayClasses = fieldDTO.DisplayClasses;
+            field.SearchClasses = fieldDTO.SearchClasses;
         }
     }
 }

@@ -45,6 +45,7 @@ namespace WEB.Models
             {
                 s.Add($"    {field.Name.ToCamelCase()}: {field.JavascriptType};");
             }
+
             foreach (var relationship in CurrentEntity.RelationshipsAsChild.Where(r => !r.ParentEntity.Exclude)
                 .OrderBy(o => o.ParentEntity.Name)
                 .ThenBy(o => o.ParentName)
@@ -98,6 +99,24 @@ namespace WEB.Models
                 s.Add($"    from{field.Name}: {field.JavascriptType};");
                 s.Add($"    to{field.Name}: {field.JavascriptType};");
             }
+
+            foreach (var relationship in CurrentEntity.RelationshipsAsChild
+                .Where(o => o.Hierarchy || o.DisplayListOnParent)
+                .Where(r => !r.ParentEntity.Exclude)
+                .OrderBy(o => o.ParentEntity.Name)
+                .ThenBy(o => o.ParentName)
+                )
+            {
+                if (relationship.RelationshipFields.Count != 1) continue;
+                var relationshipField = relationship.RelationshipFields.First();
+                // set to be excluded so skip it
+                if (relationshipField.ChildField.EditPageType == EditPageType.Exclude) continue;
+                // is a search field, should be catered for above
+                if (relationshipField.ChildField.SearchType == SearchType.Exact) continue;
+
+                s.Add($"    {relationshipField.ChildField.Name.ToCamelCase()}: {relationshipField.ChildField.JavascriptType};");
+            }
+
             if (CurrentEntity.EntityType == EntityType.User)
             {
                 s.Add($"    roleName: string;");
