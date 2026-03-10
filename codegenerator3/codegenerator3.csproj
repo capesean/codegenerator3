@@ -755,6 +755,10 @@
     <Compile Include="Migrations\202602161529197_SearchClasses.Designer.cs">
       <DependentUpon>202602161529197_SearchClasses.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202603061640420_OmitSaveDelete.cs" />
+    <Compile Include="Migrations\202603061640420_OmitSaveDelete.Designer.cs">
+      <DependentUpon>202603061640420_OmitSaveDelete.cs</DependentUpon>
+    </Compile>
     <Compile Include="Models\Relationship_.cs" />
     <Compile Include="Startup.cs" />
     <Compile Include="Utilities\ApiException.cs" />
@@ -931,6 +935,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202602161529197_SearchClasses.resx">
       <DependentUpon>202602161529197_SearchClasses.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202603061640420_OmitSaveDelete.resx">
+      <DependentUpon>202603061640420_OmitSaveDelete.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

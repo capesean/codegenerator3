@@ -53,7 +53,7 @@ namespace WEB.Models
             foreach (var field in CurrentEntity.Fields.Where(o => o.SearchType == SearchType.Exact).OrderBy(f => f.FieldOrder))
             {
                 Relationship relationship = null;
-                if (CurrentEntity.RelationshipsAsChild.Any(r => r.RelationshipFields.Any(f => f.ChildFieldId == field.FieldId)))
+                if (CurrentEntity.RelationshipsAsChild.Any(r => !r.ParentEntity.Exclude && r.RelationshipFields.Any(f => f.ChildFieldId == field.FieldId)))
                     relationship = CurrentEntity.GetParentSearchRelationship(field);
 
                 if (field.FieldType == FieldType.Enum)

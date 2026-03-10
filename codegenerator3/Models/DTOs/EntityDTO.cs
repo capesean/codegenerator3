@@ -125,6 +125,12 @@ namespace WEB.Models
         [MaxLength(50)]
         public string TypeScriptClassName { get; set; }
 
+        [Required]
+        public bool OmitSave { get; set; }
+
+        [Required]
+        public bool OmitDelete { get; set; }
+
         public FieldDTO PrimaryField { get; set; }
 
         public ProjectDTO Project { get; set; }
@@ -179,6 +185,8 @@ namespace WEB.Models
             entityDTO.UserFilterFieldPath = entity.UserFilterFieldPath;
             entityDTO.PrimaryField = null;
             entityDTO.TypeScriptClassName = entity.TypeScriptClassName;
+            entityDTO.OmitSave = entity.OmitSave;
+            entityDTO.OmitDelete = entity.OmitDelete;
             entityDTO.Project = Create(entity.Project);
 
             return entityDTO;
@@ -223,6 +231,8 @@ namespace WEB.Models
             entity.PrimaryFieldId = entityDTO.PrimaryFieldId;
             entity.IconClass = entityDTO.IconClass;
             entity.UserFilterFieldPath = entityDTO.UserFilterFieldPath;
+            entity.OmitSave = entityDTO.OmitSave;
+            entity.OmitDelete = entityDTO.OmitDelete;
             entity.TypeScriptClassName = string.IsNullOrWhiteSpace(entityDTO.TypeScriptClassName) ? null : entityDTO.TypeScriptClassName;
         }
     }

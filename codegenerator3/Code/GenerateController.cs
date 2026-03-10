@@ -86,6 +86,7 @@ namespace WEB.Models
                     s.Add($"            {{");
                     foreach (var relationship in relAsChild)
                     {
+                        if (relationship.ParentEntity.Exclude) continue;
                         foreach (var result in GetTopAncestors(new List<string>(), "o", relationship, relationship.RelationshipAncestorLimit, includeIfHierarchy: true))
                             s.Add($"                results = results.Include(o => {result});");
                     }
@@ -209,7 +210,7 @@ namespace WEB.Models
             {
                 s.Add($"                .Include(o => o.{relationship.CollectionSingular})");
             }
-            foreach (var relationship in CurrentEntity.RelationshipsAsChild.OrderBy(r => r.SortOrder).ThenBy(o => o.ParentName))
+            foreach (var relationship in CurrentEntity.RelationshipsAsChild.Where(o => !o.ParentEntity.Exclude).OrderBy(r => r.SortOrder).ThenBy(o => o.ParentName))
             {
                 if (relationship.RelationshipAncestorLimit == RelationshipAncestorLimits.Exclude) continue;
 
@@ -250,336 +251,341 @@ namespace WEB.Models
             #endregion
 
             #region save
-            s.Add($"        [HttpPost{(CurrentEntity.EntityType == EntityType.Settings ? string.Empty : $"(\"{CurrentEntity.RoutePath}\")")}{(CurrentEntity.AuthorizationType == AuthorizationType.None ? "" : ", AuthorizeRoles(Roles.Administrator)")}]");
-            s.Add($"        public async Task<IActionResult> Save({(CurrentEntity.EntityType == EntityType.Settings ? string.Empty : CurrentEntity.ControllerParameters + ", ")}[FromBody] {CurrentEntity.DTOName} {CurrentEntity.DTOName.ToCamelCase()})");
-            s.Add($"        {{");
-            s.Add($"            if (!ModelState.IsValid) return BadRequest(ModelState);");
-            s.Add($"");
-
-            if (CurrentEntity.EntityType != EntityType.Settings)
+            if (!CurrentEntity.OmitSave)
             {
-                s.Add($"            if ({GetKeyFieldLinq(CurrentEntity.DTOName.ToCamelCase(), null, "!=", "||")}) return BadRequest(\"Id mismatch\");");
+                s.Add($"        [HttpPost{(CurrentEntity.EntityType == EntityType.Settings ? string.Empty : $"(\"{CurrentEntity.RoutePath}\")")}{(CurrentEntity.AuthorizationType == AuthorizationType.None ? "" : ", AuthorizeRoles(Roles.Administrator)")}]");
+                s.Add($"        public async Task<IActionResult> Save({(CurrentEntity.EntityType == EntityType.Settings ? string.Empty : CurrentEntity.ControllerParameters + ", ")}[FromBody] {CurrentEntity.DTOName} {CurrentEntity.DTOName.ToCamelCase()})");
+                s.Add($"        {{");
+                s.Add($"            if (!ModelState.IsValid) return BadRequest(ModelState);");
                 s.Add($"");
 
-                foreach (var field in CurrentEntity.Fields.Where(f => f.IsUnique && f.EditPageType != EditPageType.Exclude).OrderBy(f => f.FieldOrder))
+                if (CurrentEntity.EntityType != EntityType.Settings)
                 {
-                    if (field.EditPageType == EditPageType.ReadOnly) continue;
+                    s.Add($"            if ({GetKeyFieldLinq(CurrentEntity.DTOName.ToCamelCase(), null, "!=", "||")}) return BadRequest(\"Id mismatch\");");
+                    s.Add($"");
 
-                    string hierarchyFields = string.Empty;
-                    if (field.IsUniqueOnHierarchy)
+                    foreach (var field in CurrentEntity.Fields.Where(f => f.IsUnique && f.EditPageType != EditPageType.Exclude).OrderBy(f => f.FieldOrder))
                     {
-                        foreach (var relField in ParentHierarchyRelationship.RelationshipFields)
-                            hierarchyFields += (hierarchyFields == string.Empty ? "" : " && ") + "o." + relField.ChildField.Name + " == " + CurrentEntity.DTOName.ToCamelCase() + "." + relField.ChildField.Name;
-                        hierarchyFields += " && ";
-                    }
-                    s.Add($"            if (" + (field.IsNullable ? field.NotNullCheck(CurrentEntity.DTOName.ToCamelCase() + "." + field.Name) + " && " : "") + $"await {CurrentEntity.Project.DbContextVariable}.{CurrentEntity.PluralName}.AnyAsync(o => {hierarchyFields}o.{field.Name} == {CurrentEntity.DTOName.ToCamelCase()}.{field.Name} && {GetKeyFieldLinq("o", CurrentEntity.DTOName.ToCamelCase(), "!=", "||", true)}))");
-                    s.Add($"                return BadRequest(\"{field.Label} already exists{(field.IsUniqueOnHierarchy ? " on this " + ParentHierarchyRelationship.ParentEntity.FriendlyName : string.Empty)}.\");");
-                    s.Add($"");
-                }
-                if (CurrentEntity.HasCompositePrimaryKey)
-                {
-                    s.Add($"            var {CurrentEntity.CamelCaseName} = await {CurrentEntity.Project.DbContextVariable}.{CurrentEntity.PluralName}");
-                    if (CurrentEntity.HasUserFilterField)
-                        s.Add($"                .Where(o => o.{CurrentEntity.UserFilterFieldPath} == CurrentUser.{CurrentEntity.Project.UserFilterFieldName})");
-                    s.Add($"                .FirstOrDefaultAsync(o => {GetKeyFieldLinq("o", CurrentEntity.DTOName.ToCamelCase())});");
-                    s.Add($"");
-                    s.Add($"            var isNew = {CurrentEntity.CamelCaseName} == null;");
-                    s.Add($"");
-                    s.Add($"            if (isNew)");
-                    s.Add($"            {{");
-                    s.Add($"                {CurrentEntity.CamelCaseName} = new {CurrentEntity.Name}();");
-                    s.Add($"");
-                    //foreach (var field in CurrentEntity.Fields.Where(f => f.KeyField && f.Entity.RelationshipsAsChild.Any(r => r.RelationshipFields.Any(rf => rf.ChildFieldId == f.FieldId))).OrderBy(f => f.FieldOrder))
-                    // on insert, all primary key fields (in composite keyed entities) come from the dto
-                    foreach (var field in CurrentEntity.Fields.Where(f => f.KeyField).OrderBy(f => f.FieldOrder))
-                    {
-                        s.Add($"                {CurrentEntity.CamelCaseName}.{field.Name} = {CurrentEntity.DTOName.ToCamelCase() + "." + field.Name};");
-                    }
-                    foreach (var field in CurrentEntity.Fields.Where(f => !string.IsNullOrWhiteSpace(f.ControllerInsertOverride)).OrderBy(f => f.FieldOrder))
-                    {
-                        s.Add($"                {CurrentEntity.CamelCaseName}.{field.Name} = {field.ControllerInsertOverride};");
-                    }
-                    if (CurrentEntity.Fields.Any(f => !string.IsNullOrWhiteSpace(f.ControllerInsertOverride)) || CurrentEntity.Fields.Any(f => f.KeyField))
-                        s.Add($"");
-                    if (CurrentEntity.HasASortField)
-                    {
-                        var field = CurrentEntity.SortField;
-                        var sort = $"                {CurrentEntity.DTOName.ToCamelCase()}.{field.Name} = (await {CurrentEntity.Project.DbContextVariable}.{CurrentEntity.PluralName}";
-                        if (CurrentEntity.RelationshipsAsChild.Any(r => r.Hierarchy) && CurrentEntity.RelationshipsAsChild.Count(r => r.Hierarchy) == 1)
+                        if (field.EditPageType == EditPageType.ReadOnly) continue;
+
+                        string hierarchyFields = string.Empty;
+                        if (field.IsUniqueOnHierarchy)
                         {
-                            sort += ".Where(o => " + (CurrentEntity.RelationshipsAsChild.Single(r => r.Hierarchy).RelationshipFields.Select(o => $"o.{o.ChildField.Name} == {CurrentEntity.DTOName.ToCamelCase()}.{o.ChildField.Name}").Aggregate((current, next) => current + " && " + next)) + ")";
+                            foreach (var relField in ParentHierarchyRelationship.RelationshipFields)
+                                hierarchyFields += (hierarchyFields == string.Empty ? "" : " && ") + "o." + relField.ChildField.Name + " == " + CurrentEntity.DTOName.ToCamelCase() + "." + relField.ChildField.Name;
+                            hierarchyFields += " && ";
                         }
-                        sort += $".MaxAsync(o => (int?)o.{field.Name}) ?? -1) + 1;";
-                        s.Add(sort);
+                        s.Add($"            if (" + (field.IsNullable ? field.NotNullCheck(CurrentEntity.DTOName.ToCamelCase() + "." + field.Name) + " && " : "") + $"await {CurrentEntity.Project.DbContextVariable}.{CurrentEntity.PluralName}.AnyAsync(o => {hierarchyFields}o.{field.Name} == {CurrentEntity.DTOName.ToCamelCase()}.{field.Name} && {GetKeyFieldLinq("o", CurrentEntity.DTOName.ToCamelCase(), "!=", "||", true)}))");
+                        s.Add($"                return BadRequest(\"{field.Label} already exists{(field.IsUniqueOnHierarchy ? " on this " + ParentHierarchyRelationship.ParentEntity.FriendlyName : string.Empty)}.\");");
                         s.Add($"");
                     }
-                    s.Add($"                {CurrentEntity.Project.DbContextVariable}.Entry({CurrentEntity.CamelCaseName}).State = EntityState.Added;");
-                    s.Add($"            }}");
-                    s.Add($"            else");
-                    s.Add($"            {{");
-                    foreach (var field in CurrentEntity.Fields.Where(f => !string.IsNullOrWhiteSpace(f.ControllerUpdateOverride)).OrderBy(f => f.FieldOrder))
+                    if (CurrentEntity.HasCompositePrimaryKey)
                     {
-                        s.Add($"                {CurrentEntity.CamelCaseName}.{field.Name} = {field.ControllerUpdateOverride};");
-                    }
-                    if (CurrentEntity.Fields.Any(f => !string.IsNullOrWhiteSpace(f.ControllerUpdateOverride)))
-                        s.Add($"");
-                    s.Add($"                {CurrentEntity.Project.DbContextVariable}.Entry({CurrentEntity.CamelCaseName}).State = EntityState.Modified;");
-                    s.Add($"            }}");
-                }
-                else
-                {
-                    if (CurrentEntity.EntityType == EntityType.User)
-                    {
-                        s.Add($"            var password = string.Empty;");
-                        s.Add($"            if (await db.Users.AnyAsync(o => o.Email == userDTO.Email && o.Id != userDTO.Id))");
-                        s.Add($"                return BadRequest(\"Email already exists.\");");
-                        s.Add($"");
-                    }
-                    s.Add($"            var isNew = {CurrentEntity.KeyFields.Select(f => CurrentEntity.DTOName.ToCamelCase() + "." + f.Name + " == " + f.EmptyValue).Aggregate((current, next) => current + " && " + next)};");
-                    s.Add($"");
-                    s.Add($"            {CurrentEntity.Name} {CurrentEntity.CamelCaseName};");
-                    s.Add($"            if (isNew)");
-                    s.Add($"            {{");
-                    s.Add($"                {CurrentEntity.CamelCaseName} = new {CurrentEntity.Name}();");
-                    if (CurrentEntity.EntityType == EntityType.User)
-                        s.Add($"                password = Utilities.General.GenerateRandomPassword(opts.Value.Password);");
-                    s.Add($"");
-                    foreach (var field in CurrentEntity.Fields.Where(f => !string.IsNullOrWhiteSpace(f.ControllerInsertOverride)).OrderBy(f => f.FieldOrder))
-                    {
-                        s.Add($"                {CurrentEntity.CamelCaseName}.{field.Name} = {field.ControllerInsertOverride};");
-                    }
-                    if (CurrentEntity.Fields.Any(f => !string.IsNullOrWhiteSpace(f.ControllerInsertOverride)))
-                        s.Add($"");
-                    if (CurrentEntity.HasASortField)
-                    {
-                        var field = CurrentEntity.SortField;
-                        var sort = $"                {CurrentEntity.DTOName.ToCamelCase()}.{field.Name} = (await {CurrentEntity.Project.DbContextVariable}.{CurrentEntity.PluralName}";
-                        if (CurrentEntity.RelationshipsAsChild.Any(r => r.Hierarchy) && CurrentEntity.RelationshipsAsChild.Count(r => r.Hierarchy) == 1)
-                        {
-                            sort += ".Where(o => " + (CurrentEntity.RelationshipsAsChild.Single(r => r.Hierarchy).RelationshipFields.Select(o => $"o.{o.ChildField.Name} == {CurrentEntity.DTOName.ToCamelCase()}.{o.ChildField.Name}").Aggregate((current, next) => current + " && " + next)) + ")";
-                        }
-                        sort += $".MaxAsync(o => (int?)o.{field.Name}) ?? 0) + 1;";
-                        s.Add(sort);
-                        s.Add($"");
-                    }
-                    if (CurrentEntity.EntityType != EntityType.User)
-                        s.Add($"                {CurrentEntity.Project.DbContextVariable}.Entry({CurrentEntity.CamelCaseName}).State = EntityState.Added;");
-                    s.Add($"            }}");
-                    s.Add($"            else");
-                    s.Add($"            {{");
-                    if (CurrentEntity.EntityType == EntityType.User)
-                    {
-                        s.Add($"                user = await userManager.FindByIdAsync(userDTO.Id.ToString());");
+                        s.Add($"            var {CurrentEntity.CamelCaseName} = await {CurrentEntity.Project.DbContextVariable}.{CurrentEntity.PluralName}");
                         if (CurrentEntity.HasUserFilterField)
-                            throw new Exception("TO FIX");
-                        //s.Add($"                    .Where(o => o.{CurrentEntity.UserFilterFieldPath} == CurrentUser.{CurrentEntity.Project.UserFilterFieldName})");
+                            s.Add($"                .Where(o => o.{CurrentEntity.UserFilterFieldPath} == CurrentUser.{CurrentEntity.Project.UserFilterFieldName})");
+                        s.Add($"                .FirstOrDefaultAsync(o => {GetKeyFieldLinq("o", CurrentEntity.DTOName.ToCamelCase())});");
+                        s.Add($"");
+                        s.Add($"            var isNew = {CurrentEntity.CamelCaseName} == null;");
+                        s.Add($"");
+                        s.Add($"            if (isNew)");
+                        s.Add($"            {{");
+                        s.Add($"                {CurrentEntity.CamelCaseName} = new {CurrentEntity.Name}();");
+                        s.Add($"");
+                        //foreach (var field in CurrentEntity.Fields.Where(f => f.KeyField && f.Entity.RelationshipsAsChild.Any(r => r.RelationshipFields.Any(rf => rf.ChildFieldId == f.FieldId))).OrderBy(f => f.FieldOrder))
+                        // on insert, all primary key fields (in composite keyed entities) come from the dto
+                        foreach (var field in CurrentEntity.Fields.Where(f => f.KeyField).OrderBy(f => f.FieldOrder))
+                        {
+                            s.Add($"                {CurrentEntity.CamelCaseName}.{field.Name} = {CurrentEntity.DTOName.ToCamelCase() + "." + field.Name};");
+                        }
+                        foreach (var field in CurrentEntity.Fields.Where(f => !string.IsNullOrWhiteSpace(f.ControllerInsertOverride)).OrderBy(f => f.FieldOrder))
+                        {
+                            s.Add($"                {CurrentEntity.CamelCaseName}.{field.Name} = {field.ControllerInsertOverride};");
+                        }
+                        if (CurrentEntity.Fields.Any(f => !string.IsNullOrWhiteSpace(f.ControllerInsertOverride)) || CurrentEntity.Fields.Any(f => f.KeyField))
+                            s.Add($"");
+                        if (CurrentEntity.HasASortField)
+                        {
+                            var field = CurrentEntity.SortField;
+                            var sort = $"                {CurrentEntity.DTOName.ToCamelCase()}.{field.Name} = (await {CurrentEntity.Project.DbContextVariable}.{CurrentEntity.PluralName}";
+                            if (CurrentEntity.RelationshipsAsChild.Any(r => r.Hierarchy) && CurrentEntity.RelationshipsAsChild.Count(r => r.Hierarchy) == 1)
+                            {
+                                sort += ".Where(o => " + (CurrentEntity.RelationshipsAsChild.Single(r => r.Hierarchy).RelationshipFields.Select(o => $"o.{o.ChildField.Name} == {CurrentEntity.DTOName.ToCamelCase()}.{o.ChildField.Name}").Aggregate((current, next) => current + " && " + next)) + ")";
+                            }
+                            sort += $".MaxAsync(o => (int?)o.{field.Name}) ?? -1) + 1;";
+                            s.Add(sort);
+                            s.Add($"");
+                        }
+                        s.Add($"                {CurrentEntity.Project.DbContextVariable}.Entry({CurrentEntity.CamelCaseName}).State = EntityState.Added;");
+                        s.Add($"            }}");
+                        s.Add($"            else");
+                        s.Add($"            {{");
+                        foreach (var field in CurrentEntity.Fields.Where(f => !string.IsNullOrWhiteSpace(f.ControllerUpdateOverride)).OrderBy(f => f.FieldOrder))
+                        {
+                            s.Add($"                {CurrentEntity.CamelCaseName}.{field.Name} = {field.ControllerUpdateOverride};");
+                        }
+                        if (CurrentEntity.Fields.Any(f => !string.IsNullOrWhiteSpace(f.ControllerUpdateOverride)))
+                            s.Add($"");
+                        s.Add($"                {CurrentEntity.Project.DbContextVariable}.Entry({CurrentEntity.CamelCaseName}).State = EntityState.Modified;");
+                        s.Add($"            }}");
                     }
                     else
                     {
-                        s.Add($"                {CurrentEntity.CamelCaseName} = await {CurrentEntity.Project.DbContextVariable}.{CurrentEntity.PluralName}");
-                        if (CurrentEntity.HasUserFilterField)
-                            s.Add($"                    .Where(o => o.{CurrentEntity.UserFilterFieldPath} == CurrentUser.{CurrentEntity.Project.UserFilterFieldName})");
-                        s.Add($"                    .FirstOrDefaultAsync(o => {GetKeyFieldLinq("o", CurrentEntity.DTOName.ToCamelCase())});");
-                    }
-                    s.Add($"");
-                    s.Add($"                if ({CurrentEntity.CamelCaseName} == null)");
-                    s.Add($"                    return NotFound();");
-                    s.Add($"");
-                    foreach (var field in CurrentEntity.Fields.Where(f => !string.IsNullOrWhiteSpace(f.ControllerUpdateOverride)).OrderBy(f => f.FieldOrder))
-                    {
-                        s.Add($"                {CurrentEntity.CamelCaseName}.{field.Name} = {field.ControllerUpdateOverride};");
-                    }
-                    if (CurrentEntity.Fields.Any(f => !string.IsNullOrWhiteSpace(f.ControllerUpdateOverride)))
-                        s.Add($"");
-                    if (CurrentEntity.EntityType != EntityType.User)
-                        s.Add($"                {CurrentEntity.Project.DbContextVariable}.Entry({CurrentEntity.CamelCaseName}).State = EntityState.Modified;");
-                    s.Add($"            }}");
-                }
-                s.Add($"");
-            }
-            else
-            {
-                s.Add($"            var {CurrentEntity.CamelCaseName} = await {CurrentEntity.Project.DbContextVariable}.{CurrentEntity.PluralName}");
-                s.Add($"                .SingleAsync();");
-                s.Add($"");
-                s.Add($"            {CurrentEntity.Project.DbContextVariable}.Entry({CurrentEntity.CamelCaseName}).State = EntityState.Modified;");
-                s.Add($"");
-            }
-
-            var deleteFile = CurrentEntity.HasAFileContentsField && CurrentEntity.HasAzureBlobStorageField && CurrentEntity.Fields.Single(o => o.EditPageType == EditPageType.FileName).IsNullable;
-            if (deleteFile)
-            {
-                var fieldName = CurrentEntity.Fields.Single(o => o.EditPageType == EditPageType.FileName).Name;
-                s.Add($"            var deleteFile = {CurrentEntity.CamelCaseName}DTO.{fieldName} == null && {CurrentEntity.CamelCaseName}.{fieldName} != null;");
-                s.Add($"");
-            }
-
-            s.Add($"            ModelFactory.Hydrate({CurrentEntity.CamelCaseName}, {CurrentEntity.DTOName.ToCamelCase()}{(CurrentEntity.Fields.Any(o => o.EditPageType == EditPageType.EditWhenNew) ? ", isNew" : "")});");
-            s.Add($"");
-
-            if (CurrentEntity.HasAFileContentsField && !CurrentEntity.HasAzureBlobStorageField)
-            {
-                s.Add($"            if ({CurrentEntity.DTOName.ToCamelCase()}.{fileContentsField.Name} != null)");
-                s.Add($"            {{");
-                s.Add($"                if (isNew)");
-                s.Add($"                    db.Entry({CurrentEntity.Name.ToCamelCase()}.{CurrentEntity.Name}Content).State = EntityState.Added;");
-                s.Add($"                else");
-                s.Add($"                {{");
-                s.Add($"                    if (await {CurrentEntity.Project.DbContextVariable}.{CurrentEntity.PluralName}.AnyAsync(o => {GetKeyFieldLinq("o", CurrentEntity.DTOName.ToCamelCase())} && o.{CurrentEntity.Name}Content != null))");
-                s.Add($"                        db.Entry({CurrentEntity.Name.ToCamelCase()}.{CurrentEntity.Name}Content).State = EntityState.Modified;");
-                s.Add($"                    else");
-                s.Add($"                        db.Entry({CurrentEntity.Name.ToCamelCase()}.{CurrentEntity.Name}Content).State = EntityState.Added;");
-                s.Add($"                }}");
-                s.Add($"            }}");
-                s.Add($"");
-            }
-
-            if (CurrentEntity.EntityType == EntityType.User)
-            {
-                s.Add($"            var saveResult = (isNew ? await userManager.CreateAsync(user, password) : await userManager.UpdateAsync(user));");
-                s.Add($"");
-                s.Add($"            if (!saveResult.Succeeded)");
-                s.Add($"                return GetErrorResult(saveResult);");
-                s.Add($"");
-                s.Add($"            if (!isNew)");
-                s.Add($"            {{");
-                // changed 1/8/24 based on what works in ixesha-2
-                s.Add($"                foreach (var role in await userManager.GetRolesAsync(user))");
-                s.Add($"                {{");
-                s.Add($"                    await userManager.RemoveFromRoleAsync(user, role);");
-                s.Add($"                }}");
-                s.Add($"            }}");
-                s.Add($"");
-                s.Add($"            if (userDTO.Roles != null)");
-                s.Add($"            {{");
-                s.Add($"                foreach (var roleName in userDTO.Roles)");
-                s.Add($"                {{");
-                s.Add($"                    await userManager.AddToRoleAsync(user, roleName);");
-                s.Add($"                }}");
-                s.Add($"            }}");
-                s.Add($"");
-                s.Add($"            if (isNew) await Utilities.General.SendWelcomeMailAsync(user, password, AppSettings);");
-            }
-            else
-            {
-                s.Add($"            await {CurrentEntity.Project.DbContextVariable}.SaveChangesAsync();");
-            }
-
-            if (CurrentEntity.HasAFileContentsField && CurrentEntity.HasAzureBlobStorageField)
-            {
-                s.Add($"");
-                s.Add($"            if ({CurrentEntity.DTOName.ToCamelCase()}.{fileContentsField.Name} != null)");
-                s.Add($"            {{");
-                s.Add($"                var blobStorageService = new BlobStorageService(AppSettings.AzureSettings.Documents.ConnectionString, AppSettings.AzureSettings.Documents.ContainerName);");
-                s.Add($"                await blobStorageService.UploadBlobAsync({CurrentEntity.Name.ToCamelCase()}.{CurrentEntity.KeyFields.Single().Name}.ToString().ToLowerInvariant(), Convert.FromBase64String({CurrentEntity.DTOName.ToCamelCase()}.{fileContentsField.Name}));");
-                s.Add($"            }}");
-                if (deleteFile)
-                {
-                    s.Add($"            else if (deleteFile)");
-                    s.Add($"            {{");
-                    s.Add($"                var blobStorageService = new BlobStorageService(AppSettings.AzureSettings.Documents.ConnectionString, AppSettings.AzureSettings.Documents.ContainerName);");
-                    s.Add($"                await blobStorageService.DeleteBlobAsync({CurrentEntity.Name.ToCamelCase()}.{CurrentEntity.KeyFields.Single().Name}.ToString().ToLowerInvariant());");
-                    s.Add($"            }}");
-                }
-            }
-
-            s.Add($"");
-            s.Add($"            return await Get({(CurrentEntity.EntityType == EntityType.Settings ? string.Empty : CurrentEntity.KeyFields.Select(f => CurrentEntity.CamelCaseName + "." + f.Name).Aggregate((current, next) => current + ", " + next))});");
-            s.Add($"        }}");
-            s.Add($"");
-            #endregion
-
-            if (CurrentEntity.EntityType != EntityType.Settings)
-            {
-
-                #region delete
-                s.Add($"        [HttpDelete(\"{CurrentEntity.RoutePath}\"){(CurrentEntity.AuthorizationType == AuthorizationType.None ? "" : ", AuthorizeRoles(Roles.Administrator)")}]");
-                s.Add($"        public async Task<IActionResult> Delete({CurrentEntity.ControllerParameters})");
-                s.Add($"        {{");
-                s.Add($"            var {CurrentEntity.CamelCaseName} = await {(CurrentEntity.EntityType == EntityType.User ? "userManager" : CurrentEntity.Project.DbContextVariable)}.{CurrentEntity.PluralName}");
-                if (CurrentEntity.HasUserFilterField)
-                    s.Add($"                .Where(o => o.{CurrentEntity.UserFilterFieldPath} == CurrentUser.{CurrentEntity.Project.UserFilterFieldName})");
-                s.Add($"                .FirstOrDefaultAsync(o => {GetKeyFieldLinq("o")});");
-                s.Add($"");
-                s.Add($"            if ({CurrentEntity.CamelCaseName} == null)");
-                s.Add($"                return NotFound();");
-                s.Add($"");
-
-                var errorOnDeleteRelationships = CurrentEntity.RelationshipsAsParent.Where(rel => !rel.ChildEntity.Exclude && !rel.CascadeDelete).OrderBy(o => o.SortOrder);
-                foreach (var relationship in errorOnDeleteRelationships)
-                {
-                    var joins = relationship.RelationshipFields.Select(o => $"o.{o.ChildField.Name} == {CurrentEntity.CamelCaseName}.{o.ParentField.Name}").Aggregate((current, next) => current + " && " + next);
-                    s.Add($"            if (await {CurrentEntity.Project.DbContextVariable}.{(relationship.ChildEntity.EntityType == EntityType.User ? "Users" : relationship.ChildEntity.PluralName)}.AnyAsync(o => {joins}))");
-                    s.Add($"                return BadRequest(\"Unable to delete the {CurrentEntity.FriendlyName.ToLower()} as it has related {relationship.CollectionFriendlyName.ToLower()}\");");
-                    s.Add($"");
-                }
-
-                var cascadeDeleteRelationships = CurrentEntity.RelationshipsAsParent.Where(rel => !rel.ChildEntity.Exclude && rel.CascadeDelete).OrderBy(o => o.SortOrder);
-
-                var usingTransaction = cascadeDeleteRelationships.Any() || (CurrentEntity.HasAFileContentsField && !CurrentEntity.HasAzureBlobStorageField);
-                if (usingTransaction)
-                {
-                    // using () -> otherwise any db calls outside the transaction will error
-                    s.Add($"            using (var transactionScope = Utilities.General.CreateTransactionScope())");
-                    s.Add($"            {{");
-                }
-
-                if (cascadeDeleteRelationships.Any())
-                {
-                    foreach (var relationship in cascadeDeleteRelationships)
-                    {
-                        var joins = relationship.RelationshipFields.Select(o => $"o.{o.ChildField.Name} == {CurrentEntity.CamelCaseName}.{o.ParentField.Name}").Aggregate((current, next) => current + " && " + next);
-                        var joinsContents = relationship.RelationshipFields.Select(o => $"o.{relationship.ChildEntity.Name}.{o.ChildField.Name} == {CurrentEntity.CamelCaseName}.{o.ParentField.Name}").Aggregate((current, next) => current + " && " + next);
-
-                        if (relationship.ChildEntity.Fields.Any(o => o.EditPageType == EditPageType.FileContents))
+                        if (CurrentEntity.EntityType == EntityType.User)
                         {
-                            s.Add($"{(usingTransaction ? "    " : "")}            await {CurrentEntity.Project.DbContextVariable}.{(relationship.ChildEntity.EntityType == EntityType.User ? "User" : relationship.ChildEntity.Name)}Contents.Where(o => {joinsContents}).ExecuteDeleteAsync();");
+                            s.Add($"            var password = string.Empty;");
+                            s.Add($"            if (await db.Users.AnyAsync(o => o.Email == userDTO.Email && o.Id != userDTO.Id))");
+                            s.Add($"                return BadRequest(\"Email already exists.\");");
                             s.Add($"");
                         }
-                        s.Add($"{(usingTransaction ? "    " : "")}            await {CurrentEntity.Project.DbContextVariable}.{(relationship.ChildEntity.EntityType == EntityType.User ? "Users" : relationship.ChildEntity.PluralName)}.Where(o => {joins}).ExecuteDeleteAsync();");
+                        s.Add($"            var isNew = {CurrentEntity.KeyFields.Select(f => CurrentEntity.DTOName.ToCamelCase() + "." + f.Name + " == " + f.EmptyValue).Aggregate((current, next) => current + " && " + next)};");
                         s.Add($"");
+                        s.Add($"            {CurrentEntity.Name} {CurrentEntity.CamelCaseName};");
+                        s.Add($"            if (isNew)");
+                        s.Add($"            {{");
+                        s.Add($"                {CurrentEntity.CamelCaseName} = new {CurrentEntity.Name}();");
+                        if (CurrentEntity.EntityType == EntityType.User)
+                            s.Add($"                password = Utilities.General.GenerateRandomPassword(opts.Value.Password);");
+                        s.Add($"");
+                        foreach (var field in CurrentEntity.Fields.Where(f => !string.IsNullOrWhiteSpace(f.ControllerInsertOverride)).OrderBy(f => f.FieldOrder))
+                        {
+                            s.Add($"                {CurrentEntity.CamelCaseName}.{field.Name} = {field.ControllerInsertOverride};");
+                        }
+                        if (CurrentEntity.Fields.Any(f => !string.IsNullOrWhiteSpace(f.ControllerInsertOverride)))
+                            s.Add($"");
+                        if (CurrentEntity.HasASortField)
+                        {
+                            var field = CurrentEntity.SortField;
+                            var sort = $"                {CurrentEntity.DTOName.ToCamelCase()}.{field.Name} = (await {CurrentEntity.Project.DbContextVariable}.{CurrentEntity.PluralName}";
+                            if (CurrentEntity.RelationshipsAsChild.Any(r => r.Hierarchy) && CurrentEntity.RelationshipsAsChild.Count(r => r.Hierarchy) == 1)
+                            {
+                                sort += ".Where(o => " + (CurrentEntity.RelationshipsAsChild.Single(r => r.Hierarchy).RelationshipFields.Select(o => $"o.{o.ChildField.Name} == {CurrentEntity.DTOName.ToCamelCase()}.{o.ChildField.Name}").Aggregate((current, next) => current + " && " + next)) + ")";
+                            }
+                            sort += $".MaxAsync(o => (int?)o.{field.Name}) ?? 0) + 1;";
+                            s.Add(sort);
+                            s.Add($"");
+                        }
+                        if (CurrentEntity.EntityType != EntityType.User)
+                            s.Add($"                {CurrentEntity.Project.DbContextVariable}.Entry({CurrentEntity.CamelCaseName}).State = EntityState.Added;");
+                        s.Add($"            }}");
+                        s.Add($"            else");
+                        s.Add($"            {{");
+                        if (CurrentEntity.EntityType == EntityType.User)
+                        {
+                            s.Add($"                user = await userManager.FindByIdAsync(userDTO.Id.ToString());");
+                            if (CurrentEntity.HasUserFilterField)
+                                throw new Exception("TO FIX");
+                            //s.Add($"                    .Where(o => o.{CurrentEntity.UserFilterFieldPath} == CurrentUser.{CurrentEntity.Project.UserFilterFieldName})");
+                        }
+                        else
+                        {
+                            s.Add($"                {CurrentEntity.CamelCaseName} = await {CurrentEntity.Project.DbContextVariable}.{CurrentEntity.PluralName}");
+                            if (CurrentEntity.HasUserFilterField)
+                                s.Add($"                    .Where(o => o.{CurrentEntity.UserFilterFieldPath} == CurrentUser.{CurrentEntity.Project.UserFilterFieldName})");
+                            s.Add($"                    .FirstOrDefaultAsync(o => {GetKeyFieldLinq("o", CurrentEntity.DTOName.ToCamelCase())});");
+                        }
+                        s.Add($"");
+                        s.Add($"                if ({CurrentEntity.CamelCaseName} == null)");
+                        s.Add($"                    return NotFound();");
+                        s.Add($"");
+                        foreach (var field in CurrentEntity.Fields.Where(f => !string.IsNullOrWhiteSpace(f.ControllerUpdateOverride)).OrderBy(f => f.FieldOrder))
+                        {
+                            s.Add($"                {CurrentEntity.CamelCaseName}.{field.Name} = {field.ControllerUpdateOverride};");
+                        }
+                        if (CurrentEntity.Fields.Any(f => !string.IsNullOrWhiteSpace(f.ControllerUpdateOverride)))
+                            s.Add($"");
+                        if (CurrentEntity.EntityType != EntityType.User)
+                            s.Add($"                {CurrentEntity.Project.DbContextVariable}.Entry({CurrentEntity.CamelCaseName}).State = EntityState.Modified;");
+                        s.Add($"            }}");
                     }
+                    s.Add($"");
                 }
+                else
+                {
+                    s.Add($"            var {CurrentEntity.CamelCaseName} = await {CurrentEntity.Project.DbContextVariable}.{CurrentEntity.PluralName}");
+                    s.Add($"                .SingleAsync();");
+                    s.Add($"");
+                    s.Add($"            {CurrentEntity.Project.DbContextVariable}.Entry({CurrentEntity.CamelCaseName}).State = EntityState.Modified;");
+                    s.Add($"");
+                }
+
+                var deleteFile = CurrentEntity.HasAFileContentsField && CurrentEntity.HasAzureBlobStorageField && CurrentEntity.Fields.Single(o => o.EditPageType == EditPageType.FileName).IsNullable;
+                if (deleteFile)
+                {
+                    var fieldName = CurrentEntity.Fields.Single(o => o.EditPageType == EditPageType.FileName).Name;
+                    s.Add($"            var deleteFile = {CurrentEntity.CamelCaseName}DTO.{fieldName} == null && {CurrentEntity.CamelCaseName}.{fieldName} != null;");
+                    s.Add($"");
+                }
+
+                s.Add($"            ModelFactory.Hydrate({CurrentEntity.CamelCaseName}, {CurrentEntity.DTOName.ToCamelCase()}{(CurrentEntity.Fields.Any(o => o.EditPageType == EditPageType.EditWhenNew) ? ", isNew" : "")});");
+                s.Add($"");
 
                 if (CurrentEntity.HasAFileContentsField && !CurrentEntity.HasAzureBlobStorageField)
                 {
-                    s.Add($"{(usingTransaction ? "    " : "")}            await {CurrentEntity.Project.DbContextVariable}.{CurrentEntity.Name}Contents.Where(o => {CurrentEntity.KeyFields.Select(o => $"o.{o.Name} == {o.Name.ToCamelCase()}").Aggregate((current, next) => current + " && " + next)}).ExecuteDeleteAsync();");
+                    s.Add($"            if ({CurrentEntity.DTOName.ToCamelCase()}.{fileContentsField.Name} != null)");
+                    s.Add($"            {{");
+                    s.Add($"                if (isNew)");
+                    s.Add($"                    db.Entry({CurrentEntity.Name.ToCamelCase()}.{CurrentEntity.Name}Content).State = EntityState.Added;");
+                    s.Add($"                else");
+                    s.Add($"                {{");
+                    s.Add($"                    if (await {CurrentEntity.Project.DbContextVariable}.{CurrentEntity.PluralName}.AnyAsync(o => {GetKeyFieldLinq("o", CurrentEntity.DTOName.ToCamelCase())} && o.{CurrentEntity.Name}Content != null))");
+                    s.Add($"                        db.Entry({CurrentEntity.Name.ToCamelCase()}.{CurrentEntity.Name}Content).State = EntityState.Modified;");
+                    s.Add($"                    else");
+                    s.Add($"                        db.Entry({CurrentEntity.Name.ToCamelCase()}.{CurrentEntity.Name}Content).State = EntityState.Added;");
+                    s.Add($"                }}");
+                    s.Add($"            }}");
                     s.Add($"");
                 }
 
                 if (CurrentEntity.EntityType == EntityType.User)
                 {
-                    s.Add($"{(usingTransaction ? "    " : "")}            foreach (var role in await userManager.GetRolesAsync(user))");
-                    s.Add($"{(usingTransaction ? "    " : "")}                await userManager.RemoveFromRoleAsync(user, role);");
+                    s.Add($"            var saveResult = (isNew ? await userManager.CreateAsync(user, password) : await userManager.UpdateAsync(user));");
                     s.Add($"");
-                    s.Add($"{(usingTransaction ? "    " : "")}            await userManager.DeleteAsync(user);");
+                    s.Add($"            if (!saveResult.Succeeded)");
+                    s.Add($"                return GetErrorResult(saveResult);");
+                    s.Add($"");
+                    s.Add($"            if (!isNew)");
+                    s.Add($"            {{");
+                    // changed 1/8/24 based on what works in ixesha-2
+                    s.Add($"                foreach (var role in await userManager.GetRolesAsync(user))");
+                    s.Add($"                {{");
+                    s.Add($"                    await userManager.RemoveFromRoleAsync(user, role);");
+                    s.Add($"                }}");
+                    s.Add($"            }}");
+                    s.Add($"");
+                    s.Add($"            if (userDTO.Roles != null)");
+                    s.Add($"            {{");
+                    s.Add($"                foreach (var roleName in userDTO.Roles)");
+                    s.Add($"                {{");
+                    s.Add($"                    await userManager.AddToRoleAsync(user, roleName);");
+                    s.Add($"                }}");
+                    s.Add($"            }}");
+                    s.Add($"");
+                    s.Add($"            if (isNew) await Utilities.General.SendWelcomeMailAsync(user, password, AppSettings);");
                 }
                 else
                 {
-                    s.Add($"{(usingTransaction ? "    " : "")}            {CurrentEntity.Project.DbContextVariable}.Entry({CurrentEntity.CamelCaseName}).State = EntityState.Deleted;");
-                    s.Add($"");
-                    s.Add($"{(usingTransaction ? "    " : "")}            await {CurrentEntity.Project.DbContextVariable}.SaveChangesAsync();");
+                    s.Add($"            await {CurrentEntity.Project.DbContextVariable}.SaveChangesAsync();");
                 }
 
-                if (usingTransaction)
+                if (CurrentEntity.HasAFileContentsField && CurrentEntity.HasAzureBlobStorageField)
                 {
                     s.Add($"");
-                    s.Add($"                transactionScope.Complete();");
+                    s.Add($"            if ({CurrentEntity.DTOName.ToCamelCase()}.{fileContentsField.Name} != null)");
+                    s.Add($"            {{");
+                    s.Add($"                var blobStorageService = new BlobStorageService(AppSettings.AzureSettings.Documents.ConnectionString, AppSettings.AzureSettings.Documents.ContainerName);");
+                    s.Add($"                await blobStorageService.UploadBlobAsync({CurrentEntity.Name.ToCamelCase()}.{CurrentEntity.KeyFields.Single().Name}.ToString().ToLowerInvariant(), Convert.FromBase64String({CurrentEntity.DTOName.ToCamelCase()}.{fileContentsField.Name}));");
                     s.Add($"            }}");
-                }
-
-                if (CurrentEntity.HasAzureBlobStorageField)
-                {
-                    s.Add($"");
-                    s.Add($"            var blobStorageService = new BlobStorageService(AppSettings.AzureSettings.Documents.ConnectionString, AppSettings.AzureSettings.Documents.ContainerName);");
-                    s.Add($"            await blobStorageService.DeleteBlobAsync({CurrentEntity.KeyFields.Single().Name.ToCamelCase()}.ToString().ToLowerInvariant());");
+                    if (deleteFile)
+                    {
+                        s.Add($"            else if (deleteFile)");
+                        s.Add($"            {{");
+                        s.Add($"                var blobStorageService = new BlobStorageService(AppSettings.AzureSettings.Documents.ConnectionString, AppSettings.AzureSettings.Documents.ContainerName);");
+                        s.Add($"                await blobStorageService.DeleteBlobAsync({CurrentEntity.Name.ToCamelCase()}.{CurrentEntity.KeyFields.Single().Name}.ToString().ToLowerInvariant());");
+                        s.Add($"            }}");
+                    }
                 }
 
                 s.Add($"");
-                s.Add($"            return Ok();");
+                s.Add($"            return await Get({(CurrentEntity.EntityType == EntityType.Settings ? string.Empty : CurrentEntity.KeyFields.Select(f => CurrentEntity.CamelCaseName + "." + f.Name).Aggregate((current, next) => current + ", " + next))});");
                 s.Add($"        }}");
                 s.Add($"");
-                #endregion
+            }
+            #endregion
+
+            if (CurrentEntity.EntityType != EntityType.Settings)
+            {
+                var cascadeDeleteRelationships = CurrentEntity.RelationshipsAsParent.Where(rel => !rel.ChildEntity.Exclude && rel.CascadeDelete).OrderBy(o => o.SortOrder);
+                var usingTransaction = cascadeDeleteRelationships.Any() || (CurrentEntity.HasAFileContentsField && !CurrentEntity.HasAzureBlobStorageField);
+
+                if (!CurrentEntity.OmitDelete)
+                {
+                    #region delete
+                    s.Add($"        [HttpDelete(\"{CurrentEntity.RoutePath}\"){(CurrentEntity.AuthorizationType == AuthorizationType.None ? "" : ", AuthorizeRoles(Roles.Administrator)")}]");
+                    s.Add($"        public async Task<IActionResult> Delete({CurrentEntity.ControllerParameters})");
+                    s.Add($"        {{");
+                    s.Add($"            var {CurrentEntity.CamelCaseName} = await {(CurrentEntity.EntityType == EntityType.User ? "userManager" : CurrentEntity.Project.DbContextVariable)}.{CurrentEntity.PluralName}");
+                    if (CurrentEntity.HasUserFilterField)
+                        s.Add($"                .Where(o => o.{CurrentEntity.UserFilterFieldPath} == CurrentUser.{CurrentEntity.Project.UserFilterFieldName})");
+                    s.Add($"                .FirstOrDefaultAsync(o => {GetKeyFieldLinq("o")});");
+                    s.Add($"");
+                    s.Add($"            if ({CurrentEntity.CamelCaseName} == null)");
+                    s.Add($"                return NotFound();");
+                    s.Add($"");
+
+                    var errorOnDeleteRelationships = CurrentEntity.RelationshipsAsParent.Where(rel => !rel.ChildEntity.Exclude && !rel.CascadeDelete).OrderBy(o => o.SortOrder);
+                    foreach (var relationship in errorOnDeleteRelationships)
+                    {
+                        var joins = relationship.RelationshipFields.Select(o => $"o.{o.ChildField.Name} == {CurrentEntity.CamelCaseName}.{o.ParentField.Name}").Aggregate((current, next) => current + " && " + next);
+                        s.Add($"            if (await {CurrentEntity.Project.DbContextVariable}.{(relationship.ChildEntity.EntityType == EntityType.User ? "Users" : relationship.ChildEntity.PluralName)}.AnyAsync(o => {joins}))");
+                        s.Add($"                return BadRequest(\"Unable to delete the {CurrentEntity.FriendlyName.ToLower()} as it has related {relationship.CollectionFriendlyName.ToLower()}\");");
+                        s.Add($"");
+                    }
+
+                    if (usingTransaction)
+                    {
+                        // using () -> otherwise any db calls outside the transaction will error
+                        s.Add($"            using (var transactionScope = Utilities.General.CreateTransactionScope())");
+                        s.Add($"            {{");
+                    }
+
+                    if (cascadeDeleteRelationships.Any())
+                    {
+                        foreach (var relationship in cascadeDeleteRelationships)
+                        {
+                            var joins = relationship.RelationshipFields.Select(o => $"o.{o.ChildField.Name} == {CurrentEntity.CamelCaseName}.{o.ParentField.Name}").Aggregate((current, next) => current + " && " + next);
+                            var joinsContents = relationship.RelationshipFields.Select(o => $"o.{relationship.ChildEntity.Name}.{o.ChildField.Name} == {CurrentEntity.CamelCaseName}.{o.ParentField.Name}").Aggregate((current, next) => current + " && " + next);
+
+                            if (relationship.ChildEntity.Fields.Any(o => o.EditPageType == EditPageType.FileContents))
+                            {
+                                s.Add($"{(usingTransaction ? "    " : "")}            await {CurrentEntity.Project.DbContextVariable}.{(relationship.ChildEntity.EntityType == EntityType.User ? "User" : relationship.ChildEntity.Name)}Contents.Where(o => {joinsContents}).ExecuteDeleteAsync();");
+                                s.Add($"");
+                            }
+                            s.Add($"{(usingTransaction ? "    " : "")}            await {CurrentEntity.Project.DbContextVariable}.{(relationship.ChildEntity.EntityType == EntityType.User ? "Users" : relationship.ChildEntity.PluralName)}.Where(o => {joins}).ExecuteDeleteAsync();");
+                            s.Add($"");
+                        }
+                    }
+
+                    if (CurrentEntity.HasAFileContentsField && !CurrentEntity.HasAzureBlobStorageField)
+                    {
+                        s.Add($"{(usingTransaction ? "    " : "")}            await {CurrentEntity.Project.DbContextVariable}.{CurrentEntity.Name}Contents.Where(o => {CurrentEntity.KeyFields.Select(o => $"o.{o.Name} == {o.Name.ToCamelCase()}").Aggregate((current, next) => current + " && " + next)}).ExecuteDeleteAsync();");
+                        s.Add($"");
+                    }
+
+                    if (CurrentEntity.EntityType == EntityType.User)
+                    {
+                        s.Add($"{(usingTransaction ? "    " : "")}            foreach (var role in await userManager.GetRolesAsync(user))");
+                        s.Add($"{(usingTransaction ? "    " : "")}                await userManager.RemoveFromRoleAsync(user, role);");
+                        s.Add($"");
+                        s.Add($"{(usingTransaction ? "    " : "")}            await userManager.DeleteAsync(user);");
+                    }
+                    else
+                    {
+                        s.Add($"{(usingTransaction ? "    " : "")}            {CurrentEntity.Project.DbContextVariable}.Entry({CurrentEntity.CamelCaseName}).State = EntityState.Deleted;");
+                        s.Add($"");
+                        s.Add($"{(usingTransaction ? "    " : "")}            await {CurrentEntity.Project.DbContextVariable}.SaveChangesAsync();");
+                    }
+
+                    if (usingTransaction)
+                    {
+                        s.Add($"");
+                        s.Add($"                transactionScope.Complete();");
+                        s.Add($"            }}");
+                    }
+
+                    if (CurrentEntity.HasAzureBlobStorageField)
+                    {
+                        s.Add($"");
+                        s.Add($"            var blobStorageService = new BlobStorageService(AppSettings.AzureSettings.Documents.ConnectionString, AppSettings.AzureSettings.Documents.ContainerName);");
+                        s.Add($"            await blobStorageService.DeleteBlobAsync({CurrentEntity.KeyFields.Single().Name.ToCamelCase()}.ToString().ToLowerInvariant());");
+                    }
+
+                    s.Add($"");
+                    s.Add($"            return Ok();");
+                    s.Add($"        }}");
+                    s.Add($"");
+                    #endregion
+                }
 
                 #region sort
                 if (CurrentEntity.HasASortField)

@@ -128,6 +128,12 @@ namespace WEB.Models
         [MaxLength(50)]
         public string TypeScriptClassName { get; set; }
 
+        [Required]
+        public bool OmitSave { get; set; }
+
+        [Required]
+        public bool OmitDelete{ get; set; }
+
         public virtual ICollection<Relationship> RelationshipsAsParent { get; set; } = new List<Relationship>();
 
         public virtual ICollection<Field> Fields { get; set; } = new List<Field>();

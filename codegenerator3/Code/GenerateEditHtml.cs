@@ -58,9 +58,9 @@ namespace WEB.Models
                 if (field.EditPageType == EditPageType.CalculatedField) continue;
                 if (field.EditPageType == EditPageType.FileContents) continue;
 
-                var isAppSelect = CurrentEntity.RelationshipsAsChild.Any(r => r.RelationshipFields.Any(f => f.ChildFieldId == field.FieldId));
+                var isAppSelect = CurrentEntity.RelationshipsAsChild.Any(r => !r.ParentEntity.Exclude && r.RelationshipFields.Any(f => f.ChildFieldId == field.FieldId));
 
-                if (CurrentEntity.RelationshipsAsChild.Any(r => r.RelationshipFields.Any(f => f.ChildFieldId == field.FieldId)))
+                if (CurrentEntity.RelationshipsAsChild.Any(r => !r.ParentEntity.Exclude && r.RelationshipFields.Any(f => f.ChildFieldId == field.FieldId)))
                 {
                     var relationship = CurrentEntity.GetParentSearchRelationship(field);
                     //var relationshipField = relationship.RelationshipFields.Single(f => f.ChildFieldId == field.FieldId);
@@ -130,7 +130,7 @@ namespace WEB.Models
                     }
                     else
                     {
-                        if (!CurrentEntity.RelationshipsAsChild.Any(r => r.RelationshipFields.Any(f => f.ChildFieldId == field.FieldId)))
+                        if (!CurrentEntity.RelationshipsAsChild.Any(r => !r.ParentEntity.Exclude && r.RelationshipFields.Any(f => f.ChildFieldId == field.FieldId)))
                         {
                             if (field.Length > 0 && field.EditPageType != EditPageType.FileName) attributes.Add("maxlength", field.Length.ToString());
                             if (field.MinLength > 0) attributes.Add("minlength", field.MinLength.ToString());
@@ -145,7 +145,7 @@ namespace WEB.Models
                     attributes.Add("readonly", null);
                     if (!isAppSelect)
                     {
-                        if (CurrentEntity.RelationshipsAsChild.Any(r => r.RelationshipFields.Any(f => f.ChildFieldId == field.FieldId)))
+                        if (CurrentEntity.RelationshipsAsChild.Any(r => !r.ParentEntity.Exclude && r.RelationshipFields.Any(f => f.ChildFieldId == field.FieldId)))
                         {
                             var relationship = CurrentEntity.GetParentSearchRelationship(field);
                             attributes.Add("value", "{{" + CurrentEntity.Name.ToCamelCase() + "." + relationship.ParentName.ToCamelCase() + "?." + relationship.ParentEntity.PrimaryField.Name.ToCamelCase() + "}}");
@@ -205,7 +205,7 @@ namespace WEB.Models
 
 
 
-                if (CurrentEntity.RelationshipsAsChild.Any(r => r.RelationshipFields.Any(f => f.ChildFieldId == field.FieldId)))
+                if (CurrentEntity.RelationshipsAsChild.Any(r => !r.ParentEntity.Exclude && r.RelationshipFields.Any(f => f.ChildFieldId == field.FieldId)))
                 {
                     var relationship = CurrentEntity.GetParentSearchRelationship(field);
                     var relationshipField = relationship.RelationshipFields.Single(f => f.ChildFieldId == field.FieldId);
@@ -286,7 +286,7 @@ namespace WEB.Models
                         if (field.EditPageType == EditPageType.FileName) validationErrors.Add("required", $"A file is required");
                         else validationErrors.Add("required", $"{field.Label} is required");
                     }
-                    if (!CurrentEntity.RelationshipsAsChild.Any(r => r.RelationshipFields.Any(f => f.ChildFieldId == field.FieldId)))
+                    if (!CurrentEntity.RelationshipsAsChild.Any(r => !r.ParentEntity.Exclude && r.RelationshipFields.Any(f => f.ChildFieldId == field.FieldId)))
                     {
                         if (field.MinLength > 0) validationErrors.Add("minlength", $"{field.Label} must be at least {field.MinLength} characters long");
                         if (field.Length > 0 && field.EditPageType != EditPageType.FileName) validationErrors.Add("maxlength", $"{field.Label} must be at most {field.Length} characters long");
@@ -448,7 +448,7 @@ namespace WEB.Models
                                     s.Add(t + $"                                </div>");
                                     s.Add($"");
                                 }
-                                else if (entity.RelationshipsAsChild.Any(r => r.RelationshipFields.Any(f => f.ChildFieldId == field.FieldId)))
+                                else if (entity.RelationshipsAsChild.Any(r => !r.ParentEntity.Exclude && r.RelationshipFields.Any(f => f.ChildFieldId == field.FieldId)))
                                 {
                                     var rel = entity.GetParentSearchRelationship(field);
                                     var parentEntity = rel.ParentEntity;
@@ -538,7 +538,7 @@ namespace WEB.Models
                     s.Add(t + $"                                <tr>");
                     if (relationship.UseMultiSelect)
                     {
-                        var reverseRel = relationship.ChildEntity.RelationshipsAsChild.Where(o => o.RelationshipId != relationship.RelationshipId).SingleOrDefault();
+                        var reverseRel = relationship.ChildEntity.RelationshipsAsChild.Where(o => !o.ParentEntity.Exclude && o.RelationshipId != relationship.RelationshipId).SingleOrDefault();
 
                         s.Add(t + $"                                    <th>{reverseRel.ParentFriendlyName}</th>");
                     }
@@ -563,7 +563,7 @@ namespace WEB.Models
                     // this was added for TrainTrack entityLinks; not sure how it will affect other projects!
                     if (relationship.UseMultiSelect)
                     {
-                        var reverseRel = relationship.ChildEntity.RelationshipsAsChild.Where(o => o.RelationshipId != relationship.RelationshipId).SingleOrDefault();
+                        var reverseRel = relationship.ChildEntity.RelationshipsAsChild.Where(o => !o.ParentEntity.Exclude && o.RelationshipId != relationship.RelationshipId).SingleOrDefault();
 
                         s.Add(t + $"                                    <td>{{{{ {relationship.ChildEntity.Name.ToCamelCase()}.{reverseRel.ParentName.ToCamelCase()}.{reverseRel.ParentEntity.PrimaryField.Name.ToCamelCase()} }}}}</td>");
                     }
@@ -615,7 +615,7 @@ namespace WEB.Models
 
             foreach (var rel in CurrentEntity.RelationshipsAsParent.Where(o => o.UseMultiSelect && !o.ChildEntity.Exclude))
             {
-                var reverseRel = rel.ChildEntity.RelationshipsAsChild.Where(o => o.RelationshipId != rel.RelationshipId).SingleOrDefault();
+                var reverseRel = rel.ChildEntity.RelationshipsAsChild.Where(o => !o.ParentEntity.Exclude && o.RelationshipId != rel.RelationshipId).SingleOrDefault();
 
                 //[organisation]=\"user.organisation\"   [canRemoveFilters]=\"false\"
                 s.Add($"<{reverseRel.ParentEntity.Name.Hyphenated()}-modal #{reverseRel.ParentEntity.Name.ToCamelCase()}Modal (changes)=\"change{reverseRel.ParentEntity.Name}($event)\" [multiple]=\"true\"></{reverseRel.ParentEntity.Name.Hyphenated()}-modal>");

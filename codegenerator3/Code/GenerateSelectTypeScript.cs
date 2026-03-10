@@ -34,7 +34,7 @@ namespace WEB.Models
                 var name = field.Name.ToCamelCase();
 
                 Relationship relationship = null;
-                if (CurrentEntity.RelationshipsAsChild.Any(r => r.RelationshipFields.Any(f => f.ChildFieldId == field.FieldId)))
+                if (CurrentEntity.RelationshipsAsChild.Any(r => !r.ParentEntity.Exclude && r.RelationshipFields.Any(f => f.ChildFieldId == field.FieldId)))
                 {
                     relationship = CurrentEntity.GetParentSearchRelationship(field);
                     name = relationship.ParentName.ToCamelCase();
@@ -50,7 +50,7 @@ namespace WEB.Models
                 else if (relationship != null)
                 {
                     inputs += $"    @Input() {relationship.ParentName.ToCamelCase()}: {relationship.ParentEntity.TypeScriptName};" + Environment.NewLine;
-                    if (relationship.ParentEntity != CurrentEntity && !imported.Contains(relationship.ParentEntity.Name))
+                    if (!relationship.ParentEntity.Exclude && relationship.ParentEntity != CurrentEntity && !imported.Contains(relationship.ParentEntity.Name))
                     {
                         imported.Add(relationship.ParentEntity.Name);
                         imports += $"import {{ {relationship.ParentEntity.TypeScriptName} }} from '{folders}../common/models/{relationship.ParentEntity.Name.ToLower()}.model';" + Environment.NewLine;
