@@ -98,7 +98,7 @@ namespace WEB.Models
             if (CurrentEntity.Project.Lookups.Where(o => o.IsRoleList).Count() > 1) throw new Exception("Project has more than 1 IsRoleList Lookups");
             var roleLookup = CurrentEntity.Project.Lookups.SingleOrDefault(o => o.IsRoleList);
 
-            s.Add($"namespace {CurrentEntity.Project.ModelsNamespace}");
+            s.Add($"namespace {CurrentEntity.Project.CoreNamespace}.Models");
             s.Add($"{{");
             s.Add($"    public enum Roles");
             s.Add($"    {{");

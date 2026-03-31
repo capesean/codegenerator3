@@ -15,7 +15,7 @@ namespace WEB.Models
         {
             var s = new StringBuilder();
 
-            s.Add($"namespace {CurrentEntity.Project.ModelsNamespace}");
+            s.Add($"namespace {CurrentEntity.Project.CoreNamespace}.Models");
             s.Add($"{{");
             foreach (var lookup in Lookups.Where(o => !o.IsRoleList))
             {

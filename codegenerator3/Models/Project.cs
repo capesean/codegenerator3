@@ -42,11 +42,21 @@ namespace WEB.Models
 
         [Required(AllowEmptyStrings = true)]
         [MaxLength(20)]
-        public string ModelsNamespace { get; set; }
+        public string Namespace { get; set; }
 
         [Required(AllowEmptyStrings = true)]
         [MaxLength(20)]
-        public string WebNamespace { get; set; }
+        public string CoreSubNamespace { get; set; }
+
+        [Required(AllowEmptyStrings = true)]
+        [MaxLength(20)]
+        public string WebSubNamespace { get; set; }
+
+        [NotMapped]
+        public string CoreNamespace { get { return $"{Namespace}.{CoreSubNamespace}"; } }
+
+        [NotMapped]
+        public string WebNamespace { get { return $"{Namespace}.{WebSubNamespace}"; } }
 
         [Required(AllowEmptyStrings = true)]
         [MaxLength(20)]

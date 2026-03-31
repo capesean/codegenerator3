@@ -767,6 +767,14 @@
     <Compile Include="Migrations\202603310729117_RemoveNamespace.Designer.cs">
       <DependentUpon>202603310729117_RemoveNamespace.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202603310757595_SubNamespaces.cs" />
+    <Compile Include="Migrations\202603310757595_SubNamespaces.Designer.cs">
+      <DependentUpon>202603310757595_SubNamespaces.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202603310805448_RemoveNamespaces.cs" />
+    <Compile Include="Migrations\202603310805448_RemoveNamespaces.Designer.cs">
+      <DependentUpon>202603310805448_RemoveNamespaces.cs</DependentUpon>
+    </Compile>
     <Compile Include="Models\Relationship_.cs" />
     <Compile Include="Startup.cs" />
     <Compile Include="Utilities\ApiException.cs" />
@@ -952,6 +960,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202603310729117_RemoveNamespace.resx">
       <DependentUpon>202603310729117_RemoveNamespace.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202603310757595_SubNamespaces.resx">
+      <DependentUpon>202603310757595_SubNamespaces.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202603310805448_RemoveNamespaces.resx">
+      <DependentUpon>202603310805448_RemoveNamespaces.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

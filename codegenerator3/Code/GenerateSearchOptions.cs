@@ -19,6 +19,8 @@ namespace WEB.Models
             if (CurrentEntity.Fields.Any(o => o.SearchType == SearchType.Text))
                 searchFields += $"        public string q {{ get; set; }}{Environment.NewLine}{Environment.NewLine}";
 
+            var usings = string.Empty;
+
             foreach (var field in CurrentEntity.AllNonTextSearchableFields)
             {
                 if (field.SearchType != SearchType.Range)
@@ -30,9 +32,16 @@ namespace WEB.Models
                     searchFields += $"        public {Field.GetNetType(field.FieldType, true, field.Lookup)} From{field.Name} {{ get; set; }}{Environment.NewLine}{Environment.NewLine}";
                     searchFields += $"        public {Field.GetNetType(field.FieldType, true, field.Lookup)} To{field.Name} {{ get; set; }}{Environment.NewLine}{Environment.NewLine}";
                 }
+
+                if (field.CustomType == CustomType.Enum && usings == string.Empty && CurrentEntity.Project.CoreSubNamespace != CurrentEntity.Project.WebSubNamespace)
+                {
+                    usings = $"using {CurrentEntity.Project.CoreNamespace}.Models;{Environment.NewLine}{Environment.NewLine}";
+                }
             }
 
+
             s.Add(RunTemplateReplacements(file)
+                .Replace("/*USINGS*/", usings)
                 .Replace("/*SEARCH-FIELDS*/", searchFields));
 
             return RunCodeReplacements(s.ToString(), CodeType.SearchOptions);

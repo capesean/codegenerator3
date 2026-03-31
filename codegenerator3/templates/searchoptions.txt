@@ -1,4 +1,4 @@
-﻿namespace WEBNAMESPACE
+﻿/*USINGS*/namespace WEBNAMESPACE
 {
     public class NAMESearchOptions : SearchOptions
     {

@@ -24,7 +24,7 @@ namespace WEB.Models
 
             s.Add($"using Microsoft.EntityFrameworkCore;");
             s.Add($"");
-            s.Add($"namespace {CurrentEntity.Project.ModelsNamespace}");
+            s.Add($"namespace {CurrentEntity.Project.CoreNamespace}.Models");
             s.Add($"{{");
             s.Add($"    public partial class ApplicationDbContext");
             s.Add($"    {{");

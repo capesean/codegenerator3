@@ -22,6 +22,33 @@
                     <div ng-class="{ 'hide':  !vm.isNew && !vm.showMore}">
 
                         <div class="col-sm-6 col-md-4">
+                            <div class="form-group" ng-class="{ 'has-error':  mainForm.$submitted && mainForm.namespace.$invalid }">
+                                <label for="namespace" class="control-label">
+                                    Namespace:
+                                </label>
+                                <input type="text" id="namespace" name="namespace" ng-model="vm.project.namespace" maxlength="20" class="form-control" ng-required="true" />
+                            </div>
+                        </div>
+
+                        <div class="col-sm-6 col-md-4">
+                            <div class="form-group" ng-class="{ 'has-error':  mainForm.$submitted && mainForm.coreSubNamespace.$invalid }">
+                                <label for="coreSubNamespace" class="control-label">
+                                    Core SubNamespace:
+                                </label>
+                                <input type="text" id="coreSubNamespace" name="coreSubNamespace" ng-model="vm.project.coreSubNamespace" maxlength="20" class="form-control" ng-required="true" />
+                            </div>
+                        </div>
+
+                        <div class="col-sm-6 col-md-4">
+                            <div class="form-group" ng-class="{ 'has-error':  mainForm.$submitted && mainForm.webSubNamespace.$invalid }">
+                                <label for="webSubNamespace" class="control-label">
+                                    Web SubNamespace:
+                                </label>
+                                <input type="text" id="webSubNamespace" name="webSubNamespace" ng-model="vm.project.webSubNamespace" maxlength="20" class="form-control" ng-required="true" />
+                            </div>
+                        </div>
+
+                        <div class="col-sm-6 col-md-4">
                             <div class="form-group" ng-class="{ 'has-error':  mainForm.$submitted && mainForm.modelsNamespace.$invalid }">
                                 <label for="modelsNamespace" class="control-label">
                                     Models Namespace:
