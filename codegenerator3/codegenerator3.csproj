@@ -759,6 +759,14 @@
     <Compile Include="Migrations\202603061640420_OmitSaveDelete.Designer.cs">
       <DependentUpon>202603061640420_OmitSaveDelete.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202603310722202_namespaces.cs" />
+    <Compile Include="Migrations\202603310722202_namespaces.Designer.cs">
+      <DependentUpon>202603310722202_namespaces.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202603310729117_RemoveNamespace.cs" />
+    <Compile Include="Migrations\202603310729117_RemoveNamespace.Designer.cs">
+      <DependentUpon>202603310729117_RemoveNamespace.cs</DependentUpon>
+    </Compile>
     <Compile Include="Models\Relationship_.cs" />
     <Compile Include="Startup.cs" />
     <Compile Include="Utilities\ApiException.cs" />
@@ -938,6 +946,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202603061640420_OmitSaveDelete.resx">
       <DependentUpon>202603061640420_OmitSaveDelete.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202603310722202_namespaces.resx">
+      <DependentUpon>202603310722202_namespaces.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202603310729117_RemoveNamespace.resx">
+      <DependentUpon>202603310729117_RemoveNamespace.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

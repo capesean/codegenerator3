@@ -1,4 +1,4 @@
-﻿namespace WEB.Models
+﻿namespace WEBNAMESPACE
 {
     public class NAMESearchOptions : SearchOptions
     {

@@ -98,7 +98,7 @@ namespace WEB.Models
             if (CurrentEntity.Project.Lookups.Where(o => o.IsRoleList).Count() > 1) throw new Exception("Project has more than 1 IsRoleList Lookups");
             var roleLookup = CurrentEntity.Project.Lookups.SingleOrDefault(o => o.IsRoleList);
 
-            s.Add($"namespace WEB.Models");
+            s.Add($"namespace {CurrentEntity.Project.ModelsNamespace}");
             s.Add($"{{");
             s.Add($"    public enum Roles");
             s.Add($"    {{");
@@ -291,6 +291,7 @@ namespace WEB.Models
                 .Replace("FRIENDLYNAME_LOWER", CurrentEntity.FriendlyName.ToLower())
                 .Replace("FRIENDLYNAME", CurrentEntity.FriendlyName)
                 .Replace("PLURALNAME", CurrentEntity.PluralName)
+                .Replace("WEBNAMESPACE", CurrentEntity.Project.WebNamespace + ".Models")
                 .Replace("NAME_TOLOWER", CurrentEntity.Name.ToLower())
                 .Replace("HYPHENATEDNAME", CurrentEntity.Name.Hyphenated())
                 .Replace("KEYFIELDTYPE", CurrentEntity.KeyFields.First().JavascriptType)
@@ -436,7 +437,7 @@ namespace WEB.Models
         {
             if (CurrentEntity.Fields.Count == 0) return "No fields are defined";
             if (CurrentEntity.KeyFields.Count == 0) return "No key fields are defined";
-            if (!CurrentEntity.Fields.Any(f => f.ShowInSearchResults)) return "No fields are designated as search result fields";
+            if (!CurrentEntity.Fields.Any(f => f.ShowInSearchResults) && CurrentEntity.EntityType != EntityType.Settings) return "No fields are designated as search result fields";
             var rel = CurrentEntity.RelationshipsAsChild.FirstOrDefault(r => r.RelationshipFields.Count == 0);
             if (rel != null) return $"Relationship {rel.CollectionName} (to {rel.ParentEntity.FriendlyName}) has no link fields defined";
             rel = CurrentEntity.RelationshipsAsParent.FirstOrDefault(r => r.RelationshipFields.Count == 0);

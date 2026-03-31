@@ -23,11 +23,12 @@ namespace WEB.Models
             s.Add($"using Microsoft.AspNetCore.Identity;");
             s.Add($"using Microsoft.AspNetCore.Authorization;");
             s.Add($"using Microsoft.EntityFrameworkCore;");
-            s.Add($"using {CurrentEntity.Project.Namespace}.Models;");
+            s.Add($"using {CurrentEntity.Project.ModelsNamespace};");
+            s.Add($"using {CurrentEntity.Project.WebNamespace}.Models;");
             if (CurrentEntity.EntityType == EntityType.User)
                 s.Add($"using Microsoft.Extensions.Options;");
             s.Add($"");
-            s.Add($"namespace {CurrentEntity.Project.Namespace}.Controllers");
+            s.Add($"namespace {CurrentEntity.Project.WebNamespace}.Controllers");
             s.Add($"{{");
             s.Add($"    [Route(\"api/[Controller]\"), Authorize]");
             s.Add($"    public {(CurrentEntity.PartialControllerClass ? "partial " : string.Empty)}class {CurrentEntity.PluralName}Controller : BaseApiController");
@@ -38,11 +39,18 @@ namespace WEB.Models
                 s.Add($"        private IOptions<IdentityOptions> opts;");
                 s.Add($"");
                 s.Add($"        public UsersController(IDbContextFactory<ApplicationDbContext> dbFactory, UserManager<User> um, AppSettings appSettings, RoleManager<Role> rm, IOptions<IdentityOptions> opts)");
-                s.Add($"            : base(dbFactory, um, appSettings) {{ this.rm = rm; this.opts = opts; }}");
+                s.Add($"            : base(dbFactory, um, appSettings)");
+                s.Add($"        {{");
+                s.Add($"            this.rm = rm;");
+                s.Add($"            this.opts = opts;");
+                s.Add($"        }}");
             }
             else
             {
-                s.Add($"        public {CurrentEntity.PluralName}Controller(IDbContextFactory<ApplicationDbContext> dbFactory, UserManager<User> um, AppSettings appSettings) : base(dbFactory, um, appSettings) {{ }}");
+                s.Add($"        public {CurrentEntity.PluralName}Controller(IDbContextFactory<ApplicationDbContext> dbFactory, UserManager<User> um, AppSettings appSettings)");
+                s.Add($"            : base(dbFactory, um, appSettings)");
+                s.Add($"        {{");
+                s.Add($"        }}");
             }
             s.Add($"");
 
@@ -525,7 +533,7 @@ namespace WEB.Models
                     if (usingTransaction)
                     {
                         // using () -> otherwise any db calls outside the transaction will error
-                        s.Add($"            using (var transactionScope = Utilities.General.CreateTransactionScope())");
+                        s.Add($"            using (var transactionScope = {()}Code.Db.CreateTransactionScope())");
                         s.Add($"            {{");
                     }
 

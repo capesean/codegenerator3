@@ -31,8 +31,10 @@ namespace WEB.Models
                 s.Add($"using System.Collections.Generic;");
                 s.Add($"using System.Linq;");
             }
+            if (CurrentEntity.Project.WebNamespace != CurrentEntity.Project.ModelsNamespace)
+                s.Add($"using {CurrentEntity.Project.ModelsNamespace};");
             s.Add($"");
-            s.Add($"namespace {CurrentEntity.Project.Namespace}.Models");
+            s.Add($"namespace {CurrentEntity.Project.WebNamespace}.Models");
             s.Add($"{{");
             s.Add($"    public class {CurrentEntity.DTOName}");
             s.Add($"    {{");

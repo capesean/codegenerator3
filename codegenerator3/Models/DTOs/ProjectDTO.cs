@@ -18,7 +18,11 @@ namespace WEB.Models
 
         [DisplayFormat(ConvertEmptyStringToNull = false)]
         [MaxLength(20)]
-        public string Namespace { get; set; }
+        public string ModelsNamespace { get; set; }
+
+        [DisplayFormat(ConvertEmptyStringToNull = false)]
+        [MaxLength(20)]
+        public string WebNamespace { get; set; }
 
         [DisplayFormat(ConvertEmptyStringToNull = false)]
         [MaxLength(20)]
@@ -75,7 +79,8 @@ namespace WEB.Models
             projectDTO.ProjectId = project.ProjectId;
             projectDTO.Name = project.Name;
             projectDTO.WebPath = project.WebPath;
-            projectDTO.Namespace = project.Namespace;
+            projectDTO.ModelsNamespace = project.ModelsNamespace;
+            projectDTO.WebNamespace = project.WebNamespace;
             projectDTO.AngularModuleName = project.AngularModuleName;
             projectDTO.AngularDirectivePrefix = project.AngularDirectivePrefix;
             projectDTO.UserFilterFieldName = project.UserFilterFieldName;
@@ -93,7 +98,8 @@ namespace WEB.Models
         {
             project.Name = projectDTO.Name;
             project.WebPath = projectDTO.WebPath;
-            project.Namespace = projectDTO.Namespace;
+            project.ModelsNamespace = projectDTO.ModelsNamespace;
+            project.WebNamespace = projectDTO.WebNamespace;
             project.AngularModuleName = projectDTO.AngularModuleName;
             project.AngularDirectivePrefix = projectDTO.AngularDirectivePrefix;
             project.UserFilterFieldName = projectDTO.UserFilterFieldName;

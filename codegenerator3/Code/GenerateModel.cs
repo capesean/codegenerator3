@@ -33,8 +33,9 @@ namespace WEB.Models
                 s.Add($"using System.Collections.Generic;");
             s.Add($"using System.ComponentModel.DataAnnotations;");
             s.Add($"using System.ComponentModel.DataAnnotations.Schema;"); // decimals
+
             s.Add($"");
-            s.Add($"namespace {CurrentEntity.Project.Namespace}.Models");
+            s.Add($"namespace {CurrentEntity.Project.ModelsNamespace}");
             s.Add($"{{");
             s.Add($"    public {(CurrentEntity.PartialEntityClass ? "partial " : string.Empty)}class {CurrentEntity.Name}");
             s.Add($"    {{");

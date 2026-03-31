@@ -42,7 +42,11 @@ namespace WEB.Models
 
         [Required(AllowEmptyStrings = true)]
         [MaxLength(20)]
-        public string Namespace { get; set; }
+        public string ModelsNamespace { get; set; }
+
+        [Required(AllowEmptyStrings = true)]
+        [MaxLength(20)]
+        public string WebNamespace { get; set; }
 
         [Required(AllowEmptyStrings = true)]
         [MaxLength(20)]
