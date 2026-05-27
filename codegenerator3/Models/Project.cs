@@ -53,10 +53,10 @@ namespace WEB.Models
         public string WebSubNamespace { get; set; }
 
         [NotMapped]
-        public string CoreNamespace { get { return $"{Namespace}.{CoreSubNamespace}"; } }
+        public string CoreNamespace { get { return $"{Namespace}{(string.IsNullOrWhiteSpace(CoreSubNamespace) ? string.Empty : $".{CoreSubNamespace}")}"; } }
 
         [NotMapped]
-        public string WebNamespace { get { return $"{Namespace}.{WebSubNamespace}"; } }
+        public string WebNamespace { get { return $"{Namespace}{(string.IsNullOrWhiteSpace(WebSubNamespace) ? string.Empty : $".{WebSubNamespace}")}"; } }
 
         [Required(AllowEmptyStrings = true)]
         [MaxLength(20)]

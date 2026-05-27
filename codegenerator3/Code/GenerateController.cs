@@ -24,10 +24,11 @@ namespace WEB.Models
             s.Add($"using Microsoft.AspNetCore.Authorization;");
             s.Add($"using Microsoft.EntityFrameworkCore;");
             s.Add($"using {CurrentEntity.Project.CoreNamespace}.Models;");
-            s.Add($"using {CurrentEntity.Project.WebNamespace}.Models;");
+            if (CurrentEntity.Project.CoreNamespace != CurrentEntity.Project.WebNamespace)
+                s.Add($"using {CurrentEntity.Project.WebNamespace}.Models;");
             if (CurrentEntity.EntityType == EntityType.User)
                 s.Add($"using Microsoft.Extensions.Options;");
-            if (CurrentEntity.HasAFileContentsField)
+            if (CurrentEntity.HasAFileContentsField || CurrentEntity.EntityType == EntityType.User)
                 s.Add($"using {CurrentEntity.Project.CoreNamespace}.Services;");
             s.Add($"");
             s.Add($"namespace {CurrentEntity.Project.WebNamespace}.Controllers");
@@ -39,27 +40,31 @@ namespace WEB.Models
             {
                 s.Add($"        private RoleManager<Role> rm;");
                 s.Add($"        private IOptions<IdentityOptions> opts;");
+                if (CurrentEntity.EntityType == EntityType.User)
+                    s.Add($"        private IEmailService emailService;");
                 s.Add($"");
-                s.Add($"        public UsersController(IDbContextFactory<ApplicationDbContext> dbFactory, UserManager<User> um, AppSettings appSettings, RoleManager<Role> rm, IOptions<IdentityOptions> opts)");
+                s.Add($"        public UsersController(IDbContextFactory<ApplicationDbContext> dbFactory, UserManager<User> um, AppSettings appSettings, RoleManager<Role> rm, IOptions<IdentityOptions> opts{(CurrentEntity.EntityType == EntityType.User ? ", IEmailService emailService" : "")})");
                 s.Add($"            : base(dbFactory, um, appSettings)");
                 s.Add($"        {{");
                 s.Add($"            this.rm = rm;");
                 s.Add($"            this.opts = opts;");
+                if (CurrentEntity.EntityType == EntityType.User)
+                    s.Add($"            this.emailService = emailService;");
                 s.Add($"        }}");
             }
             else
             {
                 if (CurrentEntity.HasAFileContentsField)
                 {
-                    s.Add($"        private readonly BlobStorageService blobStorageService;");
+                    s.Add($"        private readonly DocumentsStorageService documentsStorageService;");
                     s.Add($"        ");
                 }
-                s.Add($"        public {CurrentEntity.PluralName}Controller(IDbContextFactory<ApplicationDbContext> dbFactory, UserManager<User> um, AppSettings appSettings{(CurrentEntity.HasAFileContentsField ? ", BlobStorageService blobStorageService" : "")})");
+                s.Add($"        public {CurrentEntity.PluralName}Controller(IDbContextFactory<ApplicationDbContext> dbFactory, UserManager<User> um, AppSettings appSettings{(CurrentEntity.HasAFileContentsField ? ", DocumentsStorageService documentsStorageService" : "")})");
                 s.Add($"            : base(dbFactory, um, appSettings)");
                 s.Add($"        {{");
                 if (CurrentEntity.HasAFileContentsField)
                 {
-                    s.Add($"            this.blobStorageService = blobStorageService;");
+                    s.Add($"            this.documentsStorageService = documentsStorageService;");
                 }
                 s.Add($"        }}");
             }
@@ -492,13 +497,13 @@ namespace WEB.Models
                     s.Add($"");
                     s.Add($"            if ({CurrentEntity.DTOName.ToCamelCase()}.{fileContentsField.Name} != null)");
                     s.Add($"            {{");
-                    s.Add($"                await blobStorageService.UploadBlobAsync({CurrentEntity.Name.ToCamelCase()}.{CurrentEntity.KeyFields.Single().Name}.ToString().ToLowerInvariant(), Convert.FromBase64String({CurrentEntity.DTOName.ToCamelCase()}.{fileContentsField.Name}));");
+                    s.Add($"                await documentsStorageService.UploadBlobAsync({CurrentEntity.Name.ToCamelCase()}.{CurrentEntity.KeyFields.Single().Name}, Convert.FromBase64String({CurrentEntity.DTOName.ToCamelCase()}.{fileContentsField.Name}));");
                     s.Add($"            }}");
                     if (deleteFile)
                     {
                         s.Add($"            else if (deleteFile)");
                         s.Add($"            {{");
-                        s.Add($"                await blobStorageService.DeleteBlobAsync({CurrentEntity.Name.ToCamelCase()}.{CurrentEntity.KeyFields.Single().Name}.ToString().ToLowerInvariant());");
+                        s.Add($"                await documentsStorageService.DeleteBlobAsync({CurrentEntity.Name.ToCamelCase()}.{CurrentEntity.KeyFields.Single().Name});");
                         s.Add($"            }}");
                     }
                 }
@@ -542,7 +547,7 @@ namespace WEB.Models
                     if (usingTransaction)
                     {
                         // using () -> otherwise any db calls outside the transaction will error
-                        s.Add($"            using (var transactionScope = {CurrentEntity.Project.CoreSubNamespace}.Code.Db.CreateTransactionScope())");
+                        s.Add($"            using (var transactionScope = {(!string.IsNullOrWhiteSpace(CurrentEntity.Project.CoreSubNamespace) ? CurrentEntity.Project.CoreSubNamespace + "." : string.Empty)}Code.Db.CreateTransactionScope())");
                         s.Add($"            {{");
                     }
 
@@ -593,7 +598,7 @@ namespace WEB.Models
                     if (CurrentEntity.HasAzureBlobStorageField)
                     {
                         s.Add($"");
-                        s.Add($"            await blobStorageService.DeleteBlobAsync({CurrentEntity.KeyFields.Single().Name.ToCamelCase()}.ToString().ToLowerInvariant());");
+                        s.Add($"            await documentsStorageService.DeleteBlobAsync({CurrentEntity.KeyFields.Single().Name.ToCamelCase()});");
                     }
 
                     s.Add($"");
@@ -723,7 +728,7 @@ namespace WEB.Models
                     if (usingTransaction)
                     {
                         // using () -> otherwise any db calls outside the transaction will error
-                        s.Add($"            using (var transactionScope = {CurrentEntity.Project.CoreSubNamespace}.Code.Db.CreateTransactionScope())");
+                        s.Add($"            using (var transactionScope = {(!string.IsNullOrWhiteSpace(CurrentEntity.Project.CoreSubNamespace) ? CurrentEntity.Project.CoreSubNamespace + "." : string.Empty)}Code.Db.CreateTransactionScope())");
                         s.Add($"            {{");
                     }
 
@@ -763,7 +768,7 @@ namespace WEB.Models
                     if (entity.HasAzureBlobStorageField)
                     {
                         s.Add($"            foreach (var {entity.KeyFields.Single().Name.ToCamelCase()} in {entity.KeyFields.Single().Name.ToCamelCase()}s)");
-                        s.Add($"                await blobStorageService.DeleteBlobAsync({entity.KeyFields.Single().Name.ToCamelCase()}.ToString().ToLowerInvariant());");
+                        s.Add($"                await documentsStorageService.DeleteBlobAsync({entity.KeyFields.Single().Name.ToCamelCase()});");
                         s.Add($"");
                     }
 
