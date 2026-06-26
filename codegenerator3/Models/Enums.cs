@@ -82,7 +82,8 @@ namespace WEB.Models
         Enum,
         VarBinary,
         Colour,
-        BigInt
+        BigInt,
+        Double
     }
 
     public enum RelationshipAncestorLimits
@@ -269,6 +270,8 @@ namespace WEB.Models
                     return "Colour";
                 case FieldType.BigInt:
                     return "BigInt";
+                case FieldType.Double:
+                    return "Double";
                 default:
                     return null;
             }

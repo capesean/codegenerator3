@@ -547,7 +547,7 @@ namespace WEB.Models
                     if (usingTransaction)
                     {
                         // using () -> otherwise any db calls outside the transaction will error
-                        s.Add($"            using (var transactionScope = {(!string.IsNullOrWhiteSpace(CurrentEntity.Project.CoreSubNamespace) ? CurrentEntity.Project.CoreSubNamespace + "." : string.Empty)}Code.Db.CreateTransactionScope())");
+                        s.Add($"            using (var transactionScope = {(!string.IsNullOrWhiteSpace(CurrentEntity.Project.CoreSubNamespace) && CurrentEntity.Project.CoreSubNamespace != CurrentEntity.Project.WebSubNamespace ? CurrentEntity.Project.CoreSubNamespace + "." : string.Empty)}Code.Db.CreateTransactionScope())");
                         s.Add($"            {{");
                     }
 

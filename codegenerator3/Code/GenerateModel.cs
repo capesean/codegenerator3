@@ -63,6 +63,7 @@ namespace WEB.Models
 
                 if (field.EditPageType == EditPageType.CalculatedField)
                     attributes.Add("DatabaseGenerated(DatabaseGeneratedOption.Computed)");
+
                 if (field.EditPageType == EditPageType.CalculatedField && field.FieldType == FieldType.Decimal)
                     attributes.Add($"Column(TypeName=\"decimal({field.Precision},{field.Scale})\")");
                 else if (field.EditPageType == EditPageType.FileContents)

@@ -66,6 +66,7 @@ namespace WEB.Models
                     case FieldType.Decimal:
                     case FieldType.Money:
                     case FieldType.Float:
+                    case FieldType.Double:
                         return CustomType.Number;
                     case FieldType.nVarchar:
                     case FieldType.nText:
@@ -105,6 +106,7 @@ namespace WEB.Models
                     case FieldType.Decimal:
                     case FieldType.Money:
                     case FieldType.Float:
+                    case FieldType.Double:
                         return "number";
                     case FieldType.nVarchar:
                     case FieldType.nText:
@@ -180,7 +182,9 @@ namespace WEB.Models
                 case FieldType.BigInt:
                     return "long" + (isNullable ? "?" : string.Empty);
                 case FieldType.Float:
-                    return "float";
+                    return "float" + (isNullable ? "?" : string.Empty);
+                case FieldType.Double:
+                    return "double" + (isNullable ? "?" : string.Empty);
                 case FieldType.Decimal:
                 case FieldType.Money:
                     return "decimal" + (isNullable ? "?" : string.Empty);
